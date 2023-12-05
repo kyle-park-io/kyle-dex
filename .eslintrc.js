@@ -19,6 +19,9 @@ module.exports = {
     ecmaVersion: 'latest',
     sourceType: 'module',
   },
-  rules: {},
+  rules: {
+    '@typescript-eslint/method-signature-style': 'off',
+    'import/no-absolute-path': 'off',
+  },
   ignorePatterns: ['.eslintrc.js', '/**/*.config.ts'],
 };

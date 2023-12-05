@@ -1,5 +1,7 @@
 {
   "compilerOptions": {
+    "jsx": "preserve",
+    "jsxImportSource": "solid-js",
     "module": "commonjs",
     "allowJs": true,
     "esModuleInterop": true,
