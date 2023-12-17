@@ -2,7 +2,9 @@ import { utilities, WinstonModule } from 'nest-winston';
 import DailyRotateFile from 'winston-daily-rotate-file';
 import * as winston from 'winston';
 
-const dailyOption = (level: string) => {
+const dailyOption = (
+  level: string,
+): DailyRotateFile.DailyRotateFileTransportOptions => {
   return {
     level,
     datePattern: 'YYYY-MM-DD',

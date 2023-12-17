@@ -11,7 +11,10 @@ export const serverConfig = (): Record<string, any> => {
 
   let configs: string[] = [];
   if (env === 'dev') {
-    configs = [`${root}/config/${YAML_CONFIG_DEV}`];
+    configs = [
+      `${root}/config/${YAML_CONFIG_DEV}`,
+      `${root}/config-prod/${YAML_CONFIG_PROD}`,
+    ];
   } else if (env === 'prod') {
     configs = [`${root}/config/${YAML_CONFIG_PROD}`];
   } else {
