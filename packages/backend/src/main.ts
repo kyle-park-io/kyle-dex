@@ -22,7 +22,7 @@ async function bootstrap(): Promise<void> {
     app.use(helmet({ contentSecurityPolicy: false }));
 
     // pipe
-    // app.useGlobalPipes(new ValidationPipe());
+    app.useGlobalPipes(new ValidationPipe());
 
     // exception filter
     app.useGlobalFilters(new DetailedErrorFilter());

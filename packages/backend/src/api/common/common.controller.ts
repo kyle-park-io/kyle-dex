@@ -28,7 +28,8 @@ import {
 import { CommonService } from './common.service';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 // dto
-import { QueryContract, SubmitContractTransaction } from './dto/common.request';
+import { QueryContractDto, SubmitContractDto } from './dto/common.request';
+import { type ProcessContractDto } from 'src/blockChain/common/dto/common.dto';
 
 @ApiTags('common')
 @Controller('common')
@@ -46,14 +47,20 @@ export class CommonController {
     summary: 'Query contract',
     description: 'Query contract',
   })
-  @ApiBody({ type: QueryContract })
+  @ApiBody({ type: QueryContractDto })
   @ApiCreatedResponse({
     description: 'Successfully Query contract',
   })
   @ApiInternalServerErrorResponse({ description: 'Internal server error' })
-  async query(@Body() queryContract: QueryContract): Promise<any> {
+  async query(@Body() queryContract: QueryContractDto): Promise<any> {
     try {
-      const result = await this.commonService.query(queryContract);
+      const args: ProcessContractDto = {
+        userAddress: queryContract.userAddress,
+        contractAddress: queryContract.contractAddress,
+        function: queryContract.function,
+        args: queryContract.args,
+      };
+      const result = await this.commonService.query(args);
       return result;
     } catch (err) {
       this.logger.error(err);
@@ -67,17 +74,21 @@ export class CommonController {
     summary: 'Submit contract transaction',
     description: 'Submit transaction',
   })
-  @ApiBody({ type: SubmitContractTransaction })
+  @ApiBody({ type: SubmitContractDto })
   @ApiCreatedResponse({
     description: 'Successfully submit transaction',
     type: Boolean,
   })
   @ApiInternalServerErrorResponse({ description: 'Internal server error' })
-  async submit(
-    @Body() submitContractTransaction: SubmitContractTransaction,
-  ): Promise<boolean> {
+  async submit(@Body() submitContract: SubmitContractDto): Promise<boolean> {
     try {
-      await this.commonService.submit(submitContractTransaction);
+      const args: ProcessContractDto = {
+        userAddress: submitContract.userAddress,
+        contractAddress: submitContract.contractAddress,
+        function: submitContract.function,
+        args: submitContract.args,
+      };
+      await this.commonService.submit(args);
       return true;
     } catch (err) {
       this.logger.error(err);

@@ -1,7 +1,8 @@
-import { Module } from '@nestjs/common';
+import { Global, Module } from '@nestjs/common';
 import { SepoliaAccountService } from './account.service';
 import { RpcServiceFactory } from '../rpc/rpc.factory';
 
+@Global()
 @Module({
   providers: [
     {

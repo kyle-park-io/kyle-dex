@@ -4,7 +4,8 @@ import { SepoliaAccountService } from '../account/account.service';
 import { ContractService } from '../contract/contract.service';
 import { DecodeService } from '../utils/decode.service';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
-import { type Wallet, type Contract } from 'ethers';
+import { type Wallet, type Contract, type TransactionRequest } from 'ethers';
+import { type ProcessContractDto } from './dto/common.dto';
 
 @Injectable()
 export class CommonService {
@@ -20,34 +21,40 @@ export class CommonService {
     private readonly decodeService: DecodeService,
   ) {}
 
-  async query(
-    address: string,
-    functionName: string,
-    args: any[],
-  ): Promise<any> {
+  async query(dto: ProcessContractDto): Promise<any> {
     try {
-      const wallet: Wallet | undefined =
-        this.sepoliaAccountService.getWallet(address);
+      const wallet: Wallet | undefined = this.sepoliaAccountService.getWallet(
+        dto.userAddress,
+      );
       if (wallet === undefined) {
-        throw new Error(`wallet is not existed, address : ${address}`);
+        throw new Error(`wallet is not existed, address : ${dto.userAddress}`);
       }
 
-      const contract: Contract | undefined =
-        this.contractService.getContract(address);
+      const contract: Contract | undefined = this.contractService.getContract(
+        dto.contractAddress,
+      );
       if (contract === undefined) {
-        throw new Error(`contract is not existed, address : ${address}`);
+        throw new Error(
+          `contract is not existed, address : ${dto.contractAddress}`,
+        );
       }
 
-      const contract2 = contract.connect(wallet);
-      const result = await contract2[functionName](...args);
+      const eFD = contract.interface.encodeFunctionData(dto.function, dto.args);
+      const tx: TransactionRequest = { to: dto.contractAddress, data: eFD };
+      const result = await wallet.call(tx);
 
-      const contractName = this.contractService.getContractName(address);
+      const contractName = this.contractService.getContractName(
+        dto.contractAddress,
+      );
       if (contractName === undefined) {
-        throw new Error(`contract is not existed, address : ${address}`);
+        throw new Error(
+          `contract is not existed, address : ${dto.contractAddress}`,
+        );
       }
+
       const decodedResult = await this.decodeService.decodeResult(
         contractName,
-        functionName,
+        dto.function,
         result,
       );
       return decodedResult;
@@ -57,26 +64,27 @@ export class CommonService {
     }
   }
 
-  async submit(
-    address: string,
-    functionName: string,
-    args: any[],
-  ): Promise<boolean> {
+  async submit(dto: ProcessContractDto): Promise<boolean> {
     try {
-      const wallet: Wallet | undefined =
-        this.sepoliaAccountService.getWallet(address);
+      const wallet: Wallet | undefined = this.sepoliaAccountService.getWallet(
+        dto.userAddress,
+      );
       if (wallet === undefined) {
-        throw new Error(`wallet is not existed, address : ${address}`);
+        throw new Error(`wallet is not existed, address : ${dto.userAddress}`);
       }
 
-      const contract: Contract | undefined =
-        this.contractService.getContract(address);
+      const contract: Contract | undefined = this.contractService.getContract(
+        dto.contractAddress,
+      );
       if (contract === undefined) {
-        throw new Error(`contract is not existed, address : ${address}`);
+        throw new Error(
+          `contract is not existed, address : ${dto.contractAddress}`,
+        );
       }
 
-      const contract2 = contract.connect(wallet);
-      await contract2[functionName](...args);
+      const eFD = contract.interface.encodeFunctionData(dto.function, dto.args);
+      const tx: TransactionRequest = { to: dto.contractAddress, data: eFD };
+      await wallet.sendTransaction(tx);
 
       return true;
     } catch (err) {

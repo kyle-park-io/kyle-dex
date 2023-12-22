@@ -13,12 +13,21 @@ export class FsService {
   ) {}
 
   getAbi = async (contractName: string): Promise<object> => {
-    const abiPath = path.resolve('artifacts');
-    const jsonInterface = JSON.parse(
-      fs.readFileSync(`${abiPath}/${contractName}.json`, 'utf-8'),
-    );
-    const abi = jsonInterface.abi;
-    return abi;
+    if (contractName.includes('token')) {
+      const abiPath = path.resolve('artifacts');
+      const jsonInterface = JSON.parse(
+        fs.readFileSync(`${abiPath}/Token.json`, 'utf-8'),
+      );
+      const abi = jsonInterface.abi;
+      return abi;
+    } else {
+      const abiPath = path.resolve('artifacts');
+      const jsonInterface = JSON.parse(
+        fs.readFileSync(`${abiPath}/${contractName}.json`, 'utf-8'),
+      );
+      const abi = jsonInterface.abi;
+      return abi;
+    }
   };
 
   getBytecode = async (contractName: string): Promise<string> => {

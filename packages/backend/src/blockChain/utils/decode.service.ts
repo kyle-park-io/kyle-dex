@@ -29,12 +29,15 @@ export class DecodeService {
       }
 
       const result = interface2.decodeFunctionResult(fn, data);
-
-      const obj = {};
-      fn.outputs[0].components?.forEach((output, index) => {
-        const key = output.name;
-        obj[key] = result[0][index];
-      });
+      const obj: any = {};
+      if (fn.outputs[0].type === 'tuple') {
+        fn.outputs[0].components?.forEach((output, index) => {
+          const key = output.name;
+          obj[key] = result[0][index];
+        });
+      } else {
+        obj.result = result.toString();
+      }
       return obj;
     } catch (err) {
       this.logger.error(err);

@@ -2,10 +2,7 @@ import { Inject, Injectable, LoggerService } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { CommonService as BlockChainCommonService } from 'src/blockChain/common/common.service';
-import {
-  type QueryContract,
-  type SubmitContractTransaction,
-} from './dto/common.request';
+import { type ProcessContractDto } from 'src/blockChain/common/dto/common.dto';
 
 @Injectable()
 export class CommonService {
@@ -19,13 +16,9 @@ export class CommonService {
     private readonly blockChainCommonService: BlockChainCommonService,
   ) {}
 
-  async query(queryContract: QueryContract): Promise<any> {
+  async query(dto: ProcessContractDto): Promise<any> {
     try {
-      const result = await this.blockChainCommonService.query(
-        queryContract.address,
-        queryContract.function,
-        queryContract.args,
-      );
+      const result = await this.blockChainCommonService.query(dto);
       return result;
     } catch (err) {
       this.logger.error(err);
@@ -33,15 +26,9 @@ export class CommonService {
     }
   }
 
-  async submit(
-    submitContractTransaction: SubmitContractTransaction,
-  ): Promise<void> {
+  async submit(dto: ProcessContractDto): Promise<void> {
     try {
-      await this.blockChainCommonService.submit(
-        submitContractTransaction.address,
-        submitContractTransaction.function,
-        submitContractTransaction.args,
-      );
+      await this.blockChainCommonService.submit(dto);
     } catch (err) {
       this.logger.error(err);
       throw err;

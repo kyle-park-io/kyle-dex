@@ -14,6 +14,7 @@ import { ethers, Interface, type Contract } from 'ethers';
 export class ContractService implements OnModuleInit {
   // map
   private readonly contractNameMap: Map<string, string>;
+  private readonly contractAddressMap: Map<string, string>;
   private readonly contractMap: Map<string, Contract>;
   private readonly interfaceMap: Map<string, Interface>;
 
@@ -27,6 +28,7 @@ export class ContractService implements OnModuleInit {
     private readonly fsService: FsService,
   ) {
     this.contractNameMap = new Map<string, string>();
+    this.contractAddressMap = new Map<string, string>();
     this.contractMap = new Map<string, Contract>();
     this.interfaceMap = new Map<string, Interface>();
   }
@@ -42,6 +44,7 @@ export class ContractService implements OnModuleInit {
           this.interfaceMap.set(value.address, interface2);
           this.contractMap.set(value.address, contract);
           this.contractNameMap.set(value.address, value.name);
+          this.contractAddressMap.set(value.name, value.address);
         }
       } catch (err) {
         this.logger.error(err);
@@ -52,6 +55,10 @@ export class ContractService implements OnModuleInit {
 
   getContractName(address: string): string | undefined {
     return this.contractNameMap.get(address);
+  }
+
+  getContractAddress(name: string): string | undefined {
+    return this.contractAddressMap.get(name);
   }
 
   getContract(address: string): Contract | undefined {
