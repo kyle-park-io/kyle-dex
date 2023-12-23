@@ -12,6 +12,7 @@ import Footer from './layout/Footer';
 // route
 import App from './App';
 import AccountIndex from './account/account.index';
+import DexIndex from './dex/Dex.index';
 
 const root = document.getElementById('root');
 if (root != null) {
@@ -26,6 +27,7 @@ if (root != null) {
             <Routes>
               <Route path="/" component={App} />
               <Route path="/account" component={AccountIndex} />
+              <Route path="/dex" component={DexIndex} />
             </Routes>
           </div>
           <div class="center-flex h-10 bg-red-500">
