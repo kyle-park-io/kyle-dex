@@ -1,16 +1,2 @@
 server:
   port: 3000
-
-contracts:
-  - address: '0x618386e3c4D67eBc898c7f099d6188fEd92D4d3E'
-    name: 'tokenA'
-  - address: '0xC645F91850e7c5130B0D9Cf817936aF8cd2d3c33'
-    name: 'tokenB'
-  - address: '0x4552C0C1a2F0Eb0ec9C217C90d39006400B8B521'
-    name: 'Test'
-  - address: '0xb2d9491e496843BAd26254259703AC5bf65E0547'
-    name: 'DexCalc'
-  - address: '0xe017cc11312716f15D7467f9d530750e4D37507D'
-    name: 'Factory'
-  - address: '0x82aa4D13276CD92c6fcD4bA00f4b574b64f0d40C'
-    name: 'Pair'
