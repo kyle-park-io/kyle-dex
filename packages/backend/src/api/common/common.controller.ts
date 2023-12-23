@@ -29,7 +29,7 @@ import { CommonService } from './common.service';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 // dto
 import { QueryContractDto, SubmitContractDto } from './dto/common.request';
-import { type ProcessContractDto } from 'src/blockChain/common/dto/common.dto';
+import { type ProcessContractDto } from '../../blockChain/common/dto/common.dto';
 
 @ApiTags('common')
 @Controller('common')

@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsAddress } from 'src/common/decorator/custom.decorator';
+import { IsAddress } from '../../../common/decorator/custom.decorator';
 import { IsOptional, IsString } from 'class-validator';
 
 export class BalanceOfDto {

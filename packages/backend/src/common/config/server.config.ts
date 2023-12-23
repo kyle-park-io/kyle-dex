@@ -3,8 +3,10 @@ import path from 'path';
 import yaml from 'js-yaml';
 
 const root = process.cwd();
-const YAML_CONFIG_PROD = 'prod.yaml';
+
+const YAML_CONFIG_COMMON = 'common.yaml';
 const YAML_CONFIG_DEV = 'dev.yaml';
+const YAML_CONFIG_PROD = 'prod.yaml';
 
 export const serverConfig = (): Record<string, any> => {
   const env = process.env.NODE_ENV === undefined ? 'dev' : process.env.NODE_ENV;
@@ -12,11 +14,16 @@ export const serverConfig = (): Record<string, any> => {
   let configs: string[] = [];
   if (env === 'dev') {
     configs = [
+      `${root}/config/${YAML_CONFIG_COMMON}`,
       `${root}/config/${YAML_CONFIG_DEV}`,
       `${root}/config-prod/${YAML_CONFIG_PROD}`,
     ];
   } else if (env === 'prod') {
-    configs = [`${root}/config/${YAML_CONFIG_PROD}`];
+    configs = [
+      `${root}/config/${YAML_CONFIG_COMMON}`,
+      `${root}/config/${YAML_CONFIG_PROD}`,
+      `${root}/config-prod/${YAML_CONFIG_PROD}`,
+    ];
   } else {
     throw new Error('env error');
   }

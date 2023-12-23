@@ -1,10 +1,10 @@
 import { Inject, Injectable, LoggerService } from '@nestjs/common';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
-import { CommonService } from 'src/blockChain/common/common.service';
-import { ContractService } from 'src/blockChain/contract/contract.service';
+import { CommonService } from '../../blockChain/common/common.service';
+import { ContractService } from '../../blockChain/contract/contract.service';
 import { type BalanceOfDto } from './dto/token.request.dto';
 import { type ResponseBalanceOfDto } from './dto/token.response.dto';
-import { type ProcessContractDto } from 'src/blockChain/common/dto/common.dto';
+import { type ProcessContractDto } from '../../blockChain/common/dto/common.dto';
 
 @Injectable()
 export class TokenService {

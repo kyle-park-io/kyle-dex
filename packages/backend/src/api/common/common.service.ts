@@ -1,8 +1,8 @@
 import { Inject, Injectable, LoggerService } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
-import { CommonService as BlockChainCommonService } from 'src/blockChain/common/common.service';
-import { type ProcessContractDto } from 'src/blockChain/common/dto/common.dto';
+import { CommonService as BlockChainCommonService } from '../../blockChain/common/common.service';
+import { type ProcessContractDto } from '../../blockChain/common/dto/common.dto';
 
 @Injectable()
 export class CommonService {

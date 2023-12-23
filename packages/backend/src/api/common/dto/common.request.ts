@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsString } from 'class-validator';
-import { IsAddress } from 'src/common/decorator/custom.decorator';
+import { IsAddress } from '../../../common/decorator/custom.decorator';
 
 export class QueryContractDto {
   @IsAddress('check address type', { message: 'not address type' })
