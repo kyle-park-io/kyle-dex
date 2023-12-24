@@ -13,6 +13,7 @@ import Footer from './layout/Footer';
 import App from './App';
 import AccountIndex from './account/account.index';
 import DexIndex from './dex/Dex.index';
+import NotFoundPage from './NotFoundPage';
 
 const root = document.getElementById('root');
 if (root != null) {
@@ -25,9 +26,10 @@ if (root != null) {
           </div>
           <div class="flex-grow bg-green-500 flex flex-col">
             <Routes>
-              <Route path="/" component={App} />
-              <Route path="/account" component={AccountIndex} />
-              <Route path="/dex" component={DexIndex} />
+              <Route path="/dex" component={App} />
+              <Route path="/dex/account" component={AccountIndex} />
+              <Route path="/dex/dex" component={DexIndex} />
+              <Route path="*" component={NotFoundPage} />
             </Routes>
           </div>
           <div class="center-flex h-10 bg-red-500">

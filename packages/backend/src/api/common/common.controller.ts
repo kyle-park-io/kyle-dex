@@ -32,7 +32,7 @@ import { QueryContractDto, SubmitContractDto } from './dto/common.request';
 import { type ProcessContractDto } from '../../blockChain/common/dto/common.dto';
 
 @ApiTags('common')
-@Controller('common')
+@Controller('api-dex/api/common')
 export class CommonController {
   constructor(
     // logger

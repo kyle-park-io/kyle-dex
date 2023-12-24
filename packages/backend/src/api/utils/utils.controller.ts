@@ -21,7 +21,7 @@ import { CalcPairDto } from './dto/utils.request.dto';
 import { ResponsePairDto } from './dto/utils.response.dto';
 
 @ApiTags('utils')
-@Controller('utils')
+@Controller('api-dex/api/utils')
 export class UtilsController {
   constructor(private readonly utilsService: UtilsService) {}
 

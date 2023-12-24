@@ -1,15 +1,15 @@
 import { type Component, type JSX } from 'solid-js';
 import { createSignal, onMount } from 'solid-js';
-import { useParams } from '@solidjs/router';
-import axios from 'axios';
+// import { useParams } from '@solidjs/router';
+// import axios from 'axios';
 import Spinner from '../components/Spinner';
 
 const AccountIndex: Component = (): JSX.Element => {
-  const params = useParams();
+  // const params = useParams();
   const [isProd, setIsProd] = createSignal(false);
   const [error, setError] = createSignal<Error | null>(null);
   const [loading, setLoading] = createSignal(false);
-  const [account, setAccount] = createSignal('');
+  // const [account, setAccount] = createSignal('');
 
   const env = import.meta.env.VITE_ENV;
   let url;
@@ -21,15 +21,16 @@ const AccountIndex: Component = (): JSX.Element => {
   } else {
     throw new Error('env error');
   }
+  console.log(url);
 
   onMount(() => {
     if (isProd()) {
       async function fetchData(): Promise<void> {
         try {
-          const res = await axios.get(
-            `${url}/apis/api/dex/account/${params.id}`,
-          );
-          setAccount(res.data);
+          // const res = await axios.get(
+          //   `${url}/api-dex/api/dex/account/${params.id}`,
+          // );
+          // setAccount(res.data);
           setLoading(true);
         } catch (err) {
           if (err instanceof Error) {
@@ -42,7 +43,7 @@ const AccountIndex: Component = (): JSX.Element => {
       }
       void fetchData();
     } else {
-      setAccount('Dev: Testing');
+      // setAccount('Dev: Testing');
       setLoading(true);
     }
   });
@@ -61,7 +62,10 @@ const AccountIndex: Component = (): JSX.Element => {
             {error() !== null ? (
               <div>{error()?.message}</div>
             ) : (
-              <div>{account()}</div>
+              <div>
+                Testing...
+                {/* <div>{account()}</div> */}
+              </div>
             )}
           </div>
         )}

@@ -5,11 +5,19 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { AppModule } from './app.module';
 import { DetailedErrorFilter } from './common/expection/exception';
+import { ExpressAdapter } from '@nestjs/platform-express';
+import express, { type Request, type Response } from 'express';
 import helmet from 'helmet';
+import path from 'path';
 
 async function bootstrap(): Promise<void> {
   try {
-    const app = await NestFactory.create(AppModule, { cors: true });
+    const server = express();
+    const app = await NestFactory.create(
+      AppModule,
+      new ExpressAdapter(server),
+      { cors: true },
+    );
 
     // cors
     app.enableCors({
@@ -31,7 +39,6 @@ async function bootstrap(): Promise<void> {
     app.useLogger(app.get(WINSTON_MODULE_NEST_PROVIDER));
 
     // swagger
-    app.setGlobalPrefix('api');
     const options = new DocumentBuilder()
       .setTitle('Kyle Dex Project API  Docs')
       .setDescription('Dex API description')
@@ -48,7 +55,16 @@ async function bootstrap(): Promise<void> {
       throw new Error('not exist port');
     }
 
+    // static
+    const buildPath = path.join(__dirname, '../build');
+    server.use(express.static(buildPath));
+    server.use('*', (req: Request, res: Response) => {
+      console.log('check : ', req.url);
+      res.sendFile(path.join(buildPath, 'index.html'));
+    });
+
     // start server
+    console.log(`Server is running on http://localhost:${port}`);
     await app.listen(port);
   } catch (err) {
     console.error(err);
