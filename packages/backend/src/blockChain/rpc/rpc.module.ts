@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { SepoliaRpcService } from './rpc.sepolia.service';
-import { GanacheRpcService } from './rpc.ganache.service';
+import { HardhatRpcService } from './rpc.hardhat.service';
 
 @Module({
   providers: [
@@ -9,13 +9,13 @@ import { GanacheRpcService } from './rpc.ganache.service';
       useClass:
         process.env.NODE_ENV === 'development'
           ? SepoliaRpcService
-          : GanacheRpcService,
+          : HardhatRpcService,
     },
     {
       provide: 'GanacheRpcService',
-      useClass: GanacheRpcService,
+      useClass: HardhatRpcService,
     },
   ],
-  exports: [SepoliaRpcService, GanacheRpcService],
+  exports: [SepoliaRpcService, HardhatRpcService],
 })
 export class RpcModule {}

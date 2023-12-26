@@ -1,6 +1,6 @@
 import { type RpcService } from './interfaces/rpc.interface';
 import { SepoliaRpcService } from './rpc.sepolia.service';
-import { GanacheRpcService } from './rpc.ganache.service';
+import { HardhatRpcService } from './rpc.hardhat.service';
 
 // eslint-disable-next-line @typescript-eslint/no-extraneous-class
 export class RpcServiceFactory {
@@ -8,7 +8,7 @@ export class RpcServiceFactory {
     if (someCondition) {
       return new SepoliaRpcService();
     } else {
-      return new GanacheRpcService();
+      return new HardhatRpcService();
     }
   }
 }

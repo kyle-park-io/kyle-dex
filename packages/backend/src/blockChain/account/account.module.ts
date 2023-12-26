@@ -13,7 +13,7 @@ import { RpcServiceFactory } from '../rpc/rpc.factory';
     },
     {
       provide: 'RpcService',
-      useFactory: () => RpcServiceFactory.createService(true),
+      useFactory: () => RpcServiceFactory.createService(false),
     },
     SepoliaAccountService,
   ],
