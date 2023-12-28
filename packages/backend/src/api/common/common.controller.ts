@@ -26,6 +26,8 @@ import {
   ApiExcludeEndpoint,
 } from '@nestjs/swagger';
 import { CommonService } from './common.service';
+import { AccountService } from '../../blockChain/account/interfaces/account.interface';
+import { ContractService } from '../../blockChain/contract/contract.service';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 // dto
 import { QueryContractDto, SubmitContractDto } from './dto/common.request';
@@ -39,6 +41,9 @@ export class CommonController {
     @Inject(WINSTON_MODULE_NEST_PROVIDER)
     private readonly logger: LoggerService,
     private readonly commonService: CommonService,
+    @Inject('HardhatAccount')
+    private readonly accountService: AccountService,
+    private readonly contractService: ContractService,
   ) {}
 
   @Post('query')
@@ -52,13 +57,42 @@ export class CommonController {
     description: 'Successfully Query contract',
   })
   @ApiInternalServerErrorResponse({ description: 'Internal server error' })
-  async query(@Body() queryContract: QueryContractDto): Promise<any> {
+  async query(@Body() dto: QueryContractDto): Promise<any> {
     try {
+      // user
+      let userAddress;
+      if (dto.userAddress === undefined && dto.userName === undefined) {
+        throw new Error('check user params');
+      } else if (dto.userAddress !== undefined) {
+        userAddress = dto.userAddress;
+      } else if (dto.userName !== undefined) {
+        const wallet = this.accountService.getWalletByName(dto.userName);
+        if (wallet === undefined) {
+          throw new Error('user is not existed');
+        }
+        userAddress = wallet.address;
+      }
+      // contract
+      let contractAddress;
+      if (dto.contractAddress === undefined && dto.contractName === undefined) {
+        throw new Error('check contract params');
+      } else if (dto.contractAddress !== undefined) {
+        contractAddress = dto.contractAddress;
+      } else if (dto.contractName !== undefined) {
+        const contract = this.contractService.getContractAddress(
+          dto.contractName,
+        );
+        if (contract === undefined) {
+          throw new Error('contract is not exitsed');
+        }
+        contractAddress = contract;
+      }
+
       const args: ProcessContractDto = {
-        userAddress: queryContract.userAddress,
-        contractAddress: queryContract.contractAddress,
-        function: queryContract.function,
-        args: queryContract.args,
+        userAddress,
+        contractAddress,
+        function: dto.function,
+        args: dto.args,
       };
       const result = await this.commonService.query(args);
       return result;
@@ -80,13 +114,42 @@ export class CommonController {
     type: Boolean,
   })
   @ApiInternalServerErrorResponse({ description: 'Internal server error' })
-  async submit(@Body() submitContract: SubmitContractDto): Promise<boolean> {
+  async submit(@Body() dto: SubmitContractDto): Promise<boolean> {
     try {
+      // user
+      let userAddress;
+      if (dto.userAddress === undefined && dto.userName === undefined) {
+        throw new Error('check user params');
+      } else if (dto.userAddress !== undefined) {
+        userAddress = dto.userAddress;
+      } else if (dto.userName !== undefined) {
+        const wallet = this.accountService.getWalletByName(dto.userName);
+        if (wallet === undefined) {
+          throw new Error('user is not existed');
+        }
+        userAddress = wallet.address;
+      }
+      // contract
+      let contractAddress;
+      if (dto.contractAddress === undefined && dto.contractName === undefined) {
+        throw new Error('check contract params');
+      } else if (dto.contractAddress !== undefined) {
+        contractAddress = dto.contractAddress;
+      } else if (dto.contractName !== undefined) {
+        const contract = this.contractService.getContractAddress(
+          dto.contractName,
+        );
+        if (contract === undefined) {
+          throw new Error('contract is not existed');
+        }
+        contractAddress = contract;
+      }
+
       const args: ProcessContractDto = {
-        userAddress: submitContract.userAddress,
-        contractAddress: submitContract.contractAddress,
-        function: submitContract.function,
-        args: submitContract.args,
+        userAddress,
+        contractAddress,
+        function: dto.function,
+        args: dto.args,
       };
       await this.commonService.submit(args);
       return true;

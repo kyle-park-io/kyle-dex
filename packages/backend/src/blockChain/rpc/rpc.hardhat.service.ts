@@ -17,7 +17,7 @@ export class HardhatRpcService implements RpcService {
     try {
       const provider = this.getProvider();
       const network = await provider.getNetwork();
-      console.log(JSON.stringify(test, undefined, 2));
+      console.log(JSON.stringify(network, undefined, 2));
       return network;
     } catch (err) {
       console.error(err);

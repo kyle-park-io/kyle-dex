@@ -1,23 +1,43 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString } from 'class-validator';
+import { IsString, IsOptional } from 'class-validator';
 import { IsAddress } from '../../../common/decorator/custom.decorator';
 
 export class QueryContractDto {
+  @IsOptional()
+  @IsString()
+  @ApiProperty({
+    description: 'user name',
+    example: 'user1',
+    required: false,
+  })
+  readonly userName?: string;
+
+  @IsOptional()
   @IsAddress('check address type', { message: 'not address type' })
   @ApiProperty({
     description: 'user address',
     example: '0x0000000000000000000000000000000000000000',
-    required: true,
+    required: false,
   })
-  readonly userAddress!: string;
+  readonly userAddress?: string;
 
+  @IsOptional()
+  @IsString()
+  @ApiProperty({
+    description: 'contract name',
+    example: 'tokenA',
+    required: false,
+  })
+  readonly contractName?: string;
+
+  @IsOptional()
   @IsAddress('check address type', { message: 'not address type' })
   @ApiProperty({
     description: 'contract address',
     example: '0x0000000000000000000000000000000000000000',
-    required: true,
+    required: false,
   })
-  readonly contractAddress!: string;
+  readonly contractAddress?: string;
 
   @IsString()
   @ApiProperty({ description: 'function name', example: 'balanceOf' })
@@ -29,21 +49,41 @@ export class QueryContractDto {
 }
 
 export class SubmitContractDto {
+  @IsOptional()
+  @IsString()
+  @ApiProperty({
+    description: 'user name',
+    example: 'user1',
+    required: false,
+  })
+  readonly userName?: string;
+
+  @IsOptional()
   @IsAddress('check address type', { message: 'not address type' })
   @ApiProperty({
     description: 'user address',
     example: '0x0000000000000000000000000000000000000000',
-    required: true,
+    required: false,
   })
-  readonly userAddress!: string;
+  readonly userAddress?: string;
 
+  @IsOptional()
+  @IsString()
+  @ApiProperty({
+    description: 'contract name',
+    example: 'tokenA',
+    required: false,
+  })
+  readonly contractName?: string;
+
+  @IsOptional()
   @IsAddress('check address type', { message: 'not address type' })
   @ApiProperty({
     description: 'contract address',
     example: '0x0000000000000000000000000000000000000000',
-    required: true,
+    required: false,
   })
-  readonly contractAddress!: string;
+  readonly contractAddress?: string;
 
   @IsString()
   @ApiProperty({ description: 'function name', example: 'balanceOf' })

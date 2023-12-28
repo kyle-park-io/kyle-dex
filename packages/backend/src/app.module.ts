@@ -10,6 +10,7 @@ import { serverConfig } from './common/config/server.config';
 import { WinstonLoggerModule } from './common/winston/logger.module';
 import { ApiModule } from './api/api.module';
 // global
+import { UtilsModule } from './blockChain/utils/utils.module';
 import { CommonModule } from './blockChain/common/common.module';
 import { AccountModule } from './blockChain/account/account.module';
 import { ContractModule } from './blockChain/contract/contract.module';
@@ -32,6 +33,7 @@ import path from 'path';
     // api
     ApiModule,
     // global
+    UtilsModule,
     CommonModule,
     AccountModule,
     ContractModule,

@@ -39,6 +39,15 @@ export class FsService {
     return bytecode;
   };
 
+  getDeployedBytecode = async (contractName: string): Promise<string> => {
+    const abiPath = path.resolve('artifacts');
+    const jsonInterface = JSON.parse(
+      fs.readFileSync(`${abiPath}/${contractName}.json`, 'utf-8'),
+    );
+    const bytecode = jsonInterface.deployedBytecode;
+    return bytecode;
+  };
+
   getContractAddress = async (contractName: string): Promise<string> => {
     const contractPath = path.resolve('contracts');
     const contract = fs.readFileSync(

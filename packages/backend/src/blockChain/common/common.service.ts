@@ -1,6 +1,6 @@
 import { Inject, Injectable, LoggerService } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { SepoliaAccountService } from '../account/account.service';
+import { AccountService } from '../account/interfaces/account.interface';
 import { ContractService } from '../contract/contract.service';
 import { DecodeService } from '../utils/decode.service';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
@@ -16,14 +16,15 @@ export class CommonService {
     @Inject(WINSTON_MODULE_NEST_PROVIDER)
     private readonly logger: LoggerService,
     // extra
-    private readonly sepoliaAccountService: SepoliaAccountService,
+    @Inject('HardhatAccount')
+    private readonly accountService: AccountService,
     private readonly contractService: ContractService,
     private readonly decodeService: DecodeService,
   ) {}
 
   async query(dto: ProcessContractDto): Promise<any> {
     try {
-      const wallet: Wallet | undefined = this.sepoliaAccountService.getWallet(
+      const wallet: Wallet | undefined = this.accountService.getWalletByAddress(
         dto.userAddress,
       );
       if (wallet === undefined) {
@@ -66,7 +67,7 @@ export class CommonService {
 
   async submit(dto: ProcessContractDto): Promise<boolean> {
     try {
-      const wallet: Wallet | undefined = this.sepoliaAccountService.getWallet(
+      const wallet: Wallet | undefined = this.accountService.getWalletByAddress(
         dto.userAddress,
       );
       if (wallet === undefined) {
