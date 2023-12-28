@@ -18,7 +18,7 @@ import { BalanceOfDto } from './dto/token.request.dto';
 import { ResponseBalanceOfDto } from './dto/token.response.dto';
 
 @ApiTags('token')
-@Controller('api-dex/api/token')
+@Controller('api/token')
 export class TokenController {
   constructor(private readonly tokenService: TokenService) {}
 

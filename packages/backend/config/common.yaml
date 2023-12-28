@@ -1,7 +1,7 @@
 contracts:
-  - address: '0x618386e3c4D67eBc898c7f099d6188fEd92D4d3E'
+  - address: '0x5FbDB2315678afecb367f032d93F642f64180aa3'
     name: 'tokenA'
-  - address: '0xC645F91850e7c5130B0D9Cf817936aF8cd2d3c33'
+  - address: '0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512'
     name: 'tokenB'
   - address: '0x4552C0C1a2F0Eb0ec9C217C90d39006400B8B521'
     name: 'Test'

@@ -11,4 +11,6 @@ export class SepoliaRpcService implements RpcService {
   getProvider(): JsonRpcProvider {
     return new JsonRpcProvider(this.getRpc());
   }
+
+  async getNetwork(): Promise<void> {}
 }

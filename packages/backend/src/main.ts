@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -46,7 +47,7 @@ async function bootstrap(): Promise<void> {
       .addBearerAuth()
       .build();
     const document = SwaggerModule.createDocument(app, options);
-    SwaggerModule.setup('api-docs', app, document);
+    SwaggerModule.setup('dex/api-docs', app, document);
 
     // config
     const configService = app.get(ConfigService);
@@ -55,13 +56,11 @@ async function bootstrap(): Promise<void> {
       throw new Error('not exist port');
     }
 
-    // static
-    const buildPath = path.join(__dirname, '../build');
-    server.use(express.static(buildPath));
-    server.use('*', (req: Request, res: Response) => {
-      console.log('check : ', req.url);
-      res.sendFile(path.join(buildPath, 'index.html'));
-    });
+    // server.use(express.static(buildPath));
+    // server.use('*', (req: Request, res: Response) => {
+    //   console.log('check : ', req.url);
+    //   res.sendFile(path.join(buildPath, 'index.html'));
+    // });
 
     // start server
     console.log(`Server is running on http://localhost:${port}`);
