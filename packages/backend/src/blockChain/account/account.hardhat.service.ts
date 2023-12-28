@@ -1,12 +1,15 @@
 import { Inject, Injectable, LoggerService } from '@nestjs/common';
-import { type AccountService } from './interfaces/account.interface';
+import {
+  type AccountService,
+  type AccountConfig,
+} from './interfaces/account.interface';
 import { RpcService } from '../rpc/interfaces/rpc.interface';
 import { ConfigService } from '@nestjs/config';
 import { ethers, type Wallet } from 'ethers';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 
 @Injectable()
-export class SepoliaAccountService implements AccountService {
+export class HardhatAccountService implements AccountService {
   // map
   private readonly walletMap: Map<string, Wallet>;
 
@@ -23,22 +26,29 @@ export class SepoliaAccountService implements AccountService {
     this.logger.log(this.config.kyle);
 
     this.walletMap = new Map<string, Wallet>();
-    const privateKey = this.configService.get<string>('account.privateKey');
-    if (privateKey !== undefined) {
-      try {
-        const wallet = new ethers.Wallet(
-          privateKey,
-          this.rpcService.getProvider(),
-        );
-        this.walletMap.set(wallet.address, wallet);
-      } catch (err) {
-        this.logger.error(err);
-        throw err;
+    const accountList = this.configService.get<AccountConfig[]>('accounts');
+    if (accountList !== undefined) {
+      for (let i = 0; i < accountList.length; i++) {
+        try {
+          const wallet = new ethers.Wallet(
+            accountList[i].privateKey,
+            this.rpcService.getProvider(),
+          );
+          this.walletMap.set(wallet.address, wallet);
+          this.walletMap.set(accountList[i].name, wallet);
+        } catch (err) {
+          this.logger.error(err);
+          throw err;
+        }
       }
     }
   }
 
-  getWallet(address: string): Wallet | undefined {
+  getWalletByName(name: string): Wallet | undefined {
+    return this.walletMap.get(name);
+  }
+
+  getWalletByAddress(address: string): Wallet | undefined {
     return this.walletMap.get(address);
   }
 
@@ -52,7 +62,7 @@ export class SepoliaAccountService implements AccountService {
         privateKey,
         this.rpcService.getProvider(),
       );
-      if (this.getWallet(wallet.address) !== undefined) {
+      if (this.getWalletByAddress(wallet.address) !== undefined) {
         throw new Error('already existed wallet');
       }
       this.walletMap.set(wallet.address, wallet);

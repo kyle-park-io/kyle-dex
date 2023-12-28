@@ -1,5 +1,5 @@
 import { Global, Module } from '@nestjs/common';
-import { SepoliaAccountService } from './account.service';
+import { HardhatAccountService } from './account.hardhat.service';
 import { RpcServiceFactory } from '../rpc/rpc.factory';
 
 @Global()
@@ -15,8 +15,8 @@ import { RpcServiceFactory } from '../rpc/rpc.factory';
       provide: 'RpcService',
       useFactory: () => RpcServiceFactory.createService(false),
     },
-    SepoliaAccountService,
+    { provide: 'HardhatAccount', useClass: HardhatAccountService },
   ],
-  exports: ['CONFIG', 'RpcService', SepoliaAccountService],
+  exports: ['CONFIG', 'RpcService', 'HardhatAccount'],
 })
 export class AccountModule {}
