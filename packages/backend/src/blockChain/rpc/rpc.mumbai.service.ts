@@ -6,7 +6,7 @@ import { JsonRpcProvider } from 'ethers';
 import { setTimeout } from 'timers/promises';
 
 @Injectable()
-export class SepoliaRpcService implements RpcService {
+export class MumbaiRpcService implements RpcService {
   private readonly https: string;
   private readonly wss: string;
   private readonly provider: JsonRpcProvider;
@@ -17,7 +17,7 @@ export class SepoliaRpcService implements RpcService {
     private readonly logger: LoggerService,
   ) {
     const https = this.configService.get<string>(
-      'endpoints.ethereum.sepolia.url.https',
+      'endpoints.polygon.mumbai.url.https',
     );
     if (https === undefined) {
       throw new Error('config error');
@@ -25,7 +25,7 @@ export class SepoliaRpcService implements RpcService {
     this.https = https;
 
     const wss = this.configService.get<string>(
-      'endpoints.ethereum.sepolia.url.wss',
+      'endpoints.polygon.mumbai.url.wss',
     );
     if (wss === undefined) {
       throw new Error('config error');

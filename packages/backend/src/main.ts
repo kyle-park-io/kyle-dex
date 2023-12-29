@@ -67,7 +67,7 @@ async function bootstrap(): Promise<void> {
     await app.listen(port);
   } catch (err) {
     console.error(err);
-    process.exit();
+    process.exit(1);
   }
 }
 

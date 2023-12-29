@@ -21,7 +21,7 @@ export class HardhatAccountService implements AccountService {
     private readonly logger: LoggerService,
     // extra
     @Inject('CONFIG') private readonly config,
-    @Inject('RpcService') private readonly rpcService: RpcService,
+    @Inject('HardhatRpc') private readonly rpcService: RpcService,
   ) {
     this.logger.log(this.config.kyle);
 
@@ -30,12 +30,7 @@ export class HardhatAccountService implements AccountService {
     if (accountList !== undefined) {
       for (let i = 0; i < accountList.length; i++) {
         try {
-          const wallet = new ethers.Wallet(
-            accountList[i].privateKey,
-            this.rpcService.getProvider(),
-          );
-          this.walletMap.set(wallet.address, wallet);
-          this.walletMap.set(accountList[i].name, wallet);
+          this.createWallet(accountList[i].name, accountList[i].privateKey);
         } catch (err) {
           this.logger.error(err);
           throw err;
@@ -56,7 +51,7 @@ export class HardhatAccountService implements AccountService {
     return '0x';
   }
 
-  createWallet(privateKey: string): void {
+  private createWallet(name: string, privateKey: string): void {
     try {
       const wallet = new ethers.Wallet(
         privateKey,
@@ -66,6 +61,7 @@ export class HardhatAccountService implements AccountService {
         throw new Error('already existed wallet');
       }
       this.walletMap.set(wallet.address, wallet);
+      this.walletMap.set(name, wallet);
     } catch (err) {
       this.logger.error(err);
       throw err;

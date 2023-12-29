@@ -3,7 +3,7 @@ export interface RpcService {
 
   getProvider(): any;
 
-  getNetwork(): Promise<any>;
+  connectNetwork(): Promise<void>;
 
   // getRule(): any;
 }
