@@ -21,12 +21,13 @@ const MetamaskIndex: Component<MetamaskIndexProps> = (props): JSX.Element => {
   console.log(url);
 
   createEffect(() => {
-    if (isProd()) {
+    if (isProd() && props.loadMetamask) {
       if (
         props.network !== 'hardhat' &&
         props.network === props.currentNetwork
       ) {
         void fetchData();
+        props.initConnectStatus();
       }
     }
   });
@@ -54,7 +55,7 @@ const MetamaskIndex: Component<MetamaskIndexProps> = (props): JSX.Element => {
         infuraAPIKey: infuraUrl,
         dappMetadata: {
           name: 'Kyle Dex App',
-          url: window.location.host,
+          url: window.location.origin,
         },
       });
 

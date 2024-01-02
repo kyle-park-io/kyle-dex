@@ -13,6 +13,7 @@ import Footer from './layout/Footer';
 import App from './App';
 import AccountIndex from './account/account.index';
 import DexIndex from './dex/Dex.index';
+import TradeIndex from './trade/Trade.index';
 import NotFoundPage from './NotFoundPage';
 
 const root = document.getElementById('root');
@@ -29,6 +30,7 @@ if (root != null) {
               <Route path="/dex" component={App} />
               <Route path="/dex/account" component={AccountIndex} />
               <Route path="/dex/dex" component={DexIndex} />
+              <Route path="/dex/trade" component={TradeIndex} />
               <Route path="*" component={NotFoundPage} />
             </Routes>
           </div>
