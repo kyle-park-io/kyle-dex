@@ -1,4 +1,9 @@
-import { Inject, Injectable, LoggerService } from '@nestjs/common';
+import {
+  Inject,
+  Injectable,
+  LoggerService,
+  type OnModuleInit,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { type RpcService } from './interfaces/rpc.interface';
@@ -6,7 +11,7 @@ import { JsonRpcProvider } from 'ethers';
 import { setTimeout } from 'timers/promises';
 
 @Injectable()
-export class HardhatRpcService implements RpcService {
+export class HardhatRpcService implements RpcService, OnModuleInit {
   private readonly http: string;
   private readonly ws: string;
   private readonly provider: JsonRpcProvider;

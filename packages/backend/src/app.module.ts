@@ -14,6 +14,8 @@ import { UtilsModule } from './blockChain/utils/utils.module';
 import { CommonModule } from './blockChain/common/common.module';
 import { AccountModule } from './blockChain/account/account.module';
 import { ContractModule } from './blockChain/contract/contract.module';
+import { MetamaskModule } from './blockChain/metamask/metamask.module';
+import { ListenerModule } from './blockChain/listener/listener.module';
 import path from 'path';
 
 @Module({
@@ -37,6 +39,8 @@ import path from 'path';
     CommonModule,
     AccountModule,
     ContractModule,
+    MetamaskModule,
+    ListenerModule,
   ],
   controllers: [AppController],
   providers: [AppService],

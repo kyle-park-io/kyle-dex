@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsOptional } from 'class-validator';
+import { IsString, IsArray, IsOptional } from 'class-validator';
 import { IsAddress } from '../../../common/decorator/custom.decorator';
 
 export class QueryContractDto {
@@ -43,7 +43,7 @@ export class QueryContractDto {
   @ApiProperty({ description: 'function name', example: 'balanceOf' })
   readonly function!: string;
 
-  @IsString()
+  @IsArray()
   @ApiProperty({ description: 'function arguments' })
   readonly args!: any[];
 }
@@ -89,7 +89,7 @@ export class SubmitContractDto {
   @ApiProperty({ description: 'function name', example: 'balanceOf' })
   readonly function!: string;
 
-  @IsString()
+  @IsArray()
   @ApiProperty({ description: 'function arguments' })
   readonly args!: any[];
 }

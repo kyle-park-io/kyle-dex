@@ -4,6 +4,9 @@ node_modules
 # production files
 /config-prod
 
+# data files
+/data
+
 # Hardhat files
 /cache
 /artifacts

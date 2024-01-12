@@ -9,7 +9,7 @@ import { DetailedErrorFilter } from './common/expection/exception';
 import { ExpressAdapter } from '@nestjs/platform-express';
 import express, { type Request, type Response } from 'express';
 import helmet from 'helmet';
-import path from 'path';
+import { init } from './init';
 
 async function bootstrap(): Promise<void> {
   try {
@@ -55,6 +55,7 @@ async function bootstrap(): Promise<void> {
     if (port === undefined) {
       throw new Error('not exist port');
     }
+    await init();
 
     // server.use(express.static(buildPath));
     // server.use('*', (req: Request, res: Response) => {

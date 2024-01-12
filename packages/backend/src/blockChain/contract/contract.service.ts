@@ -16,6 +16,9 @@ export class ContractService implements OnModuleInit {
   private readonly contractNameMap: Map<string, string>;
   private readonly contractAddressMap: Map<string, string>;
   private readonly contractMap: Map<string, Contract>;
+  private readonly contractList: string[];
+  private readonly contractEventListByNameMap: Map<string, string[]>;
+  private readonly contractEventListByAddressMap: Map<string, string[]>;
   private readonly interfaceMap: Map<string, Interface>;
 
   constructor(
@@ -30,7 +33,10 @@ export class ContractService implements OnModuleInit {
     this.contractNameMap = new Map<string, string>();
     this.contractAddressMap = new Map<string, string>();
     this.contractMap = new Map<string, Contract>();
+    this.contractList = [];
     this.interfaceMap = new Map<string, Interface>();
+    this.contractEventListByNameMap = new Map<string, string[]>();
+    this.contractEventListByAddressMap = new Map<string, string[]>();
   }
 
   async onModuleInit(): Promise<void> {
@@ -45,6 +51,14 @@ export class ContractService implements OnModuleInit {
           this.contractMap.set(value.address, contract);
           this.contractNameMap.set(value.address, value.name);
           this.contractAddressMap.set(value.name, value.address);
+          this.contractList.push(value.name);
+          if (value.eventList !== undefined) {
+            this.contractEventListByNameMap.set(value.name, value.eventList);
+            this.contractEventListByAddressMap.set(
+              value.address,
+              value.eventList,
+            );
+          }
         }
       } catch (err) {
         this.logger.error(err);
@@ -63,6 +77,22 @@ export class ContractService implements OnModuleInit {
 
   getContract(address: string): Contract | undefined {
     return this.contractMap.get(address);
+  }
+
+  getContractList(): string[] {
+    return this.contractList;
+  }
+
+  getContractEventList(name?: string, address?: string): string[] | undefined {
+    if (name === undefined && address === undefined) {
+      throw new Error('param must exist least one');
+    }
+    if (name !== undefined) {
+      return this.contractEventListByNameMap.get(name);
+    }
+    if (address !== undefined) {
+      return this.contractEventListByAddressMap.get(address);
+    }
   }
 
   getFunctionSignature(address: string, functionName: string): string {
