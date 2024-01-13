@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { TransactionListenerService } from './transaction-listener.service';
+import { TransactionListenerService } from './transaction-listener.hardhat.service';
 import { HardhatRpcService } from '../../rpc/rpc.hardhat.service';
 import { SepoliaRpcService } from '../../rpc/rpc.sepolia.service';
 import { MumbaiRpcService } from '../../rpc/rpc.mumbai.service';

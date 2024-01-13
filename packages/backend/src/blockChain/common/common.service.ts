@@ -1,7 +1,7 @@
 import { Inject, Injectable, LoggerService } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { AccountService } from '../account/interfaces/account.interface';
-import { ContractService } from '../contract/contract.service';
+import { RpcService } from '../rpc/interfaces/rpc.interface';
 import { DecodeService } from '../utils/decode.service';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { type Wallet, type Contract, type TransactionRequest } from 'ethers';
@@ -18,7 +18,9 @@ export class CommonService {
     // extra
     @Inject('HardhatAccount')
     private readonly accountService: AccountService,
-    private readonly contractService: ContractService,
+    @Inject('HardhatRpc')
+    private readonly rpcService: RpcService,
+
     private readonly decodeService: DecodeService,
   ) {}
 
@@ -31,9 +33,8 @@ export class CommonService {
         throw new Error(`wallet is not existed, address : ${dto.userAddress}`);
       }
 
-      const contract: Contract | undefined = this.contractService.getContract(
-        dto.contractAddress,
-      );
+      const contract: Contract | undefined =
+        this.rpcService.getContractByAddress(dto.contractAddress);
       if (contract === undefined) {
         throw new Error(
           `contract is not existed, address : ${dto.contractAddress}`,
@@ -44,9 +45,7 @@ export class CommonService {
       const tx: TransactionRequest = { to: dto.contractAddress, data: eFD };
       const result = await wallet.call(tx);
 
-      const contractName = this.contractService.getContractName(
-        dto.contractAddress,
-      );
+      const contractName = this.rpcService.getContractName(dto.contractAddress);
       if (contractName === undefined) {
         throw new Error(
           `contract is not existed, address : ${dto.contractAddress}`,
@@ -74,9 +73,8 @@ export class CommonService {
         throw new Error(`wallet is not existed, address : ${dto.userAddress}`);
       }
 
-      const contract: Contract | undefined = this.contractService.getContract(
-        dto.contractAddress,
-      );
+      const contract: Contract | undefined =
+        this.rpcService.getContractByAddress(dto.contractAddress);
       if (contract === undefined) {
         throw new Error(
           `contract is not existed, address : ${dto.contractAddress}`,

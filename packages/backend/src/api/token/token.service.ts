@@ -2,7 +2,7 @@ import { Inject, Injectable, LoggerService } from '@nestjs/common';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { CommonService } from '../../blockChain/common/common.service';
 import { AccountService } from '../../blockChain/account/interfaces/account.interface';
-import { ContractService } from '../../blockChain/contract/contract.service';
+import { RpcService } from '../../blockChain/rpc/interfaces/rpc.interface';
 import { type BalanceOfDto } from './dto/token.request.dto';
 import { type ResponseBalanceOfDto } from './dto/token.response.dto';
 import { type ProcessContractDto } from '../../blockChain/common/dto/common.dto';
@@ -15,7 +15,8 @@ export class TokenService {
     private readonly commonService: CommonService,
     @Inject('HardhatAccount')
     private readonly accountService: AccountService,
-    private readonly contractService: ContractService,
+    @Inject('HardhatRpc')
+    private readonly rpcService: RpcService,
   ) {}
 
   async balanceOf(dto: BalanceOfDto): Promise<ResponseBalanceOfDto> {
@@ -40,9 +41,7 @@ export class TokenService {
       } else if (dto.contractAddress !== undefined) {
         contractAddress = dto.contractAddress;
       } else if (dto.contractName !== undefined) {
-        const contract = this.contractService.getContractAddress(
-          dto.contractName,
-        );
+        const contract = this.rpcService.getContractByName(dto.contractName);
         if (contract === undefined) {
           throw new Error('contract is not existed');
         }

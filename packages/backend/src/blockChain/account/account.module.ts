@@ -40,6 +40,7 @@ import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
     { provide: 'SepoliaAccount', useClass: SepoliaAccountService },
     { provide: 'MumbaiAccount', useClass: MumbaiAccountService },
   ],
-  exports: ['CONFIG', 'HardhatAccount', 'SepoliaAccount', 'MumbaiAccount'],
+  exports: ['CONFIG'],
+  // exports: ['CONFIG', 'HardhatAccount', 'SepoliaAccount', 'MumbaiAccount'],
 })
 export class AccountModule {}

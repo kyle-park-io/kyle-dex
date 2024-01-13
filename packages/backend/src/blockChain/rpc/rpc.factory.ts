@@ -10,11 +10,12 @@ export class RpcServiceFactory {
     someCondition: boolean,
     configService: ConfigService,
     loggerService: LoggerService,
-  ): RpcService {
-    if (someCondition) {
-      return new SepoliaRpcService(configService, loggerService);
-    } else {
-      return new HardhatRpcService(configService, loggerService);
-    }
+  ): void {
+    // RpcService;
+    // if (someCondition) {
+    //   return new SepoliaRpcService(configService, loggerService);
+    // } else {
+    //   return new HardhatRpcService(configService, loggerService);
+    // }
   }
 }

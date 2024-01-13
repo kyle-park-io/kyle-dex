@@ -2,17 +2,19 @@ import {
   Inject,
   Injectable,
   LoggerService,
+  forwardRef,
   type OnModuleInit,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
-import { RpcService } from '../../../blockChain/rpc/interfaces/rpc.interface';
-import { ContractService } from '../../../blockChain/contract/contract.service';
-import { FsService } from '../../../blockChain/utils/fs.service';
+import { RpcService } from '../../rpc/interfaces/rpc.interface';
+import { FsService } from '../../utils/fs.service';
 import { type ContractEventPayload, type LogDescription } from 'ethers';
 
 @Injectable()
-export class EventListenerService implements OnModuleInit {
+export class HardhatEventListenerService implements OnModuleInit {
+  private initPromise!: Promise<void>;
+
   constructor(
     // config
     private readonly configService: ConfigService,
@@ -20,30 +22,33 @@ export class EventListenerService implements OnModuleInit {
     @Inject(WINSTON_MODULE_NEST_PROVIDER)
     private readonly logger: LoggerService,
     // rpc
-    @Inject('HardhatRpc') private readonly rpcService: RpcService,
-    // contract
-    private readonly contractService: ContractService,
+    // @Inject(forwardRef(() => 'HardhatRpc'))
+    @Inject('HardhatRpc')
+    private readonly rpcService: RpcService,
+    // extra
     private readonly fsService: FsService,
-  ) {
-    // const accountList = this.configService.get<AccountConfig[]>('accounts');
+  ) {}
+
+  async getInitializationPromise(): Promise<void> {
+    await this.initPromise;
   }
 
-  async onModuleInit(): Promise<void> {
+  async connectRpc(): Promise<void> {
     const self = this;
-    const contractList = this.contractService.getContractList();
+    const contractList = this.rpcService.getContractList();
     for (const contractName of contractList) {
-      const address = this.contractService.getContractAddress(contractName);
+      const address = this.rpcService.getContractAddress(contractName);
       if (address === undefined) {
         throw new Error('check');
       }
-      const contract = this.contractService.getContract(address);
+      const contract = this.rpcService.getContractByAddress(address);
       if (contract === undefined) {
         throw new Error('check');
       }
 
       const provider = this.rpcService.getProvider();
       const connectedContract = contract.connect(provider);
-      const event = this.contractService.getContractEventList(contractName);
+      const event = this.rpcService.getContractEventList(contractName);
       if (event !== undefined) {
         for (const value of event) {
           this.logger.log('event listener open : ', value);
@@ -86,7 +91,7 @@ export class EventListenerService implements OnModuleInit {
       this.logger.log('event received: ');
 
       const eventName = log.name;
-      const name = this.contractService.getContractName(address);
+      const name = this.rpcService.getContractName(address);
       if (name === undefined) {
         this.logger.error('wrong address');
         throw new Error('wrong address');
@@ -123,5 +128,14 @@ export class EventListenerService implements OnModuleInit {
       this.logger.error(err);
       throw err;
     }
+  }
+
+  async initializeAsync(): Promise<void> {
+    await this.rpcService.getInitializationPromise();
+    await this.connectRpc();
+  }
+
+  async onModuleInit(): Promise<void> {
+    this.initPromise = this.initializeAsync();
   }
 }

@@ -32,15 +32,15 @@ import path from 'path';
     }),
     // winston
     WinstonLoggerModule,
-    // api
-    ApiModule,
     // global
     UtilsModule,
-    CommonModule,
-    AccountModule,
     ContractModule,
+    AccountModule,
+    CommonModule,
     MetamaskModule,
     ListenerModule,
+    // api
+    ApiModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -49,3 +49,19 @@ network:
         address:
       - name: 'tokenB'
         address:
+
+contracts:
+  - name: 'DexCalc'
+    address:
+  - name: 'Factory'
+    address:
+    eventList:
+      - 'PairCreated'
+  - name: 'WETH'
+    address:
+  - name: 'Router'
+    address:
+  - name: 'tokenA'
+    address:
+  - name: 'tokenB'
+    address:
