@@ -1,17 +1,21 @@
-import { type Contract } from 'ethers';
+import { type JsonRpcProvider, type Interface, type Contract } from 'ethers';
 
 export interface RpcService {
   getInitializationPromise(): Promise<void>;
 
   getRpc(): string;
 
-  getProvider(): any;
+  getProvider(): JsonRpcProvider;
 
   connectNetwork(): Promise<void>;
 
   addContract(): Promise<void>;
 
   // contract
+  getContractInterfaceByName(name: string): Interface | undefined;
+
+  getContractInterfaceByAddress(address: string): Interface | undefined;
+
   getContractName(address: string): string | undefined;
 
   getContractAddress(name: string): string | undefined;
@@ -27,4 +31,6 @@ export interface RpcService {
   getFunctionSignatureByAddress(address: string, functionName: string): string;
 
   // getRule(): any;
+
+  setContract(name: string, address: string): void;
 }

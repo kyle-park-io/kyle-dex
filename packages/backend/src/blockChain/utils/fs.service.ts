@@ -4,6 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import fs from 'fs';
 import path from 'path';
+import cacheService from '../../init/cache';
 
 @Injectable()
 export class FsService {
@@ -73,17 +74,24 @@ export class FsService {
     fs.appendFileSync(`${this.dataPath}/${name}`, JSON.stringify(body) + '\n');
   };
 
-  readArrayFromFile = async (name: string): Promise<any> => {
-    const data = fs.readFileSync(`${this.dataPath}/${name}`, 'utf8');
-    const array = JSON.parse(data);
-    return array;
+  readArrayFromFile = async (path: string, name: string): Promise<any> => {
+    if (path === '') {
+      const data = fs.readFileSync(`${this.dataPath}/${name}`, 'utf8');
+      const array = JSON.parse(data);
+      return array;
+    } else {
+      const data = fs.readFileSync(`${this.dataPath}/${path}/${name}`, 'utf8');
+      const array = JSON.parse(data);
+      return array;
+    }
   };
 
-  writeArrayToFile = async (name: string, body: any): Promise<void> => {
+  writePairArrayToFile = async (name: string, body: any): Promise<void> => {
     if (fs.existsSync(`${this.dataPath}/${name}`)) {
-      const data = await this.readArrayFromFile(name);
+      const data = await this.readArrayFromFile('', name);
       data.push(body);
 
+      cacheService.set('pairList', JSON.stringify(data, null, 2));
       fs.writeFileSync(
         `${this.dataPath}/${name}`,
         JSON.stringify(data, null, 2),
@@ -93,8 +101,115 @@ export class FsService {
       const data: any[] = [];
       data.push(body);
 
+      cacheService.set('pairList', JSON.stringify(data, null, 2));
       fs.writeFileSync(
         `${this.dataPath}/${name}`,
+        JSON.stringify(data, null, 2),
+        'utf8',
+      );
+    }
+  };
+
+  writeReserveArrayToFile = async (
+    path: string,
+    name: string,
+    body: any,
+  ): Promise<void> => {
+    if (fs.existsSync(`${this.dataPath}/${path}/${name}`)) {
+      const data = await this.readArrayFromFile(path, name);
+      data[0] = body;
+      data.push(body);
+
+      cacheService.set(
+        `pair.${name.split('.')[0]}`,
+        JSON.stringify(data, null, 2),
+      );
+      fs.writeFileSync(
+        `${this.dataPath}/${path}/${name}`,
+        JSON.stringify(data, null, 2),
+        'utf8',
+      );
+    } else {
+      fs.mkdirSync(`${this.dataPath}/${path}`, { recursive: true });
+
+      const data: any[] = [];
+      data.push(body);
+      data.push(body);
+
+      cacheService.set(
+        `pair.${name.split('.')[0]}`,
+        JSON.stringify(data, null, 2),
+      );
+      fs.writeFileSync(
+        `${this.dataPath}/${path}/${name}`,
+        JSON.stringify(data, null, 2),
+        'utf8',
+      );
+    }
+  };
+
+  writeUserArrayToFile = async (
+    path: string,
+    name: string,
+    body: any,
+  ): Promise<void> => {
+    if (fs.existsSync(`${this.dataPath}/${path}/${name}`)) {
+      const data = await this.readArrayFromFile(path, name);
+      data[0] = body;
+      data.push(body);
+
+      fs.writeFileSync(
+        `${this.dataPath}/${path}/${name}`,
+        JSON.stringify(data, null, 2),
+        'utf8',
+      );
+    } else {
+      fs.mkdirSync(`${this.dataPath}/${path}`, { recursive: true });
+
+      const data: any[] = [];
+      data.push(body);
+      data.push(body);
+
+      fs.writeFileSync(
+        `${this.dataPath}/${path}/${name}`,
+        JSON.stringify(data, null, 2),
+        'utf8',
+      );
+    }
+  };
+
+  writeUserArrayToFile2 = async (
+    path: string,
+    name: string,
+    body: any,
+  ): Promise<void> => {
+    if (fs.existsSync(`${this.dataPath}/${path}/${name}`)) {
+      const data = await this.readArrayFromFile(path, name);
+      data[0] = body;
+      data.push(body);
+
+      cacheService.set(
+        `user.${name.split('.')[0]}`,
+        JSON.stringify(data, null, 2),
+      );
+      fs.writeFileSync(
+        `${this.dataPath}/${path}/${name}`,
+        JSON.stringify(data, null, 2),
+        'utf8',
+      );
+    } else {
+      fs.mkdirSync(`${this.dataPath}/${path}`, { recursive: true });
+
+      const data: any[] = [];
+      data.push(body);
+      data.push(body);
+
+      cacheService.set(
+        `user.${name.split('.')[0]}`,
+        JSON.stringify(data, null, 2),
+      );
+      fs.writeFileSync(
+        `${this.dataPath}/${path}/${name}`,
         JSON.stringify(data, null, 2),
         'utf8',
       );

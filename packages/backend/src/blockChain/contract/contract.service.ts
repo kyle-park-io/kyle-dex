@@ -39,6 +39,10 @@ export class ContractService implements OnModuleInit {
     await this.initPromise;
   }
 
+  getContractInterfaceByName(name: string): Interface | undefined {
+    return this.interfaceByNameMap.get(name);
+  }
+
   getContractByName(name: string): Contract | undefined {
     return this.contractByNameMap.get(name);
   }

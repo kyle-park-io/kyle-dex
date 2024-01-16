@@ -9,7 +9,7 @@ import { DetailedErrorFilter } from './common/expection/exception';
 import { ExpressAdapter } from '@nestjs/platform-express';
 import express, { type Request, type Response } from 'express';
 import helmet from 'helmet';
-import { init } from './init';
+import { init } from './init/init';
 
 async function bootstrap(): Promise<void> {
   try {

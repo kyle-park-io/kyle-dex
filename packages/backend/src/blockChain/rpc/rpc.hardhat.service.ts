@@ -75,6 +75,14 @@ export class HardhatRpcService implements RpcService, OnModuleInit {
   }
 
   // contract
+  getContractInterfaceByName(name: string): Interface | undefined {
+    return this.contractService.getContractInterfaceByName(name);
+  }
+
+  getContractInterfaceByAddress(address: string): Interface | undefined {
+    return this.interfaceByAddressMap.get(address);
+  }
+
   getContractName(address: string): string | undefined {
     return this.contractNameMap.get(address);
   }
@@ -124,6 +132,28 @@ export class HardhatRpcService implements RpcService, OnModuleInit {
     }
   }
 
+  setContract = async (name: string, address: string): Promise<void> => {
+    const checkContract = this.getContractByName(name);
+    if (checkContract === undefined) {
+      throw new Error(`${name} contract is not existed`);
+    }
+    const interface2 = this.getContractInterfaceByName(name);
+    if (interface2 === undefined) {
+      throw new Error(`${name} contract is not existed`);
+    }
+
+    const contract = new ethers.Contract(address, interface2);
+    this.interfaceByAddressMap.set(address, interface2);
+    this.contractByAddressMap.set(address, contract);
+    this.contractNameMap.set(address, name);
+    this.contractAddressMap.set(name, address);
+
+    const eventList = this.getContractEventList(name, undefined);
+    if (eventList !== undefined) {
+      this.contractEventListByAddressMap.set(address, eventList);
+    }
+  };
+
   async connectNetwork(): Promise<void> {
     try {
       const provider = this.getProvider();
@@ -143,6 +173,8 @@ export class HardhatRpcService implements RpcService, OnModuleInit {
     if (contractsList !== undefined) {
       try {
         for (const value of contractsList) {
+          if (value.name === 'Pair') continue;
+
           const abi = await this.fsService.getAbi(value.name);
           const interface2 = new Interface(Object.values(abi));
           const contract = new ethers.Contract(value.address, interface2);
