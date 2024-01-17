@@ -17,27 +17,96 @@ import {
   ApiInternalServerErrorResponse, // 500
 } from '@nestjs/swagger';
 // dto
+import {
+  GetPairListDto,
+  GetPairDto,
+  GetClientPairDto,
+  GetClientDto,
+} from './dto/chart.request';
 
 @ApiTags('chart')
 @Controller('api/chart')
 export class ChartController {
   constructor(private readonly chartService: ChartService) {}
 
-  @Get('getReserve')
+  @Post('getPairList')
   @Header('Content-Type', 'application/json')
   @ApiOperation({
-    summary: 'getReserve',
-    description: 'getReserve',
+    summary: 'getPairList',
+    description: 'getPairList',
   })
-  @ApiQuery({})
-  @ApiOkResponse({
-    description: 'getReserve success',
-    // type: ResponsePairDto,
+  @ApiBody({ type: GetPairListDto })
+  @ApiCreatedResponse({
+    description: 'getPairList success',
+    // type: ResponseClientDto,
   })
   @ApiInternalServerErrorResponse({ description: 'Internal server error' })
-  async getReserve(): Promise<any> {
+  async getPairList(@Body() dto: GetPairListDto): Promise<any> {
     try {
-      return await this.chartService.getReserve();
+      return await this.chartService.getPairList(dto);
+    } catch (err) {
+      console.error(err);
+      throw err;
+    }
+  }
+
+  @Post('getPair')
+  @Header('Content-Type', 'application/json')
+  @ApiOperation({
+    summary: 'getPair',
+    description: 'getPair',
+  })
+  @ApiBody({ type: GetPairDto })
+  @ApiCreatedResponse({
+    description: 'getPair success',
+    // type: ResponseClientDto,
+  })
+  @ApiInternalServerErrorResponse({ description: 'Internal server error' })
+  async getPair(@Body() dto: GetPairDto): Promise<any> {
+    try {
+      return await this.chartService.getPair(dto);
+    } catch (err) {
+      console.error(err);
+      throw err;
+    }
+  }
+
+  @Post('getClientPair')
+  @Header('Content-Type', 'application/json')
+  @ApiOperation({
+    summary: 'getClientPair',
+    description: 'getClientPair',
+  })
+  @ApiBody({ type: GetClientPairDto })
+  @ApiCreatedResponse({
+    description: 'getClientPair success',
+    // type: ResponseClientDto,
+  })
+  @ApiInternalServerErrorResponse({ description: 'Internal server error' })
+  async getClientPair(@Body() dto: GetClientPairDto): Promise<any> {
+    try {
+      return await this.chartService.getClientPair(dto);
+    } catch (err) {
+      console.error(err);
+      throw err;
+    }
+  }
+
+  @Post('getClient')
+  @Header('Content-Type', 'application/json')
+  @ApiOperation({
+    summary: 'getClient',
+    description: 'getClient',
+  })
+  @ApiBody({ type: GetClientDto })
+  @ApiCreatedResponse({
+    description: 'getClient success',
+    // type: ResponseClientDto,
+  })
+  @ApiInternalServerErrorResponse({ description: 'Internal server error' })
+  async getClient(@Body() dto: GetClientDto): Promise<any> {
+    try {
+      return await this.chartService.getClient(dto);
     } catch (err) {
       console.error(err);
       throw err;
