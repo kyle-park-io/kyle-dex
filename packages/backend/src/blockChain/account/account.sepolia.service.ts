@@ -1,8 +1,11 @@
 import { Inject, Injectable, LoggerService } from '@nestjs/common';
-import { type AccountService } from './interfaces/account.interface';
+import {
+  type AccountInfo,
+  type AccountService,
+} from './interfaces/account.interface';
 import { RpcService } from '../rpc/interfaces/rpc.interface';
 import { ConfigService } from '@nestjs/config';
-import { ethers, type Wallet } from 'ethers';
+import { ethers, type JsonRpcProvider, type Wallet } from 'ethers';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 
 @Injectable()
@@ -33,6 +36,22 @@ export class SepoliaAccountService implements AccountService {
 
   getPublicKey(address: string): string {
     return '0x';
+  }
+
+  async getAccount(address: string): Promise<AccountInfo> {
+    const provider: JsonRpcProvider = this.rpcService.getProvider();
+
+    const network = await provider.getNetwork();
+    const balance = await provider.getBalance(address);
+    const nonce = await provider.getTransactionCount(address);
+
+    const account: AccountInfo = {
+      network: network.name,
+      address,
+      balance: balance.toString(),
+      nonce: nonce.toString(),
+    };
+    return account;
   }
 
   createWallet(name: string, address: string): void {}

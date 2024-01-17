@@ -6,9 +6,19 @@ export interface AccountService {
   getWalletByAddress(address: string): Wallet | undefined;
 
   getPublicKey(address: string): string;
+
+  getAccount(address: string): Promise<AccountInfo>;
 }
 
 export interface AccountConfig {
   name: string;
   privateKey: string;
+}
+
+export interface AccountInfo {
+  network: string;
+  name?: string;
+  address: string;
+  balance: string;
+  nonce: string;
 }
