@@ -404,6 +404,13 @@
   dependencies:
     regenerator-runtime "^0.14.0"
 
+"@babel/runtime@^7.8.7":
+  version "7.23.8"
+  resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.23.8.tgz#8ee6fe1ac47add7122902f257b8ddf55c898f650"
+  integrity sha512-Y7KbAP984rn1VGMbGqKmBLio9V7y5Je9GvU4rQPCPinCyNfUcToxIXl06d59URp/F3LwinvODxab5N/G6qggkw==
+  dependencies:
+    regenerator-runtime "^0.14.0"
+
 "@babel/template@^7.22.15", "@babel/template@^7.3.3":
   version "7.22.15"
   resolved "https://registry.npmjs.org/@babel/template/-/template-7.22.15.tgz"
@@ -1882,6 +1889,11 @@
     open "^9.1.0"
     picocolors "^1.0.0"
     tslib "^2.6.0"
+
+"@popperjs/core@^2.10.1":
+  version "2.11.8"
+  resolved "https://registry.yarnpkg.com/@popperjs/core/-/core-2.11.8.tgz#6b79032e760a0899cd4204710beede972a3a185f"
+  integrity sha512-P1st0aksCrn9sGZhp8GMYwBnQsbvAWsZAX44oXNNvLHGqAOcoVxmjZiohstwQ7SqKnbR47akdNi+uleWD8+g6A==
 
 "@react-native-async-storage/async-storage@^1.17.11":
   version "1.21.0"
@@ -4216,6 +4228,14 @@ doctrine@^3.0.0:
   integrity sha512-yS+Q5i3hBf7GBkd4KG8a7eBNNWNGLTaEwwYWUijIYM7zrlYDM0BFXHjjPWlWZ1Rg7UaddZeIDmi9jF3HmqiQ2w==
   dependencies:
     esutils "^2.0.2"
+
+dom-helpers@^5.2.0:
+  version "5.2.1"
+  resolved "https://registry.yarnpkg.com/dom-helpers/-/dom-helpers-5.2.1.tgz#d9400536b2bf8225ad98fe052e029451ac40e902"
+  integrity sha512-nRCa7CK3VTrM2NmGkIy4cbK7IZlgBE/PYMn55rrXefr5xXDP0LdtfPnblFDoVdcAfslJ7or6iqAUnx0CCGIWQA==
+  dependencies:
+    "@babel/runtime" "^7.8.7"
+    csstype "^3.0.2"
 
 dot-case@^3.0.4:
   version "3.0.4"
@@ -9243,6 +9263,24 @@ socks@^2.6.2:
     ip "^2.0.0"
     smart-buffer "^4.2.0"
 
+solid-bootstrap-core@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/solid-bootstrap-core/-/solid-bootstrap-core-2.0.0.tgz#5e9bd86bd1c21fe6d3b019542c324f50cfda12df"
+  integrity sha512-tw1me1iEvI+UzYRL2Gs53MP51WVwx785CU+6KQVGhaLESw3OoayeFLhe1CvUYb7kuskjtNGyAorZMdMwBJQIBA==
+  dependencies:
+    "@popperjs/core" "^2.10.1"
+    dom-helpers "^5.2.0"
+    solid-react-transition "^1.0.8"
+
+solid-bootstrap@^1.0.19:
+  version "1.0.19"
+  resolved "https://registry.yarnpkg.com/solid-bootstrap/-/solid-bootstrap-1.0.19.tgz#d0ddc5717f9101ea3c96c4cdfefa18ff125e0c9e"
+  integrity sha512-lYhyBOHD8R9Lg3ThWQdNV4edezjnugdLlsT+V5btDGlB3d6TC2d3gtnh4hRWwcj4XQ07ynLRSHJW36RLJL1hfA==
+  dependencies:
+    dom-helpers "^5.2.0"
+    solid-bootstrap-core "^2.0.0"
+    solid-react-transition "^1.0.11"
+
 solid-chartjs@^1.3.9:
   version "1.3.9"
   resolved "https://registry.yarnpkg.com/solid-chartjs/-/solid-chartjs-1.3.9.tgz#487aa05c40b179fa84158ba2d45679caf4af80ae"
@@ -9255,6 +9293,11 @@ solid-js@^1.8.5:
   dependencies:
     csstype "^3.1.0"
     seroval "^0.15.1"
+
+solid-react-transition@^1.0.11, solid-react-transition@^1.0.8:
+  version "1.0.11"
+  resolved "https://registry.yarnpkg.com/solid-react-transition/-/solid-react-transition-1.0.11.tgz#10c044b800674cadb2a3fb33af8a72f87bc8e9c3"
+  integrity sha512-YMT7z6sOupCicDtX19156vbVOm3vCIgjVhPTybR9gLKiIPrDB2NDVqnQk4kpNCDZTOwSjLTOyUQw0xJnXgDg2A==
 
 solid-refresh@^0.5.3:
   version "0.5.3"
