@@ -86,24 +86,30 @@ export class FsService {
     }
   };
 
-  writePairArrayToFile = async (name: string, body: any): Promise<void> => {
-    if (fs.existsSync(`${this.dataPath}/${name}`)) {
-      const data = await this.readArrayFromFile('', name);
+  writePairArrayToFile = async (
+    path: string,
+    name: string,
+    body: any,
+  ): Promise<void> => {
+    if (fs.existsSync(`${this.dataPath}/${path}/${name}`)) {
+      const data = await this.readArrayFromFile(path, name);
       data.push(body);
 
-      cacheService.set('pairList', JSON.stringify(data, null, 2));
+      cacheService.set(`${path}.pairList`, JSON.stringify(data, null, 2));
       fs.writeFileSync(
-        `${this.dataPath}/${name}`,
+        `${this.dataPath}/${path}/${name}`,
         JSON.stringify(data, null, 2),
         'utf8',
       );
     } else {
+      fs.mkdirSync(`${this.dataPath}/${path}`, { recursive: true });
+
       const data: any[] = [];
       data.push(body);
 
-      cacheService.set('pairList', JSON.stringify(data, null, 2));
+      cacheService.set(`${path}.pairList`, JSON.stringify(data, null, 2));
       fs.writeFileSync(
-        `${this.dataPath}/${name}`,
+        `${this.dataPath}/${path}/${name}`,
         JSON.stringify(data, null, 2),
         'utf8',
       );
@@ -121,7 +127,7 @@ export class FsService {
       data.push(body);
 
       cacheService.set(
-        `pair.${name.split('.')[0]}`,
+        `${path.split('/')[0]}.pair.${name.split('.')[0]}`,
         JSON.stringify(data, null, 2),
       );
       fs.writeFileSync(
@@ -137,7 +143,7 @@ export class FsService {
       data.push(body);
 
       cacheService.set(
-        `pair.${name.split('.')[0]}`,
+        `${path.split('/')[0]}.pair.${name.split('.')[0]}`,
         JSON.stringify(data, null, 2),
       );
       fs.writeFileSync(
@@ -158,6 +164,12 @@ export class FsService {
       data[0] = body;
       data.push(body);
 
+      cacheService.set(
+        `${path.split('/')[0]}.user.${name.split('.')[0]}.${
+          name.split('.')[1]
+        }`,
+        JSON.stringify(data, null, 2),
+      );
       fs.writeFileSync(
         `${this.dataPath}/${path}/${name}`,
         JSON.stringify(data, null, 2),
@@ -170,6 +182,12 @@ export class FsService {
       data.push(body);
       data.push(body);
 
+      cacheService.set(
+        `${path.split('/')[0]}.user.${name.split('.')[0]}.${
+          name.split('.')[1]
+        }`,
+        JSON.stringify(data, null, 2),
+      );
       fs.writeFileSync(
         `${this.dataPath}/${path}/${name}`,
         JSON.stringify(data, null, 2),
@@ -189,7 +207,7 @@ export class FsService {
       data.push(body);
 
       cacheService.set(
-        `user.${name.split('.')[0]}`,
+        `${path.split('/')[0]}.user.${name.split('.')[0]}`,
         JSON.stringify(data, null, 2),
       );
       fs.writeFileSync(
@@ -205,7 +223,7 @@ export class FsService {
       data.push(body);
 
       cacheService.set(
-        `user.${name.split('.')[0]}`,
+        `${path.split('/')[0]}.user.${name.split('.')[0]}`,
         JSON.stringify(data, null, 2),
       );
       fs.writeFileSync(
