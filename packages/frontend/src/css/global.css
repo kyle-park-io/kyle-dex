@@ -54,9 +54,11 @@ h3 {
     left: -9999px;
   }
 }
-/* .container {
+
+/* container */
+.container {
   @apply max-w-7xl mx-auto px-4;
-} */
+}
 
 /* colors */
 .basic {

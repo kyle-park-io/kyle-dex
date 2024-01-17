@@ -1,7 +1,7 @@
 import { type Component, type JSX } from 'solid-js';
 import { createSignal, createEffect } from 'solid-js';
 // interface
-import { type MetamaskIndexProps } from './interfaces/interfaces';
+import { type MetamaskIndexProps } from './interfaces/component.interfaces';
 // metamask
 import { MetaMaskSDK } from '@metamask/sdk';
 

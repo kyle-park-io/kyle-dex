@@ -2,7 +2,6 @@ import { render } from 'solid-js/web';
 import { Router, Route, Routes } from '@solidjs/router';
 
 // global css
-import 'normalize.css';
 import './css/global.css';
 
 // basic
@@ -25,7 +24,8 @@ if (root != null) {
           <div class="h-12 bg-blue-500">
             <Header></Header>
           </div>
-          <div class="flex-grow bg-green-500 flex flex-col">
+          {/* <div> */}
+          <div class="flex-grow bg-white flex flex-col">
             <Routes>
               <Route path="/dex" component={App} />
               <Route path="/dex/account" component={AccountIndex} />
@@ -34,7 +34,7 @@ if (root != null) {
               <Route path="*" component={NotFoundPage} />
             </Routes>
           </div>
-          <div class="center-flex h-10 bg-red-500">
+          <div class="center-flex h-10 bg-gray-200">
             <Footer></Footer>
           </div>
         </Router>

@@ -1,11 +1,28 @@
-import { type Component, type JSX, onMount, createSignal } from 'solid-js';
-import { Chart, Title, Tooltip, Legend, Colors } from 'chart.js';
-import { DefaultChart, Line, Scatter } from 'solid-chartjs';
-import { getReserve } from './Chart.axios';
-import 'chart.js/auto';
+import { type Component, type JSX } from 'solid-js';
+import { onMount, createSignal } from 'solid-js';
+import { getPairList, getPair, getClientPair, getClient } from './Chart.axios';
+import {
+  type PairListProps,
+  type ChartProps,
+  type ClientPairProps,
+} from './interfaces/component.interfaces';
 
-export const MyChart: Component = (): JSX.Element => {
-  const [data, setData] = createSignal('');
+import 'chart.js/auto';
+import { Chart, Title, Tooltip, Legend, Colors } from 'chart.js';
+import { Scatter } from 'solid-chartjs';
+
+export const ChartIndex: Component<ChartProps> = (props): JSX.Element => {
+  const env = import.meta.env.VITE_ENV;
+  let api;
+  if (env === 'DEV') {
+    api = import.meta.env.VITE_DEV_API_URL;
+  } else if (env === 'PROD') {
+    api = import.meta.env.VITE_PROD_API_URL;
+  } else {
+    throw new Error('url env error');
+  }
+
+  const [data2, setData] = createSignal('');
 
   /**
    * You must register optional elements before using the chart,
@@ -13,12 +30,13 @@ export const MyChart: Component = (): JSX.Element => {
    */
   onMount(() => {
     async function test(): Promise<void> {
-      const api = import.meta.env.VITE_DEV_API_URL;
       Chart.register(Title, Tooltip, Legend, Colors);
 
-      const data = await getReserve(api, '');
+      const data = await getPairList(api, { network: 'hardhat' });
       setData(data);
+      console.log(data2());
     }
+
     void test();
   });
 
@@ -31,10 +49,12 @@ export const MyChart: Component = (): JSX.Element => {
       },
     ],
   };
+  console.log(chartData);
   const chartOptions = {
     responsive: true,
     maintainAspectRatio: false,
   };
+  console.log(chartOptions);
 
   const chartData2 = {
     // datasets: aa(),
