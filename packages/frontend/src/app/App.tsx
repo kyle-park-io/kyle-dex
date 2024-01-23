@@ -13,11 +13,8 @@ const App: Component = (): JSX.Element => {
 
   return (
     <>
-      <div class="flex-grow flex flex-col">
-        <div>
-          <h1 class="underline">KYLE-DEX WILL OPEN SOON!</h1>
-        </div>
-        <div class="flex-grow center-flex"></div>
+      <div class="tw-flex tw-flex-col tw-items-center tw-justify-center tw-w-full">
+        <h1 class="tw-underline">KYLE-DEX WILL OPEN SOON!</h1>
       </div>
     </>
   );

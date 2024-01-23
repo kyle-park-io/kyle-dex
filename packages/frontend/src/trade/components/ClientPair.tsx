@@ -39,7 +39,7 @@ export const ClientPair: Component<ClientPairProps> = (props): JSX.Element => {
     <div>
       <ListGroup>
         <For each={items()}>
-          {(item) => (
+          {(item: any) => (
             <ListGroupItem>
               {item.event}:{item.shortPairAddress + '...'}
             </ListGroupItem>

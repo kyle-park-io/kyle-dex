@@ -1,6 +1,6 @@
 import { type Component, type JSX } from 'solid-js';
 import { createSignal, onMount } from 'solid-js';
-import Spinner from '../components/Spinner';
+import { Spinner, Container, Row, Col } from 'solid-bootstrap';
 // api
 import { balanceOf, calcPair } from './Dex.axios';
 
@@ -57,6 +57,7 @@ const DexIndex: Component = (): JSX.Element => {
           tokenB: tokenB,
         });
         setPairAddress(pair);
+
         // const B_PAIR = await balanceOf(url, {
         //   userAddress: user,
         //   contractAddress: pair,
@@ -81,36 +82,44 @@ const DexIndex: Component = (): JSX.Element => {
 
   return (
     <>
-      <div class="flex-grow flex flex-col">
-        <div>DEX Info</div>
-        {!loading() ? (
-          <div class="flex-grow center-flex">
-            Loading...
-            <Spinner></Spinner>
-          </div>
-        ) : (
-          <div>
-            {error() !== null ? (
-              <div>{error()?.message}</div>
+      <Container fluid>
+        <Row>
+          <Col md={12}>
+            <h1>DEX Info</h1>
+          </Col>
+        </Row>
+        <Row>
+          <Col md={12}>
+            {!loading() ? (
+              <div>
+                Loading...
+                <Spinner animation="border" variant="primary" />
+              </div>
             ) : (
               <div>
-                <div>
-                  <h3>tokenA</h3>
-                  {B_TOKENA()}
-                </div>
-                <div>
-                  <h3>tokenB</h3>
-                  {B_TOKENB()}
-                </div>
-                <div>
-                  <h3>pair : {pairAddress()}</h3>
-                  {B_PAIR()}
-                </div>
+                {error() !== null ? (
+                  <div>{error()?.message}</div>
+                ) : (
+                  <div>
+                    <div>
+                      <h3>tokenA</h3>
+                      {B_TOKENA()}
+                    </div>
+                    <div>
+                      <h3>tokenB</h3>
+                      {B_TOKENB()}
+                    </div>
+                    <div>
+                      <h3>pair : {pairAddress()}</h3>
+                      {B_PAIR()}
+                    </div>
+                  </div>
+                )}
               </div>
             )}
-          </div>
-        )}
-      </div>
+          </Col>
+        </Row>
+      </Container>
     </>
   );
 };

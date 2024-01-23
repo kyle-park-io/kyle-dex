@@ -9,23 +9,22 @@ import Header from './layout/Header';
 import Footer from './layout/Footer';
 
 // route
-import App from './App';
+import App from './app/App';
 import AccountIndex from './account/account.index';
 import DexIndex from './dex/Dex.index';
 import TradeIndex from './trade/Trade.index';
-import NotFoundPage from './NotFoundPage';
+import NotFoundPage from './components/404/NotFoundPage';
 
 const root = document.getElementById('root');
 if (root != null) {
   render(
     () => (
-      <div class="flex flex-col min-h-screen">
+      <div class="tw-flex tw-flex-col tw-min-h-screen">
         <Router>
-          <div class="h-12 bg-blue-500">
+          <div class="tw-bg-white tw-h-12 tw-overflow-auto">
             <Header></Header>
           </div>
-          {/* <div> */}
-          <div class="flex-grow bg-white flex flex-col">
+          <div class="tw-bg-white tw-flex-grow tw-flex tw-flex-wrap">
             <Routes>
               <Route path="/dex" component={App} />
               <Route path="/dex/account" component={AccountIndex} />
@@ -34,7 +33,7 @@ if (root != null) {
               <Route path="*" component={NotFoundPage} />
             </Routes>
           </div>
-          <div class="center-flex h-10 bg-gray-200">
+          <div class="tw-bg-gray-400 tw-h-8">
             <Footer></Footer>
           </div>
         </Router>

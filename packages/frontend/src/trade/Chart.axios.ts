@@ -1,9 +1,9 @@
 import {
   type Pair,
   type Sync,
-  type Mint,
-  type Burn,
-  type Swap,
+  // type Mint,
+  // type Burn,
+  // type Swap,
 } from './interfaces/trade.interface';
 import axios from 'axios';
 

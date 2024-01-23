@@ -1,12 +1,10 @@
 import { type Component, type JSX } from 'solid-js';
 import { onMount, createSignal } from 'solid-js';
-import { getPairList, getPair, getClientPair, getClient } from './Chart.axios';
-import {
-  type PairListProps,
-  type ChartProps,
-  type ClientPairProps,
-} from './interfaces/component.interfaces';
+import { getPairList } from './Chart.axios';
+import { type ChartProps } from './interfaces/component.interfaces';
+import { type Pair } from './interfaces/trade.interface';
 
+// chart.js
 import 'chart.js/auto';
 import { Chart, Title, Tooltip, Legend, Colors } from 'chart.js';
 import { Scatter } from 'solid-chartjs';
@@ -22,7 +20,8 @@ export const ChartIndex: Component<ChartProps> = (props): JSX.Element => {
     throw new Error('url env error');
   }
 
-  const [data2, setData] = createSignal('');
+  const [data2, setData] = createSignal<Pair[]>([]);
+  console.log(props.currentPair);
 
   /**
    * You must register optional elements before using the chart,

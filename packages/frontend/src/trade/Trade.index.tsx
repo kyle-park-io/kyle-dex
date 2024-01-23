@@ -1,12 +1,13 @@
-import { type Component, type JSX, createSignal, createEffect } from 'solid-js';
+import { type Component, type JSX } from 'solid-js';
+import { createSignal, createEffect } from 'solid-js';
+import { Container, Row, Col } from 'solid-bootstrap';
 import { ChartIndex } from './Chart.index';
 import { PairList } from './components/PairList';
 import { ClientPair } from './components/ClientPair';
-import { Container, Row, Col } from 'solid-bootstrap';
 
 const TradeIndex: Component = (): JSX.Element => {
   const [pair, setPair] = createSignal('');
-  const [client, setClient] = createSignal('');
+  // const [client, setClient] = createSignal('');
 
   const handleChangePair = (pair: string): void => {
     setPair(pair);
@@ -18,37 +19,33 @@ const TradeIndex: Component = (): JSX.Element => {
 
   return (
     <>
-      {/* container */}
-      <div class="mx-auto p-4">
-        <Container>
-          <Row class="gap-4">
-            <Col class="bg-purple-300 p-4">Chart</Col>
-            <Col class="bg-purple-300 p-4">Staking</Col>
-            <Col class="bg-purple-300 p-4">Swap</Col>
-            <Col class="bg-purple-300 p-4">Bridge</Col>
-          </Row>
-        </Container>
-
-        <div class="grid grid-cols-5 gap-4">
-          <div class="col-span-3 bg-blue-300 p-4">
-            Chart
+      <Container fluid>
+        <Row class="tw-gap-4 tw-items-center tw-justify-center">
+          <Col class="tw-bg-purple-300 tx-p-4">Chart</Col>
+          <Col class="tw-bg-purple-300 tx-p-4">Staking</Col>
+          <Col class="tw-bg-purple-300 tx-p-4">Swap</Col>
+          <Col class="tw-bg-purple-300 tx-p-4">Bridge</Col>
+        </Row>
+        <Row>
+          <Col md={8} class="tw-bg-blue-300 tw-p-4">
+            <h2>Chart</h2>
             <div>
               <ChartIndex currentPair={pair()}></ChartIndex>
             </div>
-          </div>
-          <div class="col-span-1 bg-green-300 p-4">
+          </Col>
+          <Col md={2} class="tw-bg-green-300 tw-p-4">
             <h3>Pair</h3>
             <PairList
               currentPair={pair()}
               changePair={handleChangePair}
             ></PairList>
-          </div>
-          <div class="col-span-1 bg-green-300 p-4">
+          </Col>
+          <Col md={2} class="tw-bg-red-300 tw-p-4">
             <h3>Client</h3>
             <ClientPair currentPair={pair()}></ClientPair>
-          </div>
-        </div>
-      </div>
+          </Col>
+        </Row>
+      </Container>
     </>
   );
 };
