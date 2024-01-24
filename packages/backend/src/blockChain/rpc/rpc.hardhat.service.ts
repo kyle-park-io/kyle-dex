@@ -132,7 +132,7 @@ export class HardhatRpcService implements RpcService, OnModuleInit {
     }
   }
 
-  setContract = async (name: string, address: string): Promise<void> => {
+  setContract = (name: string, address: string): void => {
     const checkContract = this.getContractByName(name);
     if (checkContract === undefined) {
       throw new Error(`${name} contract is not existed`);

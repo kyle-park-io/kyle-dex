@@ -4,7 +4,12 @@ import { AccountService } from '../account/interfaces/account.interface';
 import { RpcService } from '../rpc/interfaces/rpc.interface';
 import { DecodeService } from '../utils/decode.service';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
-import { type Wallet, type Contract, type TransactionRequest } from 'ethers';
+import {
+  type Wallet,
+  type Contract,
+  type TransactionRequest,
+  ZeroAddress,
+} from 'ethers';
 import { type ProcessContractDto } from './dto/common.dto';
 
 @Injectable()
@@ -26,6 +31,10 @@ export class CommonService {
 
   async query(dto: ProcessContractDto): Promise<any> {
     try {
+      if (dto.userAddress === ZeroAddress) {
+        return await this.queryWithContractInterface(dto);
+      }
+
       const wallet: Wallet | undefined = this.accountService.getWalletByAddress(
         dto.userAddress,
       );
@@ -52,6 +61,35 @@ export class CommonService {
         );
       }
 
+      const decodedResult = await this.decodeService.decodeResult(
+        contractName,
+        dto.function,
+        result,
+      );
+      return decodedResult;
+    } catch (err) {
+      this.logger.error(err);
+      throw err;
+    }
+  }
+
+  async queryWithContractInterface(dto: ProcessContractDto): Promise<any> {
+    try {
+      const contract: Contract | undefined =
+        this.rpcService.getContractByAddress(dto.contractAddress);
+      if (contract === undefined) {
+        throw new Error(
+          `contract is not existed, address : ${dto.contractAddress}`,
+        );
+      }
+
+      const result = await contract[dto.function](...dto.args);
+      const contractName = this.rpcService.getContractName(dto.contractAddress);
+      if (contractName === undefined) {
+        throw new Error(
+          `contract is not existed, address : ${dto.contractAddress}`,
+        );
+      }
       const decodedResult = await this.decodeService.decodeResult(
         contractName,
         dto.function,
