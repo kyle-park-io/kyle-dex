@@ -1,15 +1,14 @@
 import { Module } from '@nestjs/common';
-import { TransactionListenerService } from './transaction-listener.hardhat.service';
-import { HardhatRpcService } from '../../rpc/rpc.hardhat.service';
-import { SepoliaRpcService } from '../../rpc/rpc.sepolia.service';
-import { MumbaiRpcService } from '../../rpc/rpc.mumbai.service';
+import { HardhatTransactionListenerService } from './transaction-listener.hardhat.service';
+import { RpcModule } from '../../../blockChain/rpc/rpc.module';
 
 @Module({
+  imports: [RpcModule],
   providers: [
-    { provide: 'HardhatRpc', useClass: HardhatRpcService },
-    { provide: 'SepoliaRpc', useClass: SepoliaRpcService },
-    { provide: 'MumbaiRpc', useClass: MumbaiRpcService },
-    TransactionListenerService,
+    {
+      provide: 'HardhatTransaction',
+      useClass: HardhatTransactionListenerService,
+    },
   ],
 })
 export class TransactionListenerModule {}

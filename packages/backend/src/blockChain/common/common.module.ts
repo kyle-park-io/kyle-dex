@@ -1,15 +1,11 @@
-import { Global, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { CommonService } from './common.service';
-import { HardhatRpcService } from '../rpc/rpc.hardhat.service';
-import { HardhatAccountService } from '../account/account.hardhat.service';
+import { RpcModule } from '../rpc/rpc.module';
+import { AccountModule } from '../account/account.module';
 
-@Global()
 @Module({
-  providers: [
-    { provide: 'HardhatRpc', useClass: HardhatRpcService },
-    { provide: 'HardhatAccount', useClass: HardhatAccountService },
-    CommonService,
-  ],
+  imports: [RpcModule, AccountModule],
+  providers: [CommonService],
   exports: [CommonService],
 })
 export class CommonModule {}
