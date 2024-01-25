@@ -10,7 +10,7 @@ import { RpcService } from '../../rpc/interfaces/rpc.interface';
 import { type Provider } from 'ethers';
 
 @Injectable()
-export class TransactionListenerService implements OnModuleInit {
+export class HardhatTransactionListenerService implements OnModuleInit {
   private initPromise!: Promise<void>;
 
   constructor(
