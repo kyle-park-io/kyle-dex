@@ -1,6 +1,8 @@
-cd ../packages/backend
+currentDir=$(pwd)
+
+cd ${currentDir}/packages/backend
 rm -rf build
 
-cd ../frontend
+cd ${currentDir}/packages/frontend
 yarn run build
-cp -r -p dist ../backend/build
+cp -r -p dist ${currentDir}/packages/backend/build

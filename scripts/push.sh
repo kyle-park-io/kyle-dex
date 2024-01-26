@@ -1,4 +1,6 @@
-docker builder prune -f
+# docker builder prune -f
 
-cd ../packages/backend
+currentDir=$(pwd)
+
+cd ${currentDir}/packages/backend
 ./push2gke.sh
