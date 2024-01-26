@@ -41,7 +41,7 @@ export class TokenService {
       } else if (dto.contractAddress !== undefined) {
         contractAddress = dto.contractAddress;
       } else if (dto.contractName !== undefined) {
-        const contract = this.rpcService.getContractByName(dto.contractName);
+        const contract = this.rpcService.getContractAddress(dto.contractName);
         if (contract === undefined) {
           throw new Error('contract is not existed');
         }
@@ -54,9 +54,7 @@ export class TokenService {
         function: 'balanceOf',
         args: [dto.address],
       };
-      const balance = await this.commonService.query(args);
-      const result: ResponseBalanceOfDto = { amount: balance.result };
-      return result;
+      return await this.commonService.query(args);
     } catch (err) {
       this.logger.error('balanceOf error');
       throw err;

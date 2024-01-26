@@ -4,11 +4,7 @@ import { CommonService } from '../../blockChain/common/common.service';
 import { AccountService } from '../../blockChain/account/interfaces/account.interface';
 import { RpcService } from '../../blockChain/rpc/interfaces/rpc.interface';
 import { FsService } from '../../blockChain/utils/fs.service';
-import {
-  type CalcPairDto,
-  type Create2Dto,
-  type EstimateLiquidityDto,
-} from './dto/utils.request.dto';
+import { type CalcPairDto, type Create2Dto } from './dto/utils.request.dto';
 import { type ResponsePairDto } from './dto/utils.response.dto';
 import { type ProcessContractDto } from '../../blockChain/common/dto/common.dto';
 import { keccak256, solidityPackedKeccak256, getCreate2Address } from 'ethers';
@@ -54,15 +50,7 @@ export class UtilsService {
         function: 'calcPair',
         args: [dto.factory, dto.tokenA, dto.tokenB],
       };
-      const address = await this.commonService.query(args);
-
-      // const name = this.contractService.getContractName(address.result);
-      // if (name === undefined) {
-      //   throw new Error('pair contract is not existed');
-      // }
-      const name = 'pair';
-      const result: ResponsePairDto = { name, address: address.result };
-      return result;
+      return await this.commonService.query(args);
     } catch (err) {
       this.logger.error('calcPair error');
       throw err;
@@ -80,29 +68,6 @@ export class UtilsService {
       return address;
     } catch (err) {
       this.logger.error('create2 error');
-      throw err;
-    }
-  }
-
-  async estimateLiquidity(dto: EstimateLiquidityDto): Promise<any> {
-    try {
-      // const result = await this.commonService.query(
-      //   'Pair',
-      //   'getReserves',
-      //   [],
-      //   dto.pair,
-      // );
-      // console.log(result);
-      // const result2 = await this.commonService.query(
-      //   'Pair',
-      //   'totalSupply',
-      //   [],
-      //   dto.pair,
-      // );
-      // console.log(result2);
-      // return result;
-    } catch (err) {
-      this.logger.error('estimate liquidity error');
       throw err;
     }
   }

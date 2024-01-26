@@ -90,7 +90,7 @@ export class CommonService {
           `contract is not existed, address : ${dto.contractAddress}`,
         );
       }
-      const decodedResult = await this.decodeService.decodeResult(
+      const decodedResult = await this.decodeService.decodeResult2(
         contractName,
         dto.function,
         result,

@@ -36,7 +36,50 @@ export class DecodeService {
           obj[key] = result[0][index];
         });
       } else {
-        obj.result = result.toString();
+        for (let i = 0; i < fn.outputs.length; i++) {
+          if (fn.outputs.length === 1) {
+            obj[fn.name] = result.toString();
+          } else {
+            obj[fn.outputs[i].name] = result[i].toString();
+          }
+        }
+      }
+      return obj;
+    } catch (err) {
+      this.logger.error(err);
+      throw err;
+    }
+  };
+
+  decodeResult2 = async (
+    ccName: string,
+    fnName: string,
+    result: any,
+  ): Promise<object> => {
+    try {
+      const abi = await this.fsService.getAbi(ccName);
+      const arr = Object.values(abi);
+
+      const interface2 = new ethers.Interface(arr);
+      const fn = interface2.getFunction(fnName);
+      if (fn === null) {
+        throw new Error('does not exist function in abi');
+      }
+
+      const obj: any = {};
+      if (fn.outputs[0].type === 'tuple') {
+        fn.outputs[0].components?.forEach((output, index) => {
+          const key = output.name;
+          obj[key] = result[0][index];
+        });
+      } else {
+        for (let i = 0; i < fn.outputs.length; i++) {
+          if (fn.outputs.length === 1) {
+            obj[fn.name] = result.toString();
+          } else {
+            obj[fn.outputs[i].name] = result[i].toString();
+          }
+        }
       }
       return obj;
     } catch (err) {

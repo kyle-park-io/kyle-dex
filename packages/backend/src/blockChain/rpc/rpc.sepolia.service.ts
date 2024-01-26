@@ -140,7 +140,7 @@ export class SepoliaRpcService implements RpcService, OnModuleInit {
       throw new Error(`${name} contract is not existed`);
     }
 
-    const contract = new ethers.Contract(address, interface2);
+    const contract = new ethers.Contract(address, interface2, this.provider);
     this.interfaceByAddressMap.set(address, interface2);
     this.contractByAddressMap.set(address, contract);
     this.contractNameMap.set(address, name);
@@ -175,7 +175,11 @@ export class SepoliaRpcService implements RpcService, OnModuleInit {
 
           const abi = await this.fsService.getAbi(value.name);
           const interface2 = new Interface(Object.values(abi));
-          const contract = new ethers.Contract(value.address, interface2);
+          const contract = new ethers.Contract(
+            value.address,
+            interface2,
+            this.provider,
+          );
           this.interfaceByAddressMap.set(value.address, interface2);
           this.contractByAddressMap.set(value.address, contract);
           this.contractNameMap.set(value.address, value.name);
