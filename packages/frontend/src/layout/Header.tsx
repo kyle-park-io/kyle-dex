@@ -1,8 +1,9 @@
 import { type Component, type JSX } from 'solid-js';
-import { createSignal } from 'solid-js';
-import { useNavigate } from '@solidjs/router';
+import { createSignal, onMount, For } from 'solid-js';
+import { useNavigate, useLocation } from '@solidjs/router';
 import { Container, Row, Col, Nav } from 'solid-bootstrap';
 import HomeLogo from '/home.svg?url';
+import { getClientList } from '../account/Account.axios';
 
 // css
 import './Header.css';
@@ -11,6 +12,20 @@ import './Header.css';
 import MetamaskIndex from '../metamask/Metamask.index';
 
 const Header: Component = (): JSX.Element => {
+  const env = import.meta.env.VITE_ENV;
+  let url;
+  let apiUrl;
+  if (env === 'DEV') {
+    url = import.meta.env.VITE_DEV_URL;
+    apiUrl = import.meta.env.VITE_DEV_API_URL;
+  } else if (env === 'PROD') {
+    url = import.meta.env.VITE_PROD_URL;
+    apiUrl = import.meta.env.VITE_PROD_API_URL;
+  } else {
+    throw new Error('env error');
+  }
+
+  const location = useLocation();
   const navigate = useNavigate();
   const handleTitleClick = (): void => {
     navigate('/dex');
@@ -18,17 +33,36 @@ const Header: Component = (): JSX.Element => {
   const handleImageClick = (): void => {
     navigate('/dex');
   };
-  const handleConnectClick = (): void => {};
-  const handleNetworkClick = (): void => {};
-  const handleAccountClick = (): void => {};
+  const handleHomeClick = (): void => {
+    window.location.href = `${url}`;
+  };
+  const handleAccountClick = (): void => {
+    navigate(`/dex/account/${network()}/${accountButtonAddress()}`);
+  };
 
+  // toggle
   const [isOpen, setIsOpen] = createSignal(false);
   const toggleDropdown = (): boolean => setIsOpen(!isOpen());
+  const [isOpen2, setIsOpen2] = createSignal(false);
+  const toggleDropdown2 = (): boolean => setIsOpen2(!isOpen2());
 
   // button color
   const [hardhatButtonColor, setHardhatButtonColor] = createSignal('blue');
   const [sepoliaButtonColor, setSepoliaButtonColor] = createSignal('white');
   const [mumbaiButtonColor, setMumbaiButtonColor] = createSignal('white');
+
+  const [accountButtonId, setAccountButtonId] = createSignal(null);
+  const [accountButtonAddress, setAccountButtonAddress] = createSignal(null);
+  const handleAccountButtonClick = (event): void => {
+    const id = event.currentTarget.getAttribute('tabIndex');
+    setAccountButtonId(id);
+    console.log(accountButtonId);
+    const address = event.currentTarget.getAttribute('id');
+    setAccountButtonAddress(address);
+    if (location.pathname.startsWith('/dex/account')) {
+      handleAccountClick();
+    }
+  };
 
   // network status
   const [isLocal, setIsLocal] = createSignal(true);
@@ -81,6 +115,15 @@ const Header: Component = (): JSX.Element => {
   console.log(sepoliaError());
   console.log(mumbaiError());
 
+  const [accountList, setAccountList] = createSignal([]);
+  onMount(() => {
+    async function fetchData(): Promise<void> {
+      const res = await getClientList(apiUrl, {});
+      setAccountList(res);
+    }
+    void fetchData();
+  });
+
   return (
     <>
       <div>
@@ -115,6 +158,9 @@ const Header: Component = (): JSX.Element => {
               <button onClick={handleImageClick} class="transparent tw-h-10">
                 <img src={HomeLogo} alt="Home" class="tw-h-full"></img>
               </button>
+              <button onClick={handleHomeClick} class="transparent">
+                <span>Go Basic Home</span>
+              </button>
             </Col>
             <Col md={4} class="tw-flex tw-justify-center">
               <button onClick={handleTitleClick} class="transparent">
@@ -124,7 +170,7 @@ const Header: Component = (): JSX.Element => {
             <Col md={4} class="tw-flex tw-justify-end">
               <Nav defaultActiveKey="#" as="ul">
                 <Nav.Item as="li">
-                  <Nav.Link eventKey="connect" onClick={handleConnectClick}>
+                  <Nav.Link eventKey="connect">
                     {!isLocal() && (
                       <button
                         onClick={() => {
@@ -137,7 +183,7 @@ const Header: Component = (): JSX.Element => {
                   </Nav.Link>
                 </Nav.Item>
                 <Nav.Item as="li">
-                  <Nav.Link eventKey="network" onClick={handleNetworkClick}>
+                  <Nav.Link eventKey="network">
                     <div>
                       <button onMouseEnter={toggleDropdown}>Network</button>
                       {isOpen() && (
@@ -181,6 +227,43 @@ const Header: Component = (): JSX.Element => {
                   </Nav.Link>
                 </Nav.Item>
                 <Nav.Item as="li">
+                  <Nav.Link eventKey="account">
+                    {isLocal() && (
+                      <div>
+                        <button onMouseEnter={toggleDropdown2}>Account</button>
+                        {isOpen2() && (
+                          <div
+                            onMouseLeave={toggleDropdown2}
+                            class="dropdown-content"
+                          >
+                            <For each={accountList()}>
+                              {(item: any, index) => (
+                                <p>
+                                  <button
+                                    id={item.address}
+                                    tabIndex={index()}
+                                    style={{
+                                      background:
+                                        accountButtonAddress() === item.address
+                                          ? 'blue'
+                                          : 'white',
+                                    }}
+                                    onClick={handleAccountButtonClick}
+                                  >
+                                    <span class="tw-text-black">
+                                      {item.name}
+                                    </span>
+                                  </button>
+                                </p>
+                              )}
+                            </For>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </Nav.Link>
+                </Nav.Item>
+                <Nav.Item as="li">
                   <Nav.Link eventKey="account" onClick={handleAccountClick}>
                     <span class="tw-text-black">Account</span>
                   </Nav.Link>
@@ -189,7 +272,6 @@ const Header: Component = (): JSX.Element => {
             </Col>
           </Row>
         </Container>
-
         {/* 헤더 콘텐츠 */}
       </div>
     </>

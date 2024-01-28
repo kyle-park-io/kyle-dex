@@ -27,9 +27,12 @@ if (root != null) {
           <div class="tw-bg-white tw-flex-grow tw-flex tw-flex-wrap">
             <Routes>
               <Route path="/dex" component={App} />
-              <Route path="/dex/account" component={AccountIndex} />
+              <Route
+                path="/dex/account/:network/:address"
+                component={AccountIndex}
+              />
               <Route path="/dex/dex" component={DexIndex} />
-              <Route path="/dex/trade" component={TradeIndex} />
+              <Route path="/dex/chart" component={TradeIndex} />
               <Route path="*" component={NotFoundPage} />
             </Routes>
           </div>

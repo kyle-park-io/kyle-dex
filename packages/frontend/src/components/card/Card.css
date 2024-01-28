@@ -1,0 +1,44 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.card:hover {
+  background-color: gray;
+  border-color: transparent;
+  color: currentColor;
+  box-shadow: none;
+  outline: none;
+}
+
+/* .card {
+  background-color: transparent;
+  border-color: transparent;
+  color: currentColor;
+  text-decoration: none;
+  box-shadow: none;
+  outline: none;
+}
+
+.card2:hover {
+  background-color: yellow;
+  border-color: transparent;
+  color: currentColor;
+  box-shadow: none;
+  outline: none;
+}
+
+.card:focus {
+  background-color: transparent;
+  border-color: transparent;
+  color: currentColor;
+  box-shadow: none;
+  outline: none;
+}
+
+.card:active {
+  background-color: transparent;
+  border-color: transparent;
+  color: currentColor;
+  box-shadow: none;
+  outline: none;
+} */

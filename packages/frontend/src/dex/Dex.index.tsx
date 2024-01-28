@@ -15,11 +15,11 @@ const DexIndex: Component = (): JSX.Element => {
   const [B_PAIR, setPair] = createSignal('');
 
   const env = import.meta.env.VITE_ENV;
-  let url;
+  let apiUrl;
   if (env === 'DEV') {
-    url = import.meta.env.VITE_DEV_URL;
+    apiUrl = import.meta.env.VITE_DEV_API_URL;
   } else if (env === 'PROD') {
-    url = import.meta.env.VITE_PROD_URL;
+    apiUrl = import.meta.env.VITE_PROD_API_URL;
     setIsProd(true);
   } else {
     throw new Error('env error');
@@ -33,7 +33,7 @@ const DexIndex: Component = (): JSX.Element => {
   onMount(() => {
     async function fetchData(): Promise<void> {
       try {
-        const B_TOKENA = await balanceOf(url, {
+        const B_TOKENA = await balanceOf(apiUrl, {
           userAddress: user,
           contractAddress: tokenA,
           name: 'tokenA',
@@ -41,7 +41,7 @@ const DexIndex: Component = (): JSX.Element => {
         });
         setTokenA(B_TOKENA);
 
-        const B_TOKENB = await balanceOf(url, {
+        const B_TOKENB = await balanceOf(apiUrl, {
           userAddress: user,
           contractAddress: tokenA,
           name: 'tokenB',
@@ -49,7 +49,7 @@ const DexIndex: Component = (): JSX.Element => {
         });
         setTokenB(B_TOKENB);
 
-        const pair = await calcPair(url, {
+        const pair = await calcPair(apiUrl, {
           userAddress: user,
           name: 'DexCalc',
           factory: factory,
