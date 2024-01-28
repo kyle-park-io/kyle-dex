@@ -31,6 +31,28 @@ export class ClientController {
     private readonly mumbaiClientService: MumbaiClientService,
   ) {}
 
+  @Get('getClientList')
+  @Header('Content-Type', 'application/json')
+  @ApiOperation({
+    summary: 'getClientList',
+    description: 'getClientList',
+  })
+  @ApiOkResponse({
+    description: 'getClientList success',
+    // type:
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Internal server error',
+  })
+  getClientList(): any {
+    try {
+      return this.hardhatClientService.getClientList();
+    } catch (err) {
+      console.log(err);
+      throw err;
+    }
+  }
+
   @Post('getClient')
   @Header('Content-Type', 'application/json')
   @ApiOperation({

@@ -8,6 +8,8 @@ export interface AccountService {
   getPublicKey(address: string): string;
 
   getAccount(address: string): Promise<AccountInfo>;
+
+  getAccountList(): any;
 }
 
 export interface AccountConfig {
@@ -21,4 +23,9 @@ export interface AccountInfo {
   address: string;
   balance: string;
   nonce: string;
+}
+
+export interface AccountAddress {
+  name: string;
+  address: string;
 }

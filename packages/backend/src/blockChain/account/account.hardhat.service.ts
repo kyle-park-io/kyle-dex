@@ -3,6 +3,7 @@ import {
   type AccountService,
   type AccountConfig,
   type AccountInfo,
+  type AccountAddress,
 } from './interfaces/account.interface';
 import { RpcService } from '../rpc/interfaces/rpc.interface';
 import { ConfigService } from '@nestjs/config';
@@ -15,6 +16,8 @@ export class HardhatAccountService implements AccountService {
   private readonly walletMap: Map<string, Wallet>;
   private readonly nameByAddressMap: Map<string, string>;
   private readonly addressBynameMap: Map<string, string>;
+  // array
+  private readonly addressArray: AccountAddress[];
 
   constructor(
     // config
@@ -31,6 +34,7 @@ export class HardhatAccountService implements AccountService {
     this.walletMap = new Map<string, Wallet>();
     this.nameByAddressMap = new Map<string, string>();
     this.addressBynameMap = new Map<string, string>();
+    this.addressArray = [];
     const accountList = this.configService.get<AccountConfig[]>('accounts');
     if (accountList !== undefined) {
       for (let i = 0; i < accountList.length; i++) {
@@ -81,6 +85,10 @@ export class HardhatAccountService implements AccountService {
     return account;
   }
 
+  getAccountList(): AccountAddress[] {
+    return this.addressArray;
+  }
+
   private createWallet(name: string, privateKey: string): void {
     try {
       const wallet = new ethers.Wallet(
@@ -94,6 +102,7 @@ export class HardhatAccountService implements AccountService {
       this.walletMap.set(name, wallet);
       this.nameByAddressMap.set(wallet.address, name);
       this.addressBynameMap.set(name, wallet.address);
+      this.addressArray.push({ name, address: wallet.address });
     } catch (err) {
       this.logger.error(err);
       throw err;

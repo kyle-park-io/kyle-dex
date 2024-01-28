@@ -54,5 +54,7 @@ export class MumbaiAccountService implements AccountService {
     return account;
   }
 
+  getAccountList(): void {}
+
   createWallet(name: string, address: string): void {}
 }

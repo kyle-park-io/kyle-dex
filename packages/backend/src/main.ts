@@ -17,15 +17,15 @@ async function bootstrap(): Promise<void> {
     const app = await NestFactory.create(
       AppModule,
       new ExpressAdapter(server),
-      { cors: true },
+      // { cors: true },
     );
 
-    // cors
-    app.enableCors({
-      origin: true,
-      methods: '*',
-      credentials: true,
-    });
+    // // cors
+    // app.enableCors({
+    //   origin: true,
+    //   methods: '*',
+    //   credentials: true,
+    // });
 
     // helmet
     app.use(helmet({ contentSecurityPolicy: false }));
