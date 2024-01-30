@@ -17,7 +17,7 @@ async function bootstrap(): Promise<void> {
     const app = await NestFactory.create(
       AppModule,
       new ExpressAdapter(server),
-      // { cors: true },
+      { cors: true },
     );
 
     // // cors

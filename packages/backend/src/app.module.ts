@@ -3,6 +3,8 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 // static
 import { ServeStaticModule } from '@nestjs/serve-static';
+// eventEmitter
+import { EventEmitterModule } from '@nestjs/event-emitter';
 // config
 import { ConfigModule } from '@nestjs/config';
 import { serverConfig } from './common/config/server.config';
@@ -24,6 +26,8 @@ import path from 'path';
     ServeStaticModule.forRoot({
       rootPath: path.resolve('build'),
     }),
+    // eventEmitter
+    EventEmitterModule.forRoot(),
     // config
     ConfigModule.forRoot({
       load: [serverConfig],

@@ -9,6 +9,7 @@ import { ConfigService } from '@nestjs/config';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { RpcService } from '../../rpc/interfaces/rpc.interface';
 import { FsService } from '../../utils/fs.service';
+import { EventEmitterService } from '../../../event-emitter/event-emitter.service';
 import {
   type ContractEventPayload,
   type LogDescription,
@@ -33,6 +34,7 @@ export class HardhatEventListenerService implements OnModuleInit {
     private readonly rpcService: RpcService,
     // extra
     private readonly fsService: FsService,
+    private readonly eventEmitterService: EventEmitterService,
   ) {}
 
   async getInitializationPromise(): Promise<void> {
@@ -200,7 +202,11 @@ export class HardhatEventListenerService implements OnModuleInit {
                 reserveObj,
               );
               await this.setEventListener('Pair', pair);
-
+              // sse
+              this.eventEmitterService.create(
+                'PairCreated',
+                JSON.stringify(pairObj),
+              );
               break;
             }
             default:
