@@ -1,8 +1,10 @@
 import { type Component, type JSX } from 'solid-js';
 import { createSignal, createEffect, For } from 'solid-js';
 import { type ClientPairProps } from '../interfaces/component.interfaces';
-import { getClientPair } from '../Chart.axios';
+import { getClientPair } from '../Dex.axios';
 import { ListGroup, ListGroupItem } from 'solid-bootstrap';
+
+const [isCalled, setIsCalled] = createSignal(false);
 
 export const ClientPair: Component<ClientPairProps> = (props): JSX.Element => {
   const env = import.meta.env.VITE_ENV;
@@ -18,7 +20,14 @@ export const ClientPair: Component<ClientPairProps> = (props): JSX.Element => {
   const [items, setItems] = createSignal([]);
 
   createEffect(() => {
-    if (props.currentPair !== '') {
+    setIsCalled(true);
+    if (!isCalled()) {
+      if (props.currentPair !== '') {
+        void test();
+        setIsCalled(true);
+      }
+    }
+    if (props.currentPair !== '' && props.currentAccount !== '') {
       void test();
     }
   });
@@ -26,7 +35,7 @@ export const ClientPair: Component<ClientPairProps> = (props): JSX.Element => {
   async function test(): Promise<void> {
     const data = await getClientPair(api, {
       network: 'hardhat',
-      userAddress: '0x70997970C51812dc3A010C7d01b50e0d17dc79C8',
+      userAddress: props.currentAccount,
       pairAddress: props.currentPair,
     });
     for (let i = 0; i < data.length; i++) {

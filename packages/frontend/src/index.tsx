@@ -11,8 +11,7 @@ import Footer from './layout/Footer';
 // route
 import App from './app/App';
 import AccountIndex from './account/account.index';
-import DexIndex from './dex/Dex.index';
-import TradeIndex from './trade/Trade.index';
+import DexChartIndex from './dex/Dex.index';
 import NotFoundPage from './components/404/NotFoundPage';
 
 const root = document.getElementById('root');
@@ -31,8 +30,7 @@ if (root != null) {
                 path="/dex/account/:network/:address"
                 component={AccountIndex}
               />
-              <Route path="/dex/dex" component={DexIndex} />
-              <Route path="/dex/chart" component={TradeIndex} />
+              <Route path="/dex/chart" component={DexChartIndex} />
               <Route path="*" component={NotFoundPage} />
             </Routes>
           </div>

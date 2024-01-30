@@ -1,8 +1,6 @@
 import { type Component, type JSX } from 'solid-js';
-import { onMount, createSignal } from 'solid-js';
-import { getPairList } from './Chart.axios';
+import { onMount } from 'solid-js';
 import { type ChartProps } from './interfaces/component.interfaces';
-import { type Pair } from './interfaces/trade.interface';
 
 // chart.js
 import 'chart.js/auto';
@@ -19,9 +17,8 @@ export const ChartIndex: Component<ChartProps> = (props): JSX.Element => {
   } else {
     throw new Error('url env error');
   }
-
-  const [data2, setData] = createSignal<Pair[]>([]);
-  console.log(props.currentPair);
+  console.log(api);
+  console.log(props);
 
   /**
    * You must register optional elements before using the chart,
@@ -30,10 +27,6 @@ export const ChartIndex: Component<ChartProps> = (props): JSX.Element => {
   onMount(() => {
     async function test(): Promise<void> {
       Chart.register(Title, Tooltip, Legend, Colors);
-
-      const data = await getPairList(api, { network: 'hardhat' });
-      setData(data);
-      console.log(data2());
     }
 
     void test();

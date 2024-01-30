@@ -25,27 +25,29 @@ const AccountIndex: Component = (): JSX.Element => {
   }
 
   createEffect(() => {
-    if (isProd() && params.address !== 'null') {
-      async function fetchData(): Promise<void> {
-        try {
-          const res = await getClient(apiUrl, {
-            network: params.network,
-            userAddress: params.address,
-          });
-          setAccount(res);
-          setLoading(true);
-        } catch (err) {
-          if (err instanceof Error) {
-            setError(err);
-          } else {
-            setError(new Error(String(err)));
+    if (isProd()) {
+      if (params.address !== 'null') {
+        async function fetchData(): Promise<void> {
+          try {
+            const res = await getClient(apiUrl, {
+              network: params.network,
+              userAddress: params.address,
+            });
+            setAccount(res);
+            setLoading(true);
+          } catch (err) {
+            if (err instanceof Error) {
+              setError(err);
+            } else {
+              setError(new Error(String(err)));
+            }
+            setLoading(true);
           }
-          setLoading(true);
         }
+        void fetchData();
+      } else {
+        setLoading(true);
       }
-      void fetchData();
-    } else {
-      setLoading(true);
     }
   });
 

@@ -1,9 +1,11 @@
 import { type Component, type JSX } from 'solid-js';
-import { onMount, createSignal, createEffect, For } from 'solid-js';
+import { createSignal, createEffect, For } from 'solid-js';
 import { type PairListProps } from '../interfaces/component.interfaces';
 import { type Pair2 } from '../interfaces/trade.interface';
-import { getPairList } from '../Chart.axios';
+import { getPairList } from '../Dex.axios';
 import { ListGroup, ListGroupItem, Button } from 'solid-bootstrap';
+
+const [isCalled, setIsCalled] = createSignal(false);
 
 export const PairList: Component<PairListProps> = (props): JSX.Element => {
   const env = import.meta.env.VITE_ENV;
@@ -19,13 +21,11 @@ export const PairList: Component<PairListProps> = (props): JSX.Element => {
   // const [items, setItems] = createSignal<Pair[]>([]);
   const [items, setItems] = createSignal<Pair2[]>([]);
 
-  onMount(() => {
-    void test();
-  });
-
   createEffect(() => {
-    // void fetchData();
-    // props.initConnectStatus();
+    if (!isCalled()) {
+      void test();
+      setIsCalled(true);
+    }
   });
 
   async function test(): Promise<void> {

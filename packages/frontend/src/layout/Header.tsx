@@ -1,5 +1,6 @@
 import { type Component, type JSX } from 'solid-js';
 import { createSignal, onMount, For } from 'solid-js';
+import { createStore } from 'solid-js/store';
 import { useNavigate, useLocation } from '@solidjs/router';
 import { Container, Row, Col, Nav } from 'solid-bootstrap';
 import HomeLogo from '/home.svg?url';
@@ -10,6 +11,8 @@ import './Header.css';
 
 // metamask
 import MetamaskIndex from '../metamask/Metamask.index';
+
+export const [globalAccount, setGlobalAccount] = createStore({ address: '' });
 
 const Header: Component = (): JSX.Element => {
   const env = import.meta.env.VITE_ENV;
@@ -56,9 +59,10 @@ const Header: Component = (): JSX.Element => {
   const handleAccountButtonClick = (event): void => {
     const id = event.currentTarget.getAttribute('tabIndex');
     setAccountButtonId(id);
-    console.log(accountButtonId);
+    console.log(accountButtonId());
     const address = event.currentTarget.getAttribute('id');
     setAccountButtonAddress(address);
+    setGlobalAccount({ address });
     if (location.pathname.startsWith('/dex/account')) {
       handleAccountClick();
     }
