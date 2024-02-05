@@ -26,7 +26,7 @@ const AccountIndex: Component = (): JSX.Element => {
 
   createEffect(() => {
     if (isProd()) {
-      if (params.address !== 'null') {
+      if (params.network !== 'null' && params.address !== 'null') {
         async function fetchData(): Promise<void> {
           try {
             const res = await getClient(apiUrl, {
@@ -45,7 +45,9 @@ const AccountIndex: Component = (): JSX.Element => {
           }
         }
         void fetchData();
-      } else {
+      }
+      if (params.network === 'null' || params.address === 'null') {
+        setAccount();
         setLoading(true);
       }
     }
@@ -81,7 +83,7 @@ const AccountIndex: Component = (): JSX.Element => {
                           <p>balance : {account()?.balance}</p>
                         </div>
                       ) : (
-                        <div>Testing...</div>
+                        <div>Please select account!</div>
                       )}
                     </div>
                   )}

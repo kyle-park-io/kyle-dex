@@ -1,7 +1,12 @@
 export interface MetamaskIndexProps {
+  chainId: string;
   network: string;
-  loadMetamask: boolean;
-  initConnectStatus: () => void;
   currentNetwork: string;
+  loadMetamask: boolean;
+  handleLoadMetamask: () => void;
+  isConnected: boolean;
+  handleConnect: () => void;
+  disconnect: boolean;
+  handleDisconnect: () => void;
   onError: (error: Error) => void;
 }

@@ -12,7 +12,10 @@ import './Header.css';
 // metamask
 import MetamaskIndex from '../metamask/Metamask.index';
 
-export const [globalAccount, setGlobalAccount] = createStore({ address: '' });
+// global status
+export const [globalAccount, setGlobalAccount] = createStore({
+  address: 'null',
+});
 
 const Header: Component = (): JSX.Element => {
   const env = import.meta.env.VITE_ENV;
@@ -40,7 +43,7 @@ const Header: Component = (): JSX.Element => {
     window.location.href = `${url}`;
   };
   const handleAccountClick = (): void => {
-    navigate(`/dex/account/${network()}/${accountButtonAddress()}`);
+    navigate(`/dex/account/${network()}/${globalAccount.address}`);
   };
 
   // toggle
@@ -55,14 +58,19 @@ const Header: Component = (): JSX.Element => {
   const [mumbaiButtonColor, setMumbaiButtonColor] = createSignal('white');
 
   const [accountButtonId, setAccountButtonId] = createSignal(null);
-  const [accountButtonAddress, setAccountButtonAddress] = createSignal(null);
+  const [accountButtonAddress, setAccountButtonAddress] = createSignal('null');
   const handleAccountButtonClick = (event): void => {
     const id = event.currentTarget.getAttribute('tabIndex');
     setAccountButtonId(id);
     console.log(accountButtonId());
     const address = event.currentTarget.getAttribute('id');
-    setAccountButtonAddress(address);
-    setGlobalAccount({ address });
+    if (globalAccount.address !== address) {
+      setAccountButtonAddress(address);
+      setGlobalAccount({ address });
+    } else {
+      setAccountButtonAddress('null');
+      setGlobalAccount({ address: 'null' });
+    }
     if (location.pathname.startsWith('/dex/account')) {
       handleAccountClick();
     }
@@ -71,29 +79,70 @@ const Header: Component = (): JSX.Element => {
   // network status
   const [isLocal, setIsLocal] = createSignal(true);
   const [network, setNetwork] = createSignal('hardhat');
-  const [metamask, setMetamask] = createSignal(false);
-  const updateNetwork = (network: string): void => {
-    setNetwork(network);
-    if (network === 'hardhat') {
+  const [isMetamaskConnected, setIsMetamaskConnected] = createSignal(false);
+  const [metamaskDisconnect, setMetamaskDisconnect] = createSignal(false);
+  const [loadMetamask, setLoadMetamask] = createSignal(false);
+  const updateNetwork = (networkKey: string): void => {
+    if (network() === networkKey) {
       setIsLocal(true);
-      setHardhatButtonColor('blue');
+      setHardhatButtonColor('white');
       setSepoliaButtonColor('white');
       setMumbaiButtonColor('white');
-    } else if (network === 'sepolia') {
-      setIsLocal(false);
-      setHardhatButtonColor('white');
-      setSepoliaButtonColor('blue');
-      setMumbaiButtonColor('white');
+      setNetwork('null');
+      setAccountButtonAddress('null');
+      setGlobalAccount({ address: 'null' });
+      if (location.pathname.startsWith('/dex/account')) {
+        handleAccountClick();
+      }
     } else {
-      setIsLocal(false);
-      setHardhatButtonColor('white');
-      setSepoliaButtonColor('white');
-      setMumbaiButtonColor('blue');
+      setNetwork(networkKey);
+      if (networkKey === 'hardhat') {
+        setIsLocal(true);
+        setHardhatButtonColor('blue');
+        setSepoliaButtonColor('white');
+        setMumbaiButtonColor('white');
+      } else if (networkKey === 'sepolia') {
+        setIsLocal(false);
+        setHardhatButtonColor('white');
+        setSepoliaButtonColor('blue');
+        setMumbaiButtonColor('white');
+        setAccountButtonAddress('null');
+        setGlobalAccount({ address: 'null' });
+        if (location.pathname.startsWith('/dex/account')) {
+          handleAccountClick();
+        }
+      } else {
+        setIsLocal(false);
+        setHardhatButtonColor('white');
+        setSepoliaButtonColor('white');
+        setMumbaiButtonColor('blue');
+        setAccountButtonAddress('null');
+        setGlobalAccount({ address: 'null' });
+        if (location.pathname.startsWith('/dex/account')) {
+          handleAccountClick();
+        }
+      }
     }
   };
 
-  const updateMetamask = (): void => {
-    setMetamask(true);
+  const handleSetMetamask = (): void => {
+    setLoadMetamask(true);
+    if (location.pathname.startsWith('/dex/account')) {
+      handleAccountClick();
+    }
+  };
+  const handleMetamaskConnect = (): void => {
+    setIsMetamaskConnected(true);
+  };
+  const handleMetamaskDisconnect = (): void => {
+    setMetamaskDisconnect(true);
+  };
+  const handleMetamaskDisconnect2 = (): void => {
+    setIsMetamaskConnected(false);
+    setGlobalAccount({ address: 'null' });
+    if (location.pathname.startsWith('/dex/account')) {
+      handleAccountClick();
+    }
   };
 
   // error
@@ -110,9 +159,8 @@ const Header: Component = (): JSX.Element => {
   const handleMumbaiChange = (err): void => {
     setMumbaiError(err);
   };
-  // metamask connect status
-  const handleInitConnectStatus = (): void => {
-    setMetamask(false);
+  const handleLoadMetamask = (): void => {
+    setLoadMetamask(false);
   };
 
   console.log(hardhatError());
@@ -135,30 +183,45 @@ const Header: Component = (): JSX.Element => {
         <header class="offscreen">golang is forever !</header>
         {/* metamask */}
         <MetamaskIndex
+          chainId="0x"
           network="hardhat"
-          loadMetamask={metamask()}
-          initConnectStatus={handleInitConnectStatus}
           currentNetwork={network()}
+          loadMetamask={loadMetamask()}
+          handleLoadMetamask={handleLoadMetamask}
+          isConnected={isMetamaskConnected()}
+          handleConnect={handleMetamaskConnect}
+          disconnect={metamaskDisconnect()}
+          handleDisconnect={handleMetamaskDisconnect2}
           onError={handleHardhatChange}
         />
         <MetamaskIndex
+          chainId="0xaa36a7"
           network="sepolia"
-          loadMetamask={metamask()}
-          initConnectStatus={handleInitConnectStatus}
           currentNetwork={network()}
+          loadMetamask={loadMetamask()}
+          handleLoadMetamask={handleLoadMetamask}
+          isConnected={isMetamaskConnected()}
+          handleConnect={handleMetamaskConnect}
+          disconnect={metamaskDisconnect()}
+          handleDisconnect={handleMetamaskDisconnect2}
           onError={handleSepoliaChange}
         />
         <MetamaskIndex
+          chainId="0x13881"
           network="mumbai"
-          loadMetamask={metamask()}
-          initConnectStatus={handleInitConnectStatus}
           currentNetwork={network()}
+          loadMetamask={loadMetamask()}
+          handleLoadMetamask={handleLoadMetamask}
+          isConnected={isMetamaskConnected()}
+          handleConnect={handleMetamaskConnect}
+          disconnect={metamaskDisconnect()}
+          handleDisconnect={handleMetamaskDisconnect2}
           onError={handleMumbaiChange}
         />
 
         <Container fluid>
           <Row class="tw-items-center">
-            <Col md={4} class="tw-flex tw-justify-start">
+            <Col lg={4} md={4} sm={4} xs={4} class="tw-flex tw-justify-start">
               <button onClick={handleImageClick} class="transparent tw-h-10">
                 <img src={HomeLogo} alt="Home" class="tw-h-full"></img>
               </button>
@@ -166,23 +229,51 @@ const Header: Component = (): JSX.Element => {
                 <span>Go Basic Home</span>
               </button>
             </Col>
-            <Col md={4} class="tw-flex tw-justify-center">
+            <Col lg={4} md={4} sm={4} xs={4} class="tw-flex tw-justify-center">
               <button onClick={handleTitleClick} class="transparent">
                 <span>KYLE DEX</span>
               </button>
             </Col>
-            <Col md={4} class="tw-flex tw-justify-end">
+            <Col lg={4} md={4} sm={4} xs={4} class="tw-flex tw-justify-end">
               <Nav defaultActiveKey="#" as="ul">
                 <Nav.Item as="li">
                   <Nav.Link eventKey="connect">
-                    {!isLocal() && (
+                    {!isLocal() && !isMetamaskConnected() ? (
                       <button
                         onClick={() => {
-                          updateMetamask();
+                          handleSetMetamask();
                         }}
                       >
                         <span class="tw-text-black">Connect</span>
                       </button>
+                    ) : (
+                      <></>
+                    )}
+                  </Nav.Link>
+                </Nav.Item>
+                <Nav.Item as="li">
+                  <Nav.Link eventKey="connect">
+                    {!isLocal() && isMetamaskConnected() ? (
+                      <button>
+                        <span class="tw-text-black">isConnected</span>
+                      </button>
+                    ) : (
+                      <></>
+                    )}
+                  </Nav.Link>
+                </Nav.Item>
+                <Nav.Item as="li">
+                  <Nav.Link eventKey="connect">
+                    {!isLocal() && isMetamaskConnected() ? (
+                      <button
+                        onClick={() => {
+                          handleMetamaskDisconnect();
+                        }}
+                      >
+                        <span class="tw-text-black">Disconnect</span>
+                      </button>
+                    ) : (
+                      <></>
                     )}
                   </Nav.Link>
                 </Nav.Item>

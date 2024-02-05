@@ -21,10 +21,13 @@ const Footer: Component = (): JSX.Element => {
   return (
     <>
       <Container fluid>
-        <Row>
-          <Col md={3}></Col>
+        <Row class="tw-items-center">
+          <Col lg={3} md={3} sm={4} xs={4}></Col>
           <Col
+            lg={6}
             md={6}
+            sm={4}
+            xs={4}
             class="tw-flex tw-justify-center tw-items-center tw-h-8 tw-text-white"
           >
             <footer>
@@ -32,7 +35,10 @@ const Footer: Component = (): JSX.Element => {
             </footer>
           </Col>
           <Col
+            lg={3}
             md={3}
+            sm={4}
+            xs={4}
             class="tw-flex tw-justify-end tw-items-center tw-h-8 tw-gap-1"
           >
             <img
