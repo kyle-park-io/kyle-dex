@@ -26,6 +26,8 @@ export class SepoliaAccountService implements AccountService {
     this.walletMap = new Map<string, Wallet>();
   }
 
+  getAddressByName(name: string): undefined {}
+
   getWalletByName(name: string): Wallet | undefined {
     return this.walletMap.get(name);
   }

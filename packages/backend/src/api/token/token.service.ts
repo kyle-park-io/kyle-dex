@@ -34,6 +34,12 @@ export class TokenService {
         }
         userAddress = wallet.address;
       }
+      if (dto.userName !== undefined && dto.userAddress !== undefined) {
+        const address = this.accountService.getAddressByName(dto.userName);
+        if (dto.userAddress !== address) {
+          throw new Error('user name is unmatched by user address');
+        }
+      }
       // contract
       let contractAddress;
       if (dto.contractAddress === undefined && dto.contractName === undefined) {

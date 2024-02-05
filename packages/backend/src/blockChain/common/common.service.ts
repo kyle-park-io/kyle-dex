@@ -90,11 +90,12 @@ export class CommonService {
           `contract is not existed, address : ${dto.contractAddress}`,
         );
       }
-      const decodedResult = await this.decodeService.decodeResult2(
-        contractName,
-        dto.function,
-        result,
-      );
+      const decodedResult =
+        await this.decodeService.decodeResultFromContractCall(
+          contractName,
+          dto.function,
+          result,
+        );
       return decodedResult;
     } catch (err) {
       this.logger.error(err);

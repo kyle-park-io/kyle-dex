@@ -9,5 +9,8 @@ export async function init(): Promise<void> {
     console.log(`Folder created at: ${dataOutputPath}`);
   } else {
     console.log(`Folder already exists at: ${dataOutputPath}`);
+    // fs.rmSync(dataOutputPath, { recursive: true, force: true });
+    // fs.mkdirSync(dataOutputPath, { recursive: true });
+    // console.log(`Folder created at: ${dataOutputPath}`);
   }
 }

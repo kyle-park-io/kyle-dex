@@ -1,6 +1,8 @@
 import { type Wallet } from 'ethers';
 
 export interface AccountService {
+  getAddressByName(name: string): string | undefined;
+
   getWalletByName(name: string): Wallet | undefined;
 
   getWalletByAddress(address: string): Wallet | undefined;

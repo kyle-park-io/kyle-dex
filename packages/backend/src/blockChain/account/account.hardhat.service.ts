@@ -48,6 +48,10 @@ export class HardhatAccountService implements AccountService {
     }
   }
 
+  getAddressByName(name: string): string | undefined {
+    return this.addressBynameMap.get(name);
+  }
+
   getWalletByName(name: string): Wallet | undefined {
     return this.walletMap.get(name);
   }
@@ -64,11 +68,11 @@ export class HardhatAccountService implements AccountService {
     const provider: JsonRpcProvider = this.rpcService.getProvider();
     const wallet: Wallet | undefined = this.walletMap.get(address);
     if (wallet === undefined) {
-      throw new Error('wallet is not existed');
+      throw new Error(`wallet is not existed, address : ${address}`);
     }
     const name = this.nameByAddressMap.get(address);
     if (name === undefined) {
-      throw new Error('wallet is not existed');
+      throw new Error(`wallet is not existed, address : ${address}`);
     }
 
     const network = await provider.getNetwork();
@@ -86,6 +90,9 @@ export class HardhatAccountService implements AccountService {
   }
 
   getAccountList(): AccountAddress[] {
+    if (this.addressArray.length === 0) {
+      throw new Error('address config is wrong');
+    }
     return this.addressArray;
   }
 

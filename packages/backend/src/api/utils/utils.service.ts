@@ -37,6 +37,12 @@ export class UtilsService {
         }
         userAddress = wallet.address;
       }
+      if (dto.userName !== undefined && dto.userAddress !== undefined) {
+        const address = this.accountService.getAddressByName(dto.userName);
+        if (dto.userAddress !== address) {
+          throw new Error('user name is unmatched by user address');
+        }
+      }
       // contract
       const contractAddress: string | undefined =
         this.rpcService.getContractAddress(dto.contractName);

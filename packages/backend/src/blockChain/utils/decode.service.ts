@@ -30,28 +30,38 @@ export class DecodeService {
 
       const result = interface2.decodeFunctionResult(fn, data);
       const obj: any = {};
-      if (fn.outputs[0].type === 'tuple') {
-        fn.outputs[0].components?.forEach((output, index) => {
-          const key = output.name;
-          obj[key] = result[0][index];
-        });
+      if (fn.outputs.length === 1) {
+        if (fn.outputs[0].type === 'tuple') {
+          fn.outputs[0].components?.forEach((output, index) => {
+            const key = output.name;
+            obj[key] = result[0][index].toString();
+          });
+        } else {
+          obj[fn.name] = result.toString();
+        }
+        return obj;
       } else {
         for (let i = 0; i < fn.outputs.length; i++) {
-          if (fn.outputs.length === 1) {
-            obj[fn.name] = result.toString();
+          if (fn.outputs[i].type === 'tuple') {
+            const data = {};
+            fn.outputs[i].components?.forEach((output, index) => {
+              const key = output.name;
+              data[key] = result[i][index].toString();
+            });
+            obj[fn.outputs[i].name] = data;
           } else {
             obj[fn.outputs[i].name] = result[i].toString();
           }
         }
+        return obj;
       }
-      return obj;
     } catch (err) {
       this.logger.error(err);
       throw err;
     }
   };
 
-  decodeResult2 = async (
+  decodeResultFromContractCall = async (
     ccName: string,
     fnName: string,
     result: any,
@@ -67,21 +77,31 @@ export class DecodeService {
       }
 
       const obj: any = {};
-      if (fn.outputs[0].type === 'tuple') {
-        fn.outputs[0].components?.forEach((output, index) => {
-          const key = output.name;
-          obj[key] = result[0][index];
-        });
+      if (fn.outputs.length === 1) {
+        if (fn.outputs[0].type === 'tuple') {
+          fn.outputs[0].components?.forEach((output, index) => {
+            const key = output.name;
+            obj[key] = result[0][index].toString();
+          });
+        } else {
+          obj[fn.name] = result.toString();
+        }
+        return obj;
       } else {
         for (let i = 0; i < fn.outputs.length; i++) {
-          if (fn.outputs.length === 1) {
-            obj[fn.name] = result.toString();
+          if (fn.outputs[i].type === 'tuple') {
+            const data = {};
+            fn.outputs[i].components?.forEach((output, index) => {
+              const key = output.name;
+              data[key] = result[i][index].toString();
+            });
+            obj[fn.outputs[i].name] = data;
           } else {
             obj[fn.outputs[i].name] = result[i].toString();
           }
         }
+        return obj;
       }
-      return obj;
     } catch (err) {
       this.logger.error(err);
       throw err;

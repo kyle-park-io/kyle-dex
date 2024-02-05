@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import cacheService from '../../init/cache';
 import {
   type GetPairListDto,
@@ -10,20 +10,36 @@ import {
 @Injectable()
 export class ChartService {
   async getPairList(dto: GetPairListDto): Promise<any> {
-    return cacheService.get(`${dto.network}.pairList`);
+    const data = cacheService.get(`${dto.network}.pairList`);
+    if (data === undefined) {
+      throw new NotFoundException('pair list not found');
+    }
+    return data;
   }
 
   async getPair(dto: GetPairDto): Promise<any> {
-    return cacheService.get(`${dto.network}.pair.${dto.pairAddress}`);
+    const data = cacheService.get(`${dto.network}.pair.${dto.pairAddress}`);
+    if (data === undefined) {
+      throw new NotFoundException('pair not found');
+    }
+    return data;
   }
 
   async getClientPair(dto: GetClientPairDto): Promise<any> {
-    return cacheService.get(
+    const data = cacheService.get(
       `${dto.network}.user.${dto.userAddress}.${dto.pairAddress}`,
     );
+    if (data === undefined) {
+      throw new NotFoundException("client's pair not found");
+    }
+    return data;
   }
 
   async getClient(dto: GetClientDto): Promise<any> {
-    return cacheService.get(`${dto.network}.user.${dto.userAddress}`);
+    const data = cacheService.get(`${dto.network}.user.${dto.userAddress}`);
+    if (data === undefined) {
+      throw new NotFoundException('client not found');
+    }
+    return data;
   }
 }
