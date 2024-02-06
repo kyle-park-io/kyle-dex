@@ -32,6 +32,7 @@ const Header: Component = (): JSX.Element => {
   }
 
   const location = useLocation();
+  // navigate
   const navigate = useNavigate();
   const handleTitleClick = (): void => {
     navigate('/dex');
@@ -57,6 +58,7 @@ const Header: Component = (): JSX.Element => {
   const [sepoliaButtonColor, setSepoliaButtonColor] = createSignal('white');
   const [mumbaiButtonColor, setMumbaiButtonColor] = createSignal('white');
 
+  // account
   const [accountButtonId, setAccountButtonId] = createSignal(null);
   const [accountButtonAddress, setAccountButtonAddress] = createSignal('null');
   const handleAccountButtonClick = (event): void => {
@@ -79,9 +81,10 @@ const Header: Component = (): JSX.Element => {
   // network status
   const [isLocal, setIsLocal] = createSignal(true);
   const [network, setNetwork] = createSignal('hardhat');
+  const [loadMetamask, setLoadMetamask] = createSignal(false);
   const [isMetamaskConnected, setIsMetamaskConnected] = createSignal(false);
   const [metamaskDisconnect, setMetamaskDisconnect] = createSignal(false);
-  const [loadMetamask, setLoadMetamask] = createSignal(false);
+
   const updateNetwork = (networkKey: string): void => {
     if (network() === networkKey) {
       setIsLocal(true);
@@ -125,19 +128,23 @@ const Header: Component = (): JSX.Element => {
     }
   };
 
+  // metamask
   const handleSetMetamask = (): void => {
     setLoadMetamask(true);
     if (location.pathname.startsWith('/dex/account')) {
       handleAccountClick();
     }
   };
-  const handleMetamaskConnect = (): void => {
+  const propsHandleLoadMetamask = (): void => {
+    setLoadMetamask(false);
+  };
+  const propsHandleMetamaskConnect = (): void => {
     setIsMetamaskConnected(true);
   };
   const handleMetamaskDisconnect = (): void => {
     setMetamaskDisconnect(true);
   };
-  const handleMetamaskDisconnect2 = (): void => {
+  const propsHandleMetamaskDisconnect = (): void => {
     setIsMetamaskConnected(false);
     setGlobalAccount({ address: 'null' });
     if (location.pathname.startsWith('/dex/account')) {
@@ -150,17 +157,14 @@ const Header: Component = (): JSX.Element => {
   const [sepoliaError, setSepoliaError] = createSignal<Error | null>(null);
   const [mumbaiError, setMumbaiError] = createSignal<Error | null>(null);
   // props
-  const handleHardhatChange = (err): void => {
+  const propsHandleHardhatChange = (err): void => {
     setHardhatError(err);
   };
-  const handleSepoliaChange = (err): void => {
+  const propsHandleSepoliaChange = (err): void => {
     setSepoliaError(err);
   };
-  const handleMumbaiChange = (err): void => {
+  const propsHandleMumbaiChange = (err): void => {
     setMumbaiError(err);
-  };
-  const handleLoadMetamask = (): void => {
-    setLoadMetamask(false);
   };
 
   console.log(hardhatError());
@@ -187,36 +191,36 @@ const Header: Component = (): JSX.Element => {
           network="hardhat"
           currentNetwork={network()}
           loadMetamask={loadMetamask()}
-          handleLoadMetamask={handleLoadMetamask}
+          handleLoadMetamask={propsHandleLoadMetamask}
           isConnected={isMetamaskConnected()}
-          handleConnect={handleMetamaskConnect}
+          handleConnect={propsHandleMetamaskConnect}
           disconnect={metamaskDisconnect()}
-          handleDisconnect={handleMetamaskDisconnect2}
-          onError={handleHardhatChange}
+          handleDisconnect={propsHandleMetamaskDisconnect}
+          onError={propsHandleHardhatChange}
         />
         <MetamaskIndex
           chainId="0xaa36a7"
           network="sepolia"
           currentNetwork={network()}
           loadMetamask={loadMetamask()}
-          handleLoadMetamask={handleLoadMetamask}
+          handleLoadMetamask={propsHandleLoadMetamask}
           isConnected={isMetamaskConnected()}
-          handleConnect={handleMetamaskConnect}
+          handleConnect={propsHandleMetamaskConnect}
           disconnect={metamaskDisconnect()}
-          handleDisconnect={handleMetamaskDisconnect2}
-          onError={handleSepoliaChange}
+          handleDisconnect={propsHandleMetamaskDisconnect}
+          onError={propsHandleSepoliaChange}
         />
         <MetamaskIndex
           chainId="0x13881"
           network="mumbai"
           currentNetwork={network()}
           loadMetamask={loadMetamask()}
-          handleLoadMetamask={handleLoadMetamask}
+          handleLoadMetamask={propsHandleLoadMetamask}
           isConnected={isMetamaskConnected()}
-          handleConnect={handleMetamaskConnect}
+          handleConnect={propsHandleMetamaskConnect}
           disconnect={metamaskDisconnect()}
-          handleDisconnect={handleMetamaskDisconnect2}
-          onError={handleMumbaiChange}
+          handleDisconnect={propsHandleMetamaskDisconnect}
+          onError={propsHandleMumbaiChange}
         />
 
         <Container fluid>

@@ -8,7 +8,8 @@ import { MetaMaskSDK, type SDKProvider } from '@metamask/sdk';
 
 import { globalAccount, setGlobalAccount } from '../layout/Header';
 
-const [isCalled, setIsCalled] = createSignal(false);
+const [isProcessing, setIsProcessing] = createSignal(false);
+
 const [metamask, setMetamask] = createSignal<MetaMaskSDK>();
 const [provider, setProvider] = createSignal<SDKProvider>();
 
@@ -31,19 +32,16 @@ const MetamaskIndex: Component<MetamaskIndexProps> = (props): JSX.Element => {
 
   createEffect(() => {
     if (isProd()) {
-      if (props.network === props.currentNetwork) {
-        if (props.network !== 'hardhat') {
+      if (
+        props.network === props.currentNetwork &&
+        props.network !== 'hardhat'
+      ) {
+        if (!isProcessing()) {
           if (props.loadMetamask) {
-            if (!isCalled()) {
-              void go();
-              setIsCalled(true);
-            }
-            props.handleLoadMetamask();
-            props.handleConnect();
+            void go();
           } else {
             if (props.disconnect) {
               void disconnectNetwork();
-              props.handleDisconnect();
             } else {
               if (props.isConnected) {
                 void changeNetwork();
@@ -59,10 +57,17 @@ const MetamaskIndex: Component<MetamaskIndexProps> = (props): JSX.Element => {
 
   async function go(): Promise<void> {
     try {
+      setIsProcessing(true);
+
       if (metamask() === undefined) {
         await initMetamask();
       }
       await connectNetwork();
+
+      props.handleLoadMetamask();
+      props.handleConnect();
+
+      setIsProcessing(false);
     } catch (err) {
       if (err instanceof Error) {
         props.onError(err);
@@ -103,41 +108,7 @@ const MetamaskIndex: Component<MetamaskIndexProps> = (props): JSX.Element => {
       const provider = metamask()?.getProvider(); // You can also access via window.ethereum
       setProvider(provider);
 
-      // sepolia
-      await provider?.request({
-        method: 'wallet_addEthereumChain',
-        params: [
-          {
-            chainId: '0xaa36a7',
-            chainName: 'Sepolia',
-            nativeCurrency: {
-              name: 'Ether',
-              symbol: 'ETH',
-              decimals: 18,
-            },
-            rpcUrls: ['https://rpc.sepolia.org'],
-            blockExplorerUrls: ['https://sepolia.etherscan.io/'],
-          },
-        ],
-      });
-
-      // mumbai
-      await provider?.request({
-        method: 'wallet_addEthereumChain',
-        params: [
-          {
-            chainId: '0x13881',
-            chainName: 'Mumbai',
-            nativeCurrency: {
-              name: 'Matic',
-              symbol: 'MATIC',
-              decimals: 18,
-            },
-            rpcUrls: ['https://rpc-mumbai.maticvigil.com/'],
-            blockExplorerUrls: ['https://mumbai.polygonscan.com/'],
-          },
-        ],
-      });
+      startListener();
     } catch (err) {
       if (err instanceof Error) {
         props.onError(err);
@@ -149,19 +120,33 @@ const MetamaskIndex: Component<MetamaskIndexProps> = (props): JSX.Element => {
 
   async function connectNetwork(): Promise<void> {
     try {
-      const connect = await metamask()?.connect();
-      console.log(connect);
-
       if (provider() === undefined) {
         throw new Error('provider is undefined');
       }
 
-      const a = await provider()?.request({
-        method: 'eth_requestAccounts',
-        params: [],
-      });
-      console.log(a);
+      const chainId = await provider()?.request({ method: 'eth_chainId' });
+      if (chainId !== props.chainId) {
+        try {
+          await provider()?.request({
+            method: 'wallet_switchEthereumChain',
+            params: [{ chainId: props.chainId }],
+          });
+        } catch (err) {
+          if (err instanceof Error) {
+            props.onError(err);
+          } else {
+            if (typeof err === 'object' && err !== null && 'code' in err) {
+              if (err.code === 4902) {
+                await addNetwork();
+              }
+            } else {
+              props.onError(new Error(String(err)));
+            }
+          }
+        }
+      }
 
+      const connect = await metamask()?.connect();
       const addr = connect?.[0];
       setGlobalAccount({
         address: addr,
@@ -180,8 +165,20 @@ const MetamaskIndex: Component<MetamaskIndexProps> = (props): JSX.Element => {
 
   async function disconnectNetwork(): Promise<void> {
     try {
+      setIsProcessing(true);
+
       const connect = metamask()?.disconnect();
       console.log(connect);
+
+      setGlobalAccount({
+        address: 'null',
+      });
+      if (location.pathname.startsWith('/dex/account')) {
+        navigate(`/dex/account/${props.network}/${globalAccount.address}`);
+      }
+      props.handleDisconnect();
+
+      setIsProcessing(false);
     } catch (err) {
       if (err instanceof Error) {
         props.onError(err);
@@ -193,6 +190,8 @@ const MetamaskIndex: Component<MetamaskIndexProps> = (props): JSX.Element => {
 
   async function changeNetwork(): Promise<void> {
     try {
+      setIsProcessing(true);
+
       if (provider() === undefined) {
         throw new Error('provider is undefined');
       }
@@ -200,8 +199,81 @@ const MetamaskIndex: Component<MetamaskIndexProps> = (props): JSX.Element => {
         method: 'wallet_switchEthereumChain',
         params: [{ chainId: props.chainId }],
       });
+
+      const connect = await metamask()?.connect();
+      const addr = connect?.[0];
+      setGlobalAccount({
+        address: addr,
+      });
+      if (location.pathname.startsWith('/dex/account')) {
+        navigate(`/dex/account/${props.network}/${globalAccount.address}`);
+      }
+
+      setIsProcessing(false);
     } catch (err) {
       console.error('Failed to switch network', err);
+    }
+  }
+
+  async function addNetwork(): Promise<void> {
+    try {
+      switch (props.network) {
+        case 'sepolia': {
+          await provider()?.request({
+            method: 'wallet_addEthereumChain',
+            params: [
+              {
+                chainId: '0xaa36a7',
+                chainName: 'Sepolia',
+                nativeCurrency: {
+                  name: 'Ether',
+                  symbol: 'ETH',
+                  decimals: 18,
+                },
+                rpcUrls: ['https://rpc.sepolia.org'],
+                blockExplorerUrls: ['https://sepolia.etherscan.io/'],
+              },
+            ],
+          });
+
+          break;
+        }
+        case 'mumbai': {
+          await provider()?.request({
+            method: 'wallet_addEthereumChain',
+            params: [
+              {
+                chainId: '0x13881',
+                chainName: 'Mumbai',
+                nativeCurrency: {
+                  name: 'Matic',
+                  symbol: 'MATIC',
+                  decimals: 18,
+                },
+                rpcUrls: ['https://rpc-mumbai.maticvigil.com/'],
+                blockExplorerUrls: ['https://mumbai.polygonscan.com/'],
+              },
+            ],
+          });
+          break;
+        }
+        default:
+          break;
+      }
+    } catch (err) {
+      console.error('Failed to switch network', err);
+    }
+  }
+
+  function startListener(): void {
+    if (provider() === undefined) {
+      throw new Error('provider is undefined');
+    }
+
+    provider()?.on('accountsChanged', handleAccountsChanged);
+    function handleAccountsChanged(accounts): void {
+      console.log(accounts);
+      // console.log('Selected account changed:', accounts[0]);
     }
   }
 };
