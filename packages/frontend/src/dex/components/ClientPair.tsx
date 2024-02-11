@@ -27,7 +27,7 @@ export const ClientPair: Component<ClientPairProps> = (props): JSX.Element => {
         setIsCalled(true);
       }
     }
-    if (props.currentPair !== '' && props.currentAccount !== '') {
+    if (props.currentPair !== '' && props.currentAccount !== 'null') {
       void test();
     }
   });

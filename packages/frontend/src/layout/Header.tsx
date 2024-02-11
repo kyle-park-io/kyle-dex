@@ -84,6 +84,7 @@ const Header: Component = (): JSX.Element => {
   const [loadMetamask, setLoadMetamask] = createSignal(false);
   const [isMetamaskConnected, setIsMetamaskConnected] = createSignal(false);
   const [metamaskDisconnect, setMetamaskDisconnect] = createSignal(false);
+  const [metamaskChange, setMetamaskChange] = createSignal(false);
 
   const updateNetwork = (networkKey: string): void => {
     if (network() === networkKey) {
@@ -98,19 +99,30 @@ const Header: Component = (): JSX.Element => {
         handleAccountClick();
       }
     } else {
-      setNetwork(networkKey);
       if (networkKey === 'hardhat') {
         setIsLocal(true);
         setHardhatButtonColor('blue');
         setSepoliaButtonColor('white');
         setMumbaiButtonColor('white');
+        setAccountButtonAddress('null');
+        setGlobalAccount({ address: 'null' });
+        setNetwork(networkKey);
+        if (location.pathname.startsWith('/dex/account')) {
+          handleAccountClick();
+        }
       } else if (networkKey === 'sepolia') {
         setIsLocal(false);
         setHardhatButtonColor('white');
         setSepoliaButtonColor('blue');
         setMumbaiButtonColor('white');
         setAccountButtonAddress('null');
-        setGlobalAccount({ address: 'null' });
+        if (!isMetamaskConnected() && network() === 'hardhat') {
+          setGlobalAccount({ address: 'null' });
+        }
+        setNetwork(networkKey);
+        if (isMetamaskConnected()) {
+          setMetamaskChange(true);
+        }
         if (location.pathname.startsWith('/dex/account')) {
           handleAccountClick();
         }
@@ -120,7 +132,14 @@ const Header: Component = (): JSX.Element => {
         setSepoliaButtonColor('white');
         setMumbaiButtonColor('blue');
         setAccountButtonAddress('null');
-        setGlobalAccount({ address: 'null' });
+        if (!isMetamaskConnected() && network() === 'hardhat') {
+          setGlobalAccount({ address: 'null' });
+        }
+        setNetwork(networkKey);
+        if (isMetamaskConnected()) {
+          setMetamaskChange(true);
+        }
+        setNetwork(networkKey);
         if (location.pathname.startsWith('/dex/account')) {
           handleAccountClick();
         }
@@ -146,10 +165,14 @@ const Header: Component = (): JSX.Element => {
   };
   const propsHandleMetamaskDisconnect = (): void => {
     setIsMetamaskConnected(false);
+    setMetamaskDisconnect(false);
     setGlobalAccount({ address: 'null' });
     if (location.pathname.startsWith('/dex/account')) {
       handleAccountClick();
     }
+  };
+  const propsHandleMetamaskChange = (): void => {
+    setMetamaskChange(false);
   };
 
   // error
@@ -196,6 +219,8 @@ const Header: Component = (): JSX.Element => {
           handleConnect={propsHandleMetamaskConnect}
           disconnect={metamaskDisconnect()}
           handleDisconnect={propsHandleMetamaskDisconnect}
+          change={metamaskChange()}
+          handleChange={propsHandleMetamaskChange}
           onError={propsHandleHardhatChange}
         />
         <MetamaskIndex
@@ -208,6 +233,8 @@ const Header: Component = (): JSX.Element => {
           handleConnect={propsHandleMetamaskConnect}
           disconnect={metamaskDisconnect()}
           handleDisconnect={propsHandleMetamaskDisconnect}
+          change={metamaskChange()}
+          handleChange={propsHandleMetamaskChange}
           onError={propsHandleSepoliaChange}
         />
         <MetamaskIndex
@@ -220,6 +247,8 @@ const Header: Component = (): JSX.Element => {
           handleConnect={propsHandleMetamaskConnect}
           disconnect={metamaskDisconnect()}
           handleDisconnect={propsHandleMetamaskDisconnect}
+          change={metamaskChange()}
+          handleChange={propsHandleMetamaskChange}
           onError={propsHandleMumbaiChange}
         />
 

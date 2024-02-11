@@ -40,10 +40,10 @@ const MetamaskIndex: Component<MetamaskIndexProps> = (props): JSX.Element => {
           if (props.loadMetamask) {
             void go();
           } else {
-            if (props.disconnect) {
-              void disconnectNetwork();
-            } else {
-              if (props.isConnected) {
+            if (props.isConnected) {
+              if (props.disconnect) {
+                void disconnectNetwork();
+              } else if (props.change) {
                 void changeNetwork();
               }
             }
@@ -167,8 +167,7 @@ const MetamaskIndex: Component<MetamaskIndexProps> = (props): JSX.Element => {
     try {
       setIsProcessing(true);
 
-      const connect = metamask()?.disconnect();
-      console.log(connect);
+      metamask()?.terminate();
 
       setGlobalAccount({
         address: 'null',
@@ -206,8 +205,11 @@ const MetamaskIndex: Component<MetamaskIndexProps> = (props): JSX.Element => {
         address: addr,
       });
       if (location.pathname.startsWith('/dex/account')) {
-        navigate(`/dex/account/${props.network}/${globalAccount.address}`);
+        navigate(
+          `/dex/account/${props.currentNetwork}/${globalAccount.address}`,
+        );
       }
+      props.handleChange();
 
       setIsProcessing(false);
     } catch (err) {
@@ -272,8 +274,15 @@ const MetamaskIndex: Component<MetamaskIndexProps> = (props): JSX.Element => {
 
     provider()?.on('accountsChanged', handleAccountsChanged);
     function handleAccountsChanged(accounts): void {
-      console.log(accounts);
-      // console.log('Selected account changed:', accounts[0]);
+      const addr = accounts[0];
+      setGlobalAccount({
+        address: addr,
+      });
+      if (location.pathname.startsWith('/dex/account')) {
+        navigate(
+          `/dex/account/${props.currentNetwork}/${globalAccount.address}`,
+        );
+      }
     }
   }
 };

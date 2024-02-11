@@ -8,5 +8,7 @@ export interface MetamaskIndexProps {
   handleConnect: () => void;
   disconnect: boolean;
   handleDisconnect: () => void;
+  change: boolean;
+  handleChange: () => void;
   onError: (error: Error) => void;
 }
