@@ -177,6 +177,7 @@ export class HardhatEventListenerService implements OnModuleInit {
               const reserveObj: any = {};
               pairObj.timestamp = timestamp;
               reserveObj.timestamp = timestamp;
+              reserveObj.event = 'PairCreated';
               let pair: string = '';
               for (let i = 0; i < log.fragment.inputs.length; i++) {
                 const key = log.fragment.inputs[i].name;
@@ -193,12 +194,13 @@ export class HardhatEventListenerService implements OnModuleInit {
               reserveObj.reserve1 = '0';
               await this.fsService.writePairArrayToFile(
                 'hardhat',
-                'pair.array.json',
+                'pair.list',
                 pairObj,
               );
-              await this.fsService.writeReserveArrayToFile(
-                'hardhat/pair',
-                `${pair}.reserve.json`,
+              await this.fsService.writePairReserveArrayToFile(
+                'hardhat',
+                `pair.reserve`,
+                pair,
                 reserveObj,
               );
               await this.setEventListener('Pair', pair);
@@ -226,9 +228,10 @@ export class HardhatEventListenerService implements OnModuleInit {
                 const key = log.fragment.inputs[i].name;
                 reserveObj[key] = log.args[i].toString();
               }
-              await this.fsService.writeReserveArrayToFile(
-                'hardhat/pair',
-                `${pair}.reserve.json`,
+              await this.fsService.writePairReserveArrayToFile(
+                'hardhat',
+                `pair.reserve`,
+                pair,
                 reserveObj,
               );
               break;
@@ -244,14 +247,17 @@ export class HardhatEventListenerService implements OnModuleInit {
                 const key = log.fragment.inputs[i].name;
                 mintObj[key] = log.args[i].toString();
               }
-              await this.fsService.writeUserArrayToFile(
-                'hardhat/user',
-                `${user}.${pair}.reserve.json`,
+              await this.fsService.writeUserReserveArrayToFile(
+                'hardhat',
+                'user.reserve',
+                user,
+                pair,
                 mintObj,
               );
-              await this.fsService.writeUserArrayToFile2(
-                'hardhat/user',
-                `${user}.reserve.json`,
+              await this.fsService.writeUserReserveAllArrayToFile(
+                'hardhat',
+                'user.reserve.all',
+                user,
                 mintObj,
               );
               break;
@@ -267,14 +273,17 @@ export class HardhatEventListenerService implements OnModuleInit {
                 const key = log.fragment.inputs[i].name;
                 burnObj[key] = log.args[i].toString();
               }
-              await this.fsService.writeUserArrayToFile(
-                'hardhat/user',
-                `${user}.${pair}.reserve.json`,
+              await this.fsService.writeUserReserveArrayToFile(
+                'hardhat',
+                'user.reserve',
+                user,
+                pair,
                 burnObj,
               );
-              await this.fsService.writeUserArrayToFile2(
-                'hardhat/user',
-                `${user}.reserve.json`,
+              await this.fsService.writeUserReserveAllArrayToFile(
+                'hardhat',
+                'user.reserve.all',
+                user,
                 burnObj,
               );
               break;
@@ -290,14 +299,17 @@ export class HardhatEventListenerService implements OnModuleInit {
                 const key = log.fragment.inputs[i].name;
                 swapObj[key] = log.args[i].toString();
               }
-              await this.fsService.writeUserArrayToFile(
-                'hardhat/user',
-                `${user}.${pair}.reserve.json`,
+              await this.fsService.writeUserReserveArrayToFile(
+                'hardhat',
+                'user.reserve',
+                user,
+                pair,
                 swapObj,
               );
-              await this.fsService.writeUserArrayToFile2(
-                'hardhat/user',
-                `${user}.reserve.json`,
+              await this.fsService.writeUserReserveAllArrayToFile(
+                'hardhat',
+                'user.reserve.all',
+                user,
                 swapObj,
               );
               break;

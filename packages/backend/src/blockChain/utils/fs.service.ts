@@ -75,29 +75,27 @@ export class FsService {
   };
 
   readArrayFromFile = async (path: string, name: string): Promise<any> => {
-    if (path === '') {
-      const data = fs.readFileSync(`${this.dataPath}/${name}`, 'utf8');
-      const array = JSON.parse(data);
-      return array;
-    } else {
-      const data = fs.readFileSync(`${this.dataPath}/${path}/${name}`, 'utf8');
-      const array = JSON.parse(data);
-      return array;
-    }
+    const data = fs.readFileSync(
+      `${this.dataPath}/${path}/${name}.json`,
+      'utf8',
+    );
+    const array = JSON.parse(data);
+    return array;
   };
 
   writePairArrayToFile = async (
-    path: string,
+    network: string,
     name: string,
     body: any,
   ): Promise<void> => {
-    if (fs.existsSync(`${this.dataPath}/${path}/${name}`)) {
+    const path = `${network}/pair`;
+    if (fs.existsSync(`${this.dataPath}/${path}/${name}.json`)) {
       const data = await this.readArrayFromFile(path, name);
       data.push(body);
 
-      cacheService.set(`${path}.pairList`, JSON.stringify(data, null, 2));
+      cacheService.set(`${network}.${name}`, JSON.stringify(data, null, 2));
       fs.writeFileSync(
-        `${this.dataPath}/${path}/${name}`,
+        `${this.dataPath}/${path}/${name}.json`,
         JSON.stringify(data, null, 2),
         'utf8',
       );
@@ -107,31 +105,33 @@ export class FsService {
       const data: any[] = [];
       data.push(body);
 
-      cacheService.set(`${path}.pairList`, JSON.stringify(data, null, 2));
+      cacheService.set(`${network}.${name}`, JSON.stringify(data, null, 2));
       fs.writeFileSync(
-        `${this.dataPath}/${path}/${name}`,
+        `${this.dataPath}/${path}/${name}.json`,
         JSON.stringify(data, null, 2),
         'utf8',
       );
     }
   };
 
-  writeReserveArrayToFile = async (
-    path: string,
+  writePairReserveArrayToFile = async (
+    network: string,
     name: string,
+    pair: string,
     body: any,
   ): Promise<void> => {
-    if (fs.existsSync(`${this.dataPath}/${path}/${name}`)) {
-      const data = await this.readArrayFromFile(path, name);
+    const path = `${network}/pair/reserve`;
+    if (fs.existsSync(`${this.dataPath}/${path}/${pair}.json`)) {
+      const data = await this.readArrayFromFile(path, pair);
       data[0] = body;
       data.push(body);
 
       cacheService.set(
-        `${path.split('/')[0]}.pair.${name.split('.')[0]}`,
+        `${network}.${name}.${pair}`,
         JSON.stringify(data, null, 2),
       );
       fs.writeFileSync(
-        `${this.dataPath}/${path}/${name}`,
+        `${this.dataPath}/${path}/${pair}.json`,
         JSON.stringify(data, null, 2),
         'utf8',
       );
@@ -143,35 +143,36 @@ export class FsService {
       data.push(body);
 
       cacheService.set(
-        `${path.split('/')[0]}.pair.${name.split('.')[0]}`,
+        `${network}.${name}.${pair}`,
         JSON.stringify(data, null, 2),
       );
       fs.writeFileSync(
-        `${this.dataPath}/${path}/${name}`,
+        `${this.dataPath}/${path}/${pair}.json`,
         JSON.stringify(data, null, 2),
         'utf8',
       );
     }
   };
 
-  writeUserArrayToFile = async (
-    path: string,
+  writeUserReserveArrayToFile = async (
+    network: string,
     name: string,
+    user: string,
+    pair: string,
     body: any,
   ): Promise<void> => {
-    if (fs.existsSync(`${this.dataPath}/${path}/${name}`)) {
-      const data = await this.readArrayFromFile(path, name);
+    const path = `${network}/user/reserve`;
+    if (fs.existsSync(`${this.dataPath}/${path}/${user}.${pair}.json`)) {
+      const data = await this.readArrayFromFile(path, `${user}.${pair}`);
       data[0] = body;
       data.push(body);
 
       cacheService.set(
-        `${path.split('/')[0]}.user.${name.split('.')[0]}.${
-          name.split('.')[1]
-        }`,
+        `${network}.${name}.${user}.${pair}`,
         JSON.stringify(data, null, 2),
       );
       fs.writeFileSync(
-        `${this.dataPath}/${path}/${name}`,
+        `${this.dataPath}/${path}/${user}.${pair}.json`,
         JSON.stringify(data, null, 2),
         'utf8',
       );
@@ -183,51 +184,53 @@ export class FsService {
       data.push(body);
 
       cacheService.set(
-        `${path.split('/')[0]}.user.${name.split('.')[0]}.${
-          name.split('.')[1]
-        }`,
+        `${network}.${name}.${user}.${pair}`,
         JSON.stringify(data, null, 2),
       );
       fs.writeFileSync(
-        `${this.dataPath}/${path}/${name}`,
+        `${this.dataPath}/${path}/${user}.${pair}.json`,
         JSON.stringify(data, null, 2),
         'utf8',
       );
     }
   };
 
-  writeUserArrayToFile2 = async (
-    path: string,
+  writeUserReserveAllArrayToFile = async (
+    network: string,
     name: string,
+    user: string,
     body: any,
   ): Promise<void> => {
-    if (fs.existsSync(`${this.dataPath}/${path}/${name}`)) {
-      const data = await this.readArrayFromFile(path, name);
+    const path = `${network}/user/reserve`;
+    if (fs.existsSync(`${this.dataPath}/${path}/${user}.json`)) {
+      const data = await this.readArrayFromFile(path, user);
       data[0] = body;
       data.push(body);
 
       cacheService.set(
-        `${path.split('/')[0]}.user.${name.split('.')[0]}`,
+        `${network}.${name}.${user}`,
         JSON.stringify(data, null, 2),
       );
       fs.writeFileSync(
-        `${this.dataPath}/${path}/${name}`,
+        `${this.dataPath}/${path}/${user}.json`,
         JSON.stringify(data, null, 2),
         'utf8',
       );
     } else {
-      fs.mkdirSync(`${this.dataPath}/${path}`, { recursive: true });
+      fs.mkdirSync(`${this.dataPath}/${path}`, {
+        recursive: true,
+      });
 
       const data: any[] = [];
       data.push(body);
       data.push(body);
 
       cacheService.set(
-        `${path.split('/')[0]}.user.${name.split('.')[0]}`,
+        `${network}.${name}.${user}`,
         JSON.stringify(data, null, 2),
       );
       fs.writeFileSync(
-        `${this.dataPath}/${path}/${name}`,
+        `${this.dataPath}/${path}/${user}.json`,
         JSON.stringify(data, null, 2),
         'utf8',
       );
