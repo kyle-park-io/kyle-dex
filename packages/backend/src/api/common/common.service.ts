@@ -2,7 +2,10 @@ import { Inject, Injectable, LoggerService } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { CommonService as BlockChainCommonService } from '../../blockChain/common/common.service';
-import { type ProcessContractDto } from '../../blockChain/common/dto/common.dto';
+import {
+  type ProcessContractDto,
+  type ProcessContractWithETHDto,
+} from '../../blockChain/common/dto/common.dto';
 
 @Injectable()
 export class CommonService {
@@ -29,6 +32,15 @@ export class CommonService {
   async submit(dto: ProcessContractDto): Promise<void> {
     try {
       await this.blockChainCommonService.submit(dto);
+    } catch (err) {
+      this.logger.error(err);
+      throw err;
+    }
+  }
+
+  async submitWithETH(dto: ProcessContractWithETHDto): Promise<void> {
+    try {
+      await this.blockChainCommonService.submitWithETH(dto);
     } catch (err) {
       this.logger.error(err);
       throw err;

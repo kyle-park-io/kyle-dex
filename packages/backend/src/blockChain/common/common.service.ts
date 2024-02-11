@@ -10,7 +10,10 @@ import {
   type TransactionRequest,
   ZeroAddress,
 } from 'ethers';
-import { type ProcessContractDto } from './dto/common.dto';
+import {
+  type ProcessContractDto,
+  type ProcessContractWithETHDto,
+} from './dto/common.dto';
 
 @Injectable()
 export class CommonService {
@@ -122,6 +125,38 @@ export class CommonService {
 
       const eFD = contract.interface.encodeFunctionData(dto.function, dto.args);
       const tx: TransactionRequest = { to: dto.contractAddress, data: eFD };
+      await wallet.sendTransaction(tx);
+
+      return true;
+    } catch (err) {
+      this.logger.error(err);
+      throw err;
+    }
+  }
+
+  async submitWithETH(dto: ProcessContractWithETHDto): Promise<boolean> {
+    try {
+      const wallet: Wallet | undefined = this.accountService.getWalletByAddress(
+        dto.userAddress,
+      );
+      if (wallet === undefined) {
+        throw new Error(`wallet is not existed, address : ${dto.userAddress}`);
+      }
+
+      const contract: Contract | undefined =
+        this.rpcService.getContractByAddress(dto.contractAddress);
+      if (contract === undefined) {
+        throw new Error(
+          `contract is not existed, address : ${dto.contractAddress}`,
+        );
+      }
+
+      const eFD = contract.interface.encodeFunctionData(dto.function, dto.args);
+      const tx: TransactionRequest = {
+        to: dto.contractAddress,
+        data: eFD,
+        value: dto.eth,
+      };
       await wallet.sendTransaction(tx);
 
       return true;

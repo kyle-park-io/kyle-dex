@@ -30,8 +30,16 @@ import { AccountService } from '../../blockChain/account/interfaces/account.inte
 import { RpcService } from '../../blockChain/rpc/interfaces/rpc.interface';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 // dto
-import { QueryContractDto, SubmitContractDto } from './dto/common.request';
-import { type ProcessContractDto } from '../../blockChain/common/dto/common.dto';
+import {
+  QueryContractDto,
+  SubmitContractDto,
+  SubmitContractWithETHDto,
+} from './dto/common.request';
+import {
+  type ProcessContractDto,
+  type ProcessContractWithETHDto,
+} from '../../blockChain/common/dto/common.dto';
+import { formatEther, formatUnits, parseEther, parseUnits } from 'ethers';
 
 @ApiTags('common')
 @Controller('api/common')
@@ -149,6 +157,63 @@ export class CommonController {
         args: dto.args,
       };
       await this.commonService.submit(args);
+      return true;
+    } catch (err) {
+      this.logger.error(err);
+      throw err;
+    }
+  }
+
+  @Post('submitWithETH')
+  @Header('Content-Type', 'application/json')
+  @ApiOperation({
+    summary: 'Submit contract transaction',
+    description: 'Submit transaction',
+  })
+  @ApiBody({ type: SubmitContractWithETHDto })
+  @ApiCreatedResponse({
+    description: 'Successfully submit transaction',
+    type: Boolean,
+  })
+  @ApiInternalServerErrorResponse({ description: 'Internal server error' })
+  async submitWithETH(@Body() dto: SubmitContractWithETHDto): Promise<boolean> {
+    try {
+      // user
+      let userAddress;
+      if (dto.userAddress === undefined && dto.userName === undefined) {
+        throw new Error('check user params');
+      } else if (dto.userAddress !== undefined) {
+        userAddress = dto.userAddress;
+      } else if (dto.userName !== undefined) {
+        const wallet = this.accountService.getWalletByName(dto.userName);
+        if (wallet === undefined) {
+          throw new Error('user is not existed');
+        }
+        userAddress = wallet.address;
+      }
+      // contract
+      let contractAddress;
+      if (dto.contractAddress === undefined && dto.contractName === undefined) {
+        throw new Error('check contract params');
+      } else if (dto.contractAddress !== undefined) {
+        contractAddress = dto.contractAddress;
+      } else if (dto.contractName !== undefined) {
+        const contract = this.rpcService.getContractAddress(dto.contractName);
+        if (contract === undefined) {
+          throw new Error('contract is not existed');
+        }
+        contractAddress = contract;
+      }
+
+      const args: ProcessContractWithETHDto = {
+        userAddress,
+        contractAddress,
+        function: dto.function,
+        args: dto.args,
+        eth: parseEther(dto.eth).toString(),
+      };
+
+      await this.commonService.submitWithETH(args);
       return true;
     } catch (err) {
       this.logger.error(err);

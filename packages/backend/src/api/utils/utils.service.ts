@@ -7,7 +7,12 @@ import { FsService } from '../../blockChain/utils/fs.service';
 import { type CalcPairDto, type Create2Dto } from './dto/utils.request.dto';
 import { type ResponsePairDto } from './dto/utils.response.dto';
 import { type ProcessContractDto } from '../../blockChain/common/dto/common.dto';
-import { keccak256, solidityPackedKeccak256, getCreate2Address } from 'ethers';
+import {
+  keccak256,
+  solidityPackedKeccak256,
+  getCreate2Address,
+  ZeroAddress,
+} from 'ethers';
 
 @Injectable()
 export class UtilsService {
@@ -22,12 +27,72 @@ export class UtilsService {
     private readonly fsService: FsService,
   ) {}
 
-  async calcPair(dto: CalcPairDto): Promise<ResponsePairDto> {
+  async getWETH(): Promise<string> {
+    try {
+      // contract
+      const contractAddress: string | undefined =
+        this.rpcService.getContractAddress('Router');
+      if (contractAddress === undefined) {
+        throw new Error('contract is not existed');
+      }
+      const args: ProcessContractDto = {
+        userAddress: ZeroAddress,
+        contractAddress,
+        function: 'WETH',
+        args: [],
+      };
+
+      const result = await this.commonService.query(args);
+      return result.WETH;
+    } catch (err) {
+      this.logger.error(err);
+      throw err;
+    }
+  }
+
+  async getFactory(): Promise<string> {
+    try {
+      // contract
+      const contractAddress: string | undefined =
+        this.rpcService.getContractAddress('Router');
+      if (contractAddress === undefined) {
+        throw new Error('contract is not existed');
+      }
+      const args: ProcessContractDto = {
+        userAddress: ZeroAddress,
+        contractAddress,
+        function: 'factory',
+        args: [],
+      };
+
+      const result = await this.commonService.query(args);
+      return result.factory;
+    } catch (err) {
+      this.logger.error(err);
+      throw err;
+    }
+  }
+
+  async getRouter(): Promise<string> {
+    try {
+      const address = this.rpcService.getContractAddress('Router');
+      if (address === undefined) {
+        throw new Error('router address is not existed');
+      }
+      return address;
+    } catch (err) {
+      this.logger.error(err);
+      throw err;
+    }
+  }
+
+  async calcPair(dto: CalcPairDto): Promise<string> {
     try {
       // user
       let userAddress;
       if (dto.userAddress === undefined && dto.userName === undefined) {
-        throw new Error('check user params');
+        // throw new Error('check user params');
+        userAddress = ZeroAddress;
       } else if (dto.userAddress !== undefined) {
         userAddress = dto.userAddress;
       } else if (dto.userName !== undefined) {
@@ -49,14 +114,15 @@ export class UtilsService {
       if (contractAddress === undefined) {
         throw new Error('contract is not existed');
       }
-
       const args: ProcessContractDto = {
         userAddress,
         contractAddress,
         function: 'calcPair',
         args: [dto.factory, dto.tokenA, dto.tokenB],
       };
-      return await this.commonService.query(args);
+
+      const result = await this.commonService.query(args);
+      return result.calcPair;
     } catch (err) {
       this.logger.error('calcPair error');
       throw err;

@@ -39,7 +39,11 @@ export class HardhatAccountService implements AccountService {
     if (accountList !== undefined) {
       for (let i = 0; i < accountList.length; i++) {
         try {
-          this.createWallet(accountList[i].name, accountList[i].privateKey);
+          this.createWallet(
+            accountList[i].name,
+            accountList[i].privateKey,
+            accountList[i].address,
+          );
         } catch (err) {
           this.logger.error(err);
           throw err;
@@ -96,12 +100,19 @@ export class HardhatAccountService implements AccountService {
     return this.addressArray;
   }
 
-  private createWallet(name: string, privateKey: string): void {
+  private createWallet(
+    name: string,
+    privateKey: string,
+    address: string,
+  ): void {
     try {
       const wallet = new ethers.Wallet(
         privateKey,
         this.rpcService.getProvider(),
       );
+      if (address !== wallet.address) {
+        throw new Error('address config is not matched by wallet address');
+      }
       if (this.getWalletByAddress(wallet.address) !== undefined) {
         throw new Error('already existed wallet');
       }

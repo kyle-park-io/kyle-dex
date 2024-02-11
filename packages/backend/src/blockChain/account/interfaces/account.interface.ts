@@ -17,6 +17,7 @@ export interface AccountService {
 export interface AccountConfig {
   name: string;
   privateKey: string;
+  address: string;
 }
 
 export interface AccountInfo {

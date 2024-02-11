@@ -25,8 +25,79 @@ import { ResponsePairDto } from './dto/utils.response.dto';
 export class UtilsController {
   constructor(private readonly utilsService: UtilsService) {}
 
+  @Get('getWETH')
+  @Header('Content-Type', 'text/plain')
+  @ApiProduces('text/plain')
+  @ApiOperation({
+    summary: 'getWETH',
+    description: 'getWETH',
+  })
+  @ApiOkResponse({
+    description: 'getWETH success',
+    type: String,
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Internal server error',
+  })
+  async getWETH(): Promise<string> {
+    try {
+      return await this.utilsService.getWETH();
+    } catch (err) {
+      console.log(err);
+      throw err;
+    }
+  }
+
+  @Get('getFactory')
+  @Header('Content-Type', 'text/plain')
+  @ApiProduces('text/plain')
+  @ApiOperation({
+    summary: 'getFactory',
+    description: 'getFactory',
+  })
+  @ApiOkResponse({
+    description: 'getFactory success',
+    type: String,
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Internal server error',
+  })
+  async getFactory(): Promise<string> {
+    try {
+      return await this.utilsService.getFactory();
+    } catch (err) {
+      console.log(err);
+      throw err;
+    }
+  }
+
+  @Get('getRouter')
+  @Header('Content-Type', 'text/plain')
+  @ApiProduces('text/plain')
+  @ApiOperation({
+    summary: 'getRouter',
+    description: 'getRouter',
+  })
+  @ApiOkResponse({
+    description: 'getRouter success',
+    type: String,
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Internal server error',
+  })
+  async getRouter(): Promise<string> {
+    try {
+      return await this.utilsService.getRouter();
+    } catch (err) {
+      console.log(err);
+      throw err;
+    }
+  }
+
   @Post('calcPair')
-  @Header('Content-Type', 'application/json')
+  // @Header('Content-Type', 'application/json')
+  @Header('Content-Type', 'text/plain')
+  @ApiProduces('text/plain')
   @ApiOperation({
     summary: 'calulate pair address',
     description: 'calulate pair address',
@@ -36,10 +107,11 @@ export class UtilsController {
   })
   @ApiCreatedResponse({
     description: 'calulate pair address success',
-    type: ResponsePairDto,
+    // type: ResponsePairDto,
+    type: String,
   })
   @ApiInternalServerErrorResponse({ description: 'Internal server error' })
-  async calcPair(@Body() calcPairDto: CalcPairDto): Promise<ResponsePairDto> {
+  async calcPair(@Body() calcPairDto: CalcPairDto): Promise<string> {
     try {
       return await this.utilsService.calcPair(calcPairDto);
     } catch (err) {
