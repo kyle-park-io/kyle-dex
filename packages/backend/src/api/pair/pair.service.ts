@@ -50,7 +50,7 @@ export class PairService {
 
   async getTokens(dto: GetTokensDto): Promise<any> {
     try {
-      const cache = cacheService.get('hardhat.pairList');
+      const cache = cacheService.get('hardhat.pairs.list');
       if (typeof cache === 'string') {
         const pairList = JSON.parse(cache);
         for (let i = 0; i < pairList.length; i++) {

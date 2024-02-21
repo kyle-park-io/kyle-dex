@@ -44,4 +44,24 @@ export class TokenController {
       throw err;
     }
   }
+
+  @Get('getTokenContractList')
+  @Header('Content-Type', 'application/json')
+  @ApiOperation({
+    summary: 'getTokenContractList',
+    description: 'getTokenContractList',
+  })
+  @ApiCreatedResponse({
+    description: 'getTokenContractList success',
+    // type: ResponseBalanceOfDto,
+  })
+  @ApiInternalServerErrorResponse({ description: 'Internal server error' })
+  async getTokenContractList(): Promise<any> {
+    try {
+      return await this.tokenService.getTokenContractList();
+    } catch (err) {
+      console.error(err);
+      throw err;
+    }
+  }
 }

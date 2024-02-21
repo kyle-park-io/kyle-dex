@@ -20,8 +20,9 @@ import {
 import {
   GetPairListDto,
   GetPairDto,
-  GetClientPairDto,
-  GetClientDto,
+  GetPairsDto,
+  GetClientEventDto,
+  GetClientEventAllDto,
 } from './dto/chart.request';
 
 @ApiTags('chart')
@@ -50,63 +51,126 @@ export class ChartController {
     }
   }
 
-  @Post('getPair')
+  @Post('getPairsCurrentReserve')
   @Header('Content-Type', 'application/json')
   @ApiOperation({
-    summary: 'getPair',
-    description: 'getPair',
+    summary: 'getPairsCurrentReserve',
+    description: 'getPairsCurrentReserve',
+  })
+  @ApiBody({ type: GetPairsDto })
+  @ApiCreatedResponse({
+    description: 'getPairsCurrentReserve success',
+    // type: ResponseClientDto,
+  })
+  @ApiInternalServerErrorResponse({ description: 'Internal server error' })
+  async getPairsCurrentReserve(@Body() dto: GetPairsDto): Promise<any> {
+    try {
+      return await this.chartService.getPairsCurrentReserve(dto);
+    } catch (err) {
+      console.error(err);
+      throw err;
+    }
+  }
+
+  @Post('getPairCurrentReserve')
+  @Header('Content-Type', 'application/json')
+  @ApiOperation({
+    summary: 'getPairCurrentReserve',
+    description: 'getPairCurrentReserve',
   })
   @ApiBody({ type: GetPairDto })
   @ApiCreatedResponse({
-    description: 'getPair success',
+    description: 'getPairCurrentReserve success',
     // type: ResponseClientDto,
   })
   @ApiInternalServerErrorResponse({ description: 'Internal server error' })
-  async getPair(@Body() dto: GetPairDto): Promise<any> {
+  async getPairCurrentReserve(@Body() dto: GetPairDto): Promise<any> {
     try {
-      return await this.chartService.getPair(dto);
+      return await this.chartService.getPairCurrentReserve(dto);
     } catch (err) {
       console.error(err);
       throw err;
     }
   }
 
-  @Post('getClientPair')
+  @Post('getPairReserveAll')
   @Header('Content-Type', 'application/json')
   @ApiOperation({
-    summary: 'getClientPair',
-    description: 'getClientPair',
+    summary: 'getPairReserveAll',
+    description: 'getPairReserveAll',
   })
-  @ApiBody({ type: GetClientPairDto })
+  @ApiBody({ type: GetPairDto })
   @ApiCreatedResponse({
-    description: 'getClientPair success',
+    description: 'getPairReserveAll success',
     // type: ResponseClientDto,
   })
   @ApiInternalServerErrorResponse({ description: 'Internal server error' })
-  async getClientPair(@Body() dto: GetClientPairDto): Promise<any> {
+  async getPairReserveAll(@Body() dto: GetPairDto): Promise<any> {
     try {
-      return await this.chartService.getClientPair(dto);
+      return await this.chartService.getPairReserveAll(dto);
     } catch (err) {
       console.error(err);
       throw err;
     }
   }
 
-  @Post('getClient')
+  @Post('getPairEventAll')
   @Header('Content-Type', 'application/json')
   @ApiOperation({
-    summary: 'getClient',
-    description: 'getClient',
+    summary: 'getPairEventAll',
+    description: 'getPairEventAll',
   })
-  @ApiBody({ type: GetClientDto })
+  @ApiBody({ type: GetPairDto })
+  @ApiCreatedResponse({
+    description: 'getPairEventAll success',
+    // type: ResponseClientDto,
+  })
+  @ApiInternalServerErrorResponse({ description: 'Internal server error' })
+  async getPairEventAll(@Body() dto: GetPairDto): Promise<any> {
+    try {
+      return await this.chartService.getPairEventAll(dto);
+    } catch (err) {
+      console.error(err);
+      throw err;
+    }
+  }
+
+  @Post('getClientPairsEvent')
+  @Header('Content-Type', 'application/json')
+  @ApiOperation({
+    summary: 'getClientPairsEvent',
+    description: 'getClientPairsEvent',
+  })
+  @ApiBody({ type: GetClientEventAllDto })
   @ApiCreatedResponse({
     description: 'getClient success',
     // type: ResponseClientDto,
   })
   @ApiInternalServerErrorResponse({ description: 'Internal server error' })
-  async getClient(@Body() dto: GetClientDto): Promise<any> {
+  async getClientPairsEvent(@Body() dto: GetClientEventAllDto): Promise<any> {
     try {
-      return await this.chartService.getClient(dto);
+      return await this.chartService.getClientPairsEvent(dto);
+    } catch (err) {
+      console.error(err);
+      throw err;
+    }
+  }
+
+  @Post('getClientPairEvent')
+  @Header('Content-Type', 'application/json')
+  @ApiOperation({
+    summary: 'getClientPairEvent',
+    description: 'getClientPairEvent',
+  })
+  @ApiBody({ type: GetClientEventDto })
+  @ApiCreatedResponse({
+    description: 'getClientPair success',
+    // type: ResponseClientDto,
+  })
+  @ApiInternalServerErrorResponse({ description: 'Internal server error' })
+  async getClientPairEvent(@Body() dto: GetClientEventDto): Promise<any> {
+    try {
+      return await this.chartService.getClientPairEvent(dto);
     } catch (err) {
       console.error(err);
       throw err;

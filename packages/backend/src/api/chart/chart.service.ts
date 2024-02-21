@@ -3,42 +3,75 @@ import cacheService from '../../init/cache';
 import {
   type GetPairListDto,
   type GetPairDto,
-  type GetClientPairDto,
-  type GetClientDto,
+  type GetPairsDto,
+  type GetClientEventDto,
+  type GetClientEventAllDto,
 } from './dto/chart.request';
 
 @Injectable()
 export class ChartService {
   async getPairList(dto: GetPairListDto): Promise<any> {
-    const data = cacheService.get(`${dto.network}.pairList`);
+    const data = cacheService.get(`${dto.network}.pairs.list`);
     if (data === undefined) {
       throw new NotFoundException('pair list not found');
     }
     return data;
   }
 
-  async getPair(dto: GetPairDto): Promise<any> {
-    const data = cacheService.get(`${dto.network}.pair.${dto.pairAddress}`);
+  async getPairsCurrentReserve(dto: GetPairsDto): Promise<any> {
+    const data = cacheService.get(`${dto.network}.pairs.current.reserve`);
+    if (data === undefined) {
+      throw new NotFoundException('pairs reserve not found');
+    }
+    return data;
+  }
+
+  async getPairCurrentReserve(dto: GetPairDto): Promise<any> {
+    const data = cacheService.get(
+      `${dto.network}.pair.current.reserve.${dto.pairAddress}`,
+    );
+    if (data === undefined) {
+      throw new NotFoundException('pair reserve not found');
+    }
+    return data;
+  }
+
+  async getPairReserveAll(dto: GetPairDto): Promise<any> {
+    const data = cacheService.get(
+      `${dto.network}.pair.reserve.all.${dto.pairAddress}`,
+    );
     if (data === undefined) {
       throw new NotFoundException('pair not found');
     }
     return data;
   }
 
-  async getClientPair(dto: GetClientPairDto): Promise<any> {
+  async getPairEventAll(dto: GetPairDto): Promise<any> {
     const data = cacheService.get(
-      `${dto.network}.user.${dto.userAddress}.${dto.pairAddress}`,
+      `${dto.network}.pair.event.all.${dto.pairAddress}`,
     );
     if (data === undefined) {
-      throw new NotFoundException("client's pair not found");
+      throw new NotFoundException('pair not found');
     }
     return data;
   }
 
-  async getClient(dto: GetClientDto): Promise<any> {
-    const data = cacheService.get(`${dto.network}.user.${dto.userAddress}`);
+  async getClientPairsEvent(dto: GetClientEventAllDto): Promise<any> {
+    const data = cacheService.get(
+      `${dto.network}.user.event.all.${dto.userAddress}`,
+    );
     if (data === undefined) {
       throw new NotFoundException('client not found');
+    }
+    return data;
+  }
+
+  async getClientPairEvent(dto: GetClientEventDto): Promise<any> {
+    const data = cacheService.get(
+      `${dto.network}.user.event.${dto.userAddress}.${dto.pairAddress}`,
+    );
+    if (data === undefined) {
+      throw new NotFoundException("client's pair not found");
     }
     return data;
   }

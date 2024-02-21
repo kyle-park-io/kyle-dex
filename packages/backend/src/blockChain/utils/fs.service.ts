@@ -83,6 +83,7 @@ export class FsService {
     return array;
   };
 
+  // pairs.list
   writePairArrayToFile = async (
     network: string,
     name: string,
@@ -114,7 +115,8 @@ export class FsService {
     }
   };
 
-  writePairReserveArrayToFile = async (
+  // pair.reserve.all
+  writePairReserveAllArrayToFile = async (
     network: string,
     name: string,
     pair: string,
@@ -154,7 +156,95 @@ export class FsService {
     }
   };
 
-  writeUserReserveArrayToFile = async (
+  // pair.event.all
+  writePairEventAllArrayToFile = async (
+    network: string,
+    name: string,
+    pair: string,
+    body: any,
+  ): Promise<void> => {
+    const path = `${network}/pair/reserve`;
+    if (fs.existsSync(`${this.dataPath}/${path}/${pair}.all.json`)) {
+      const data = await this.readArrayFromFile(path, `${pair}.all`);
+      data[0] = body;
+      data.push(body);
+
+      cacheService.set(
+        `${network}.${name}.${pair}`,
+        JSON.stringify(data, null, 2),
+      );
+      fs.writeFileSync(
+        `${this.dataPath}/${path}/${pair}.all.json`,
+        JSON.stringify(data, null, 2),
+        'utf8',
+      );
+    } else {
+      fs.mkdirSync(`${this.dataPath}/${path}`, {
+        recursive: true,
+      });
+
+      const data: any[] = [];
+      data.push(body);
+      data.push(body);
+
+      cacheService.set(
+        `${network}.${name}.${pair}`,
+        JSON.stringify(data, null, 2),
+      );
+      fs.writeFileSync(
+        `${this.dataPath}/${path}/${pair}.all.json`,
+        JSON.stringify(data, null, 2),
+        'utf8',
+      );
+    }
+  };
+
+  // pair(s).current.reserve
+  writePairsReserveListArrayToFile = async (
+    network: string,
+    name: string,
+    pair: string,
+    body: any,
+  ): Promise<void> => {
+    const path = `${network}/pair`;
+    if (fs.existsSync(`${this.dataPath}/${path}/${name}.json`)) {
+      const index = cacheService.get(`hardhat.pair.index.${pair}`);
+      if (index === undefined) {
+        throw new Error('wrong pair address');
+      }
+
+      const data = await this.readArrayFromFile(path, name);
+      data[Number(index)] = body;
+      fs.writeFileSync(
+        `${this.dataPath}/${path}/${name}.json`,
+        JSON.stringify(data, null, 2),
+        'utf8',
+      );
+
+      cacheService.set(
+        `${network}.pair.current.reserve.${pair}`,
+        JSON.stringify(body, null, 2),
+      );
+      cacheService.set(
+        `${network}.pairs.current.reserve`,
+        JSON.stringify(data, null, 2),
+      );
+    } else {
+      fs.mkdirSync(`${this.dataPath}/${path}`, { recursive: true });
+
+      // TODO : check concurrency
+      const data: any[] = [];
+      data.push(body);
+      fs.writeFileSync(
+        `${this.dataPath}/${path}/${name}.json`,
+        JSON.stringify(data, null, 2),
+        'utf8',
+      );
+    }
+  };
+
+  // user.event (1 pair)
+  writeUserEventArrayToFile = async (
     network: string,
     name: string,
     user: string,
@@ -195,7 +285,8 @@ export class FsService {
     }
   };
 
-  writeUserReserveAllArrayToFile = async (
+  // user.event.all
+  writeUserEventAllArrayToFile = async (
     network: string,
     name: string,
     user: string,

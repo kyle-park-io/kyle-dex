@@ -101,6 +101,10 @@ export class MumbaiRpcService implements RpcService, OnModuleInit {
     return this.contractService.getContractList();
   }
 
+  getTokenContractList(): Contract[] {
+    return [];
+  }
+
   getContractEventList(name?: string, address?: string): string[] | undefined {
     if (name === undefined && address === undefined) {
       throw new Error('param must exist least one');

@@ -26,6 +26,8 @@ network:
           - 'Mint'
           - 'Burn'
           - 'Swap'
+          - 'Transfer'
+          - 'Approval'
 
   sepolia:
     contracts:
@@ -52,6 +54,8 @@ network:
           - 'Mint'
           - 'Burn'
           - 'Swap'
+          - 'Transfer'
+          - 'Approval'
 
   mumbai:
     contracts:
@@ -80,6 +84,8 @@ network:
           - 'Mint'
           - 'Burn'
           - 'Swap'
+          - 'Transfer'
+          - 'Approval'
 
 contracts:
   - name: 'DexCalc'
@@ -107,3 +113,5 @@ contracts:
       - 'Mint'
       - 'Burn'
       - 'Swap'
+      - 'Transfer'
+      - 'Approval'

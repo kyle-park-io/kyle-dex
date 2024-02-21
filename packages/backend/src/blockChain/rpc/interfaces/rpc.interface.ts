@@ -26,6 +26,8 @@ export interface RpcService {
 
   getContractList(): string[];
 
+  getTokenContractList(): Contract[];
+
   getContractEventList(name?: string, address?: string): string[] | undefined;
 
   getFunctionSignatureByAddress(address: string, functionName: string): string;

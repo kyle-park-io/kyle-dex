@@ -19,6 +19,15 @@ export class TokenService {
     private readonly rpcService: RpcService,
   ) {}
 
+  async getTokenContractList(): Promise<any> {
+    try {
+      return this.rpcService.getTokenContractList();
+    } catch (err) {
+      this.logger.error('getTokenContractList error');
+      throw err;
+    }
+  }
+
   async balanceOf(dto: BalanceOfDto): Promise<ResponseBalanceOfDto> {
     try {
       // user

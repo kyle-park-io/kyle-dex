@@ -28,6 +28,8 @@ export class HardhatRpcService implements RpcService, OnModuleInit {
   private readonly contractNameMap: Map<string, string>;
   private readonly contractAddressMap: Map<string, string>;
   private readonly contractEventListByAddressMap: Map<string, string[]>;
+  // array
+  private readonly tokenContractList: Contract[];
 
   constructor(
     private readonly configService: ConfigService,
@@ -42,6 +44,7 @@ export class HardhatRpcService implements RpcService, OnModuleInit {
     this.contractNameMap = new Map<string, string>();
     this.contractAddressMap = new Map<string, string>();
     this.contractEventListByAddressMap = new Map<string, string[]>();
+    this.tokenContractList = [];
 
     const http = this.configService.get<string>(
       'endpoints.localhost.hardhat.url.http',
@@ -101,6 +104,10 @@ export class HardhatRpcService implements RpcService, OnModuleInit {
 
   getContractList(): string[] {
     return this.contractService.getContractList();
+  }
+
+  getTokenContractList(): Contract[] {
+    return this.tokenContractList;
   }
 
   getContractEventList(name?: string, address?: string): string[] | undefined {
@@ -186,6 +193,11 @@ export class HardhatRpcService implements RpcService, OnModuleInit {
           this.contractByAddressMap.set(value.address, contract);
           this.contractNameMap.set(value.address, value.name);
           this.contractAddressMap.set(value.name, value.address);
+
+          // token
+          if (value.name.includes('token')) {
+            this.tokenContractList.push(contract);
+          }
 
           if (value.eventList !== undefined) {
             this.contractEventListByAddressMap.set(

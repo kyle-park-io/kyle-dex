@@ -30,7 +30,17 @@ export class GetPairDto {
   readonly pairAddress!: string;
 }
 
-export class GetClientPairDto {
+export class GetPairsDto {
+  @IsString()
+  @ApiProperty({
+    description: 'network',
+    example: 'hardhat',
+    required: true,
+  })
+  readonly network!: string;
+}
+
+export class GetClientEventDto {
   @IsString()
   @ApiProperty({
     description: 'network',
@@ -56,7 +66,7 @@ export class GetClientPairDto {
   readonly pairAddress!: string;
 }
 
-export class GetClientDto {
+export class GetClientEventAllDto {
   @IsString()
   @ApiProperty({
     description: 'network',
