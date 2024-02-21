@@ -10,8 +10,11 @@ import Footer from './layout/Footer';
 
 // route
 import App from './app/App';
-import AccountIndex from './account/account.index';
+import AccountIndex from './account/Account.index';
 import DexChartIndex from './dex/Dex.index';
+import DexStaking from './dex/Dex.staking';
+import DexSwap from './dex/Dex.swap';
+import DexBridge from './dex/Dex.bridge';
 import NotFoundPage from './components/404/NotFoundPage';
 
 const root = document.getElementById('root');
@@ -31,6 +34,9 @@ if (root != null) {
                 component={AccountIndex}
               />
               <Route path="/dex/chart" component={DexChartIndex} />
+              <Route path="/dex/staking" component={DexStaking} />
+              <Route path="/dex/swap" component={DexSwap} />
+              <Route path="/dex/bridge" component={DexBridge} />
               <Route path="*" component={NotFoundPage} />
             </Routes>
           </div>

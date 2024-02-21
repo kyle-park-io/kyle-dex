@@ -1,11 +1,17 @@
 import { type Component, type JSX } from 'solid-js';
 import { createSignal, createEffect, For } from 'solid-js';
 import { type PairListProps } from '../interfaces/component.interfaces';
-import { type Pair2 } from '../interfaces/trade.interface';
+// import { type Pair2 } from '../interfaces/trade.interface';
 import { getPairList } from '../Dex.axios';
 import { ListGroup, ListGroupItem, Button } from 'solid-bootstrap';
 
+import { globalNetwork } from '../../global/global.store';
+
 const [isCalled, setIsCalled] = createSignal(false);
+
+// const [items, setItems] = createSignal<Pair[]>([]);
+// const [items, setItems] = createSignal<Pair2[]>([]);
+const [items, setItems] = createSignal<string[]>([]);
 
 export const PairList: Component<PairListProps> = (props): JSX.Element => {
   const env = import.meta.env.VITE_ENV;
@@ -18,9 +24,6 @@ export const PairList: Component<PairListProps> = (props): JSX.Element => {
     throw new Error('url env error');
   }
 
-  // const [items, setItems] = createSignal<Pair[]>([]);
-  const [items, setItems] = createSignal<Pair2[]>([]);
-
   createEffect(() => {
     if (!isCalled()) {
       void test();
@@ -29,12 +32,11 @@ export const PairList: Component<PairListProps> = (props): JSX.Element => {
   });
 
   async function test(): Promise<void> {
-    const data = await getPairList(api, { network: 'hardhat' });
-    const test: Pair2[] = [];
+    const data = await getPairList(api, { network: globalNetwork.network });
+    const test: any[] = [];
     for (let i = 0; i < data.length; i++) {
-      console.log(data[i].pair);
-      test.push(data[i]);
-      test[i].shortPairAddress = data[i].pair.slice(0, 5);
+      test.push({ pair: data[i].eventData.pair });
+      test[i].shortPairAddress = data[i].eventData.pair.slice(0, 10);
     }
     setItems(test);
   }
@@ -43,12 +45,12 @@ export const PairList: Component<PairListProps> = (props): JSX.Element => {
     <div>
       <ListGroup>
         <For each={items()}>
-          {(item) => (
+          {(item: any) => (
             <ListGroupItem>
               <Button
                 variant="outline-primary"
                 onClick={() => {
-                  props.changePair(item.pair);
+                  props.handleCurrentPair(item.pair);
                 }}
               >
                 {item.shortPairAddress + '...'}: {item.timestamp}

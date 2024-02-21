@@ -1,6 +1,5 @@
 import { type Component, type JSX } from 'solid-js';
 import { createSignal, onMount, For } from 'solid-js';
-import { createStore } from 'solid-js/store';
 import { useNavigate, useLocation } from '@solidjs/router';
 import { Container, Row, Col, Nav } from 'solid-bootstrap';
 import HomeLogo from '/home.svg?url';
@@ -12,10 +11,12 @@ import './Header.css';
 // metamask
 import MetamaskIndex from '../metamask/Metamask.index';
 
-// global status
-export const [globalAccount, setGlobalAccount] = createStore({
-  address: 'null',
-});
+// global
+import {
+  setGlobalNetwork,
+  globalAccount,
+  setGlobalAccount,
+} from '../global/global.store';
 
 const Header: Component = (): JSX.Element => {
   const env = import.meta.env.VITE_ENV;
@@ -93,6 +94,7 @@ const Header: Component = (): JSX.Element => {
       setSepoliaButtonColor('white');
       setMumbaiButtonColor('white');
       setNetwork('null');
+      setGlobalNetwork({ network: 'null' });
       setAccountButtonAddress('null');
       setGlobalAccount({ address: 'null' });
       if (location.pathname.startsWith('/dex/account')) {
@@ -107,6 +109,7 @@ const Header: Component = (): JSX.Element => {
         setAccountButtonAddress('null');
         setGlobalAccount({ address: 'null' });
         setNetwork(networkKey);
+        setGlobalNetwork({ network: 'hardhat' });
         if (location.pathname.startsWith('/dex/account')) {
           handleAccountClick();
         }
@@ -120,6 +123,7 @@ const Header: Component = (): JSX.Element => {
           setGlobalAccount({ address: 'null' });
         }
         setNetwork(networkKey);
+        setGlobalNetwork({ network: 'sepolia' });
         if (isMetamaskConnected()) {
           setMetamaskChange(true);
         }
@@ -136,6 +140,7 @@ const Header: Component = (): JSX.Element => {
           setGlobalAccount({ address: 'null' });
         }
         setNetwork(networkKey);
+        setGlobalNetwork({ network: 'mumbai' });
         if (isMetamaskConnected()) {
           setMetamaskChange(true);
         }
@@ -356,7 +361,7 @@ const Header: Component = (): JSX.Element => {
                 </Nav.Item>
                 <Nav.Item as="li">
                   <Nav.Link eventKey="account">
-                    {isLocal() && (
+                    {isLocal() && network() !== 'null' && (
                       <div>
                         <button onMouseEnter={toggleDropdown2}>Account</button>
                         {isOpen2() && (

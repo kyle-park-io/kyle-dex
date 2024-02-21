@@ -1,14 +1,14 @@
 import { type Component, type JSX } from 'solid-js';
 import { createSignal, createEffect, For } from 'solid-js';
-import { type ClientPairProps } from '../interfaces/component.interfaces';
-import { getClientPairEvent } from '../Dex.axios';
+import { type PairEventProps } from '../interfaces/component.interfaces';
+import { getPairEventAll } from '../Dex.axios';
 import { ListGroup, ListGroupItem } from 'solid-bootstrap';
 
-import { globalNetwork, globalAccount } from '../../global/global.store';
+import { globalNetwork } from '../../global/global.store';
 
 const [isCalled, setIsCalled] = createSignal(false);
 
-export const ClientPair: Component<ClientPairProps> = (props): JSX.Element => {
+export const PairEvent: Component<PairEventProps> = (props): JSX.Element => {
   const env = import.meta.env.VITE_ENV;
   let api;
   if (env === 'DEV') {
@@ -23,11 +23,7 @@ export const ClientPair: Component<ClientPairProps> = (props): JSX.Element => {
 
   createEffect(() => {
     if (isCalled()) {
-      if (
-        props.currentPair !== '' &&
-        globalNetwork.network !== 'null' &&
-        globalAccount.address !== 'null'
-      ) {
+      if (props.currentPair !== '' && globalNetwork.network !== 'null') {
         void test();
       } else {
         setItems([]);
@@ -38,22 +34,21 @@ export const ClientPair: Component<ClientPairProps> = (props): JSX.Element => {
   });
 
   async function test(): Promise<void> {
-    try {
-      const data = await getClientPairEvent(api, {
-        network: globalNetwork.network,
-        userAddress: globalAccount.address,
-        pairAddress: props.currentPair,
-      });
-
-      const test: any[] = [];
-      for (let i = 1; i < data.length; i++) {
-        test.push({ tx: data[i].txHash, event: data[i].event });
-        test[i - 1].shortTx = data[i].txHash.slice(0, 10);
+    const data = await getPairEventAll(api, {
+      network: globalNetwork.network,
+      pairAddress: props.currentPair,
+    });
+    const test: any[] = [];
+    let index = 0;
+    for (let i = 1; i < data.length; i++) {
+      if (data[i].event === 'Sync') {
+        continue;
       }
-      setItems(test);
-    } catch (err) {
-      setItems([]);
+      test.push({ tx: data[i].txHash, event: data[i].event });
+      test[index].shortTx = data[i].txHash.slice(0, 10);
+      index++;
     }
+    setItems(test);
   }
 
   return (

@@ -1,9 +1,18 @@
 export interface PairListProps {
   currentPair: string;
-  changePair: (pair: string) => void;
+  handleCurrentPair: (pair: string) => void;
+}
+
+export interface PairEventProps {
+  currentPair: string;
 }
 
 export interface ClientPairProps {
   currentPair: string;
-  currentAccount: string;
+}
+
+export interface StakingListProps {
+  handleTokenA: (token: string) => void;
+  handleTokenB: (token: string) => void;
+  handlePair: (pair: string) => void;
 }

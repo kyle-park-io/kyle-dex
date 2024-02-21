@@ -6,7 +6,7 @@ import { type MetamaskIndexProps } from './interfaces/component.interfaces';
 // metamask
 import { MetaMaskSDK, type SDKProvider } from '@metamask/sdk';
 
-import { globalAccount, setGlobalAccount } from '../layout/Header';
+import { globalAccount, setGlobalAccount } from '../global/global.store';
 
 const [isProcessing, setIsProcessing] = createSignal(false);
 

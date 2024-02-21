@@ -1,102 +1,278 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import { type Component, type JSX } from 'solid-js';
-import { onMount } from 'solid-js';
+import { createSignal, createEffect } from 'solid-js';
 import { type ChartProps } from './interfaces/component.interfaces';
+import {
+  getPairData,
+  getAllData,
+  getMyAllData,
+  getMyAllDataByEvent,
+} from './Chart.data';
+import { globalNetwork, globalAccount } from '../global/global.store';
+
+import { Scatter } from 'solid-chartjs';
+import {
+  type ChartOptions,
+  // type ChartData,
+  // Chart,
+  // Title,
+  // Tooltip,
+  // Legend,
+  // Colors,
+  // Plugin,
+} from 'chart.js';
 
 // chart.js
 import 'chart.js/auto';
-import { Chart, Title, Tooltip, Legend, Colors } from 'chart.js';
-import { Scatter } from 'solid-chartjs';
+/**
+ * You must register optional elements before using the chart,
+ * otherwise you will have the most primitive UI
+ */
+// Chart.register(Title, Tooltip, Legend, Colors);
+
+const [isCalled, setIsCalled] = createSignal(false);
 
 export const ChartIndex: Component<ChartProps> = (props): JSX.Element => {
-  const env = import.meta.env.VITE_ENV;
-  let api;
-  if (env === 'DEV') {
-    api = import.meta.env.VITE_DEV_API_URL;
-  } else if (env === 'PROD') {
-    api = import.meta.env.VITE_PROD_API_URL;
-  } else {
-    throw new Error('url env error');
+  const [currentChart, setCurrentChart] = createSignal('all');
+  const [currentPair, setCurrentPair] = createSignal('');
+  const [currentAccount, setCurrentAccount] = createSignal('null');
+
+  const [, setAllData] = createSignal<any[]>([]);
+  const [allData2, setAllData2] = createSignal<any>({});
+  const [allOption, setAllOption] = createSignal<ChartOptions>({});
+
+  const [, setMyAllData] = createSignal<any[]>([]);
+  const [, setMyAllData2] = createSignal<any>({});
+  const [, setMyAllOption] = createSignal<ChartOptions>({});
+
+  const [, setMyAllDataMint] = createSignal<any[]>([]);
+  const [, setMyAllDataMint2] = createSignal<any>({});
+  const [, setMyAllOptionMint] = createSignal<ChartOptions>({});
+
+  const [, setPairData] = createSignal<any[]>([]);
+  const [pairData2, setPairData2] = createSignal<any>({});
+  const [pairOption, setPairOption] = createSignal<ChartOptions>({});
+
+  async function all(): Promise<void> {
+    const { data, dataset, option } = await getAllData(globalNetwork.network);
+    setAllData(data);
+    setAllData2(dataset);
+    setAllOption(option);
+
+    setCurrentPair('');
+    setCurrentChart('all');
   }
-  console.log(api);
-  console.log(props);
 
-  /**
-   * You must register optional elements before using the chart,
-   * otherwise you will have the most primitive UI
-   */
-  onMount(() => {
-    async function test(): Promise<void> {
-      Chart.register(Title, Tooltip, Legend, Colors);
+  async function myAll(): Promise<void> {
+    const { data, dataset, option } = await getMyAllData(
+      globalNetwork.network,
+      globalAccount.address,
+    );
+    setMyAllData(data);
+    setMyAllData2(dataset);
+    setMyAllOption(option);
+
+    const { data2, dataset2, option2 } = await getMyAllDataByEvent(
+      globalNetwork.network,
+      globalAccount.address,
+      'Mint',
+    );
+    setMyAllDataMint(data2);
+    setMyAllDataMint2(dataset2);
+    setMyAllOptionMint(option2);
+
+    setCurrentAccount(globalAccount.address);
+    setCurrentPair('');
+    setCurrentChart('all');
+  }
+
+  async function pair(): Promise<void> {
+    const { data, dataset, option } = await getPairData(
+      globalNetwork.network,
+      props.currentPair,
+    );
+    setPairData(data);
+    setPairData2(dataset);
+    setPairOption(option);
+
+    setCurrentPair(props.currentPair);
+    setCurrentChart('pair');
+
+    props.handleCurrentChart('pair');
+  }
+
+  createEffect(() => {
+    if (isCalled()) {
+      if (globalNetwork.network !== 'null') {
+        if (props.currentChart.includes('all')) {
+          // if (!currentChart().includes('all')) {
+          // }
+          console.log('how?');
+          void all();
+          // TODO
+          if (
+            props.currentChart.includes('my') &&
+            globalAccount.address !== 'null' &&
+            currentAccount() !== globalAccount.address
+          ) {
+            void myAll();
+          }
+        }
+
+        if (props.currentChart.includes('pair')) {
+          if (!currentChart().includes('pair')) {
+            if (
+              props.currentPair !== '' &&
+              props.currentPair !== currentPair()
+            ) {
+              void pair();
+            }
+            if (
+              props.currentChart.includes('my') &&
+              globalAccount.address !== 'null' &&
+              currentAccount() !== globalAccount.address
+            ) {
+              // void allACC();
+            }
+          }
+        }
+      }
+    } else {
+      void all();
+      setIsCalled(true);
     }
-
-    void test();
   });
-
-  const chartData = {
-    labels: ['January', 'February', 'March', 'April', 'May'],
-    datasets: [
-      {
-        label: 'Sales',
-        data: [50, 60, 70, 80, 90],
-      },
-    ],
-  };
-  console.log(chartData);
-  const chartOptions = {
-    responsive: true,
-    maintainAspectRatio: false,
-  };
-  console.log(chartOptions);
-
-  const chartData2 = {
-    // datasets: aa(),
-    datasets: [
-      {
-        label: 'Scatter Dataset',
-        data: [
-          {
-            x: -10,
-            y: 0,
-          },
-          {
-            x: 0,
-            y: 10,
-          },
-          {
-            x: 10,
-            y: 5,
-          },
-          {
-            x: 0.5,
-            y: 5.5,
-          },
-        ],
-        backgroundColor: 'rgb(255, 99, 132)',
-      },
-    ],
-  };
-
-  const chartOptions2 = {
-    scales: {
-      x: {
-        type: 'linear',
-        position: 'bottom',
-        min: -15, // x축 최소값
-        max: 15, // x축 최대값
-      },
-      y: {
-        type: 'linear',
-        min: -5, // y축 최소값
-        max: 15, // y축 최대값
-      },
-    },
-  };
 
   return (
     <div>
       {/* <Line data={chartData} options={chartOptions} width={500} height={500} /> */}
       {/* <DefaultChart type="line" data={chartData} options={chartOptions} /> */}
-      <Scatter type="scatter" data={chartData2} options={chartOptions2} />
+
+      {props.currentChart.includes('all') && (
+        <>
+          {props.currentChart.includes('my') ? (
+            <>
+              {currentAccount() === 'null' ? (
+                <>
+                  <div>Please select account!</div>
+                </>
+              ) : (
+                // <>
+                //   <Scatter
+                //     type="scatter"
+                //     data={myAllData2()}
+                //     options={myAllOption()}
+                //   />
+                // </>
+
+                <>
+                  {props.currentChart.includes('Mint') && (
+                    <>
+                      <Scatter
+                        type="scatter"
+                        data={pairData2()}
+                        options={pairOption()}
+                      />
+                    </>
+                  )}
+                </>
+              )}
+            </>
+          ) : (
+            <>
+              <>
+                <Scatter
+                  type="scatter"
+                  data={allData2()}
+                  options={allOption()}
+                />
+              </>
+            </>
+          )}
+        </>
+      )}
+
+      {props.currentChart.includes('pair') && (
+        <>
+          {currentPair() === '' ? (
+            <>
+              <div>Please select pair!</div>
+            </>
+          ) : (
+            <>
+              {props.currentChart.includes('my') ? (
+                <>
+                  {currentAccount() === 'null' ? (
+                    <>
+                      <div>Please select account!</div>
+                    </>
+                  ) : (
+                    <>
+                      {props.currentChart.includes('Mint') && (
+                        <>
+                          <Scatter
+                            type="scatter"
+                            data={pairData2()}
+                            options={pairOption()}
+                          />
+                        </>
+                      )}
+                      {props.currentChart.includes('Burn') && (
+                        <>
+                          <Scatter
+                            type="scatter"
+                            data={pairData2()}
+                            options={pairOption()}
+                          />
+                        </>
+                      )}
+                      {props.currentChart.includes('Swap') && (
+                        <>
+                          <Scatter
+                            type="scatter"
+                            data={pairData2()}
+                            options={pairOption()}
+                          />
+                        </>
+                      )}
+                    </>
+                  )}
+                </>
+              ) : (
+                <>
+                  {props.currentChart.includes('Mint') && (
+                    <>
+                      <Scatter
+                        type="scatter"
+                        data={pairData2()}
+                        options={pairOption()}
+                      />
+                    </>
+                  )}
+                  {props.currentChart.includes('Burn') && (
+                    <>
+                      <Scatter
+                        type="scatter"
+                        data={pairData2()}
+                        options={pairOption()}
+                      />
+                    </>
+                  )}
+                  {props.currentChart.includes('Swap') && (
+                    <>
+                      <Scatter
+                        type="scatter"
+                        data={pairData2()}
+                        options={pairOption()}
+                      />
+                    </>
+                  )}
+                </>
+              )}
+            </>
+          )}
+        </>
+      )}
     </div>
   );
 };
