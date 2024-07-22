@@ -14,7 +14,7 @@ import { ethers, JsonRpcProvider, Interface, type Contract } from 'ethers';
 import { setTimeout } from 'timers/promises';
 
 @Injectable()
-export class MumbaiRpcService implements RpcService, OnModuleInit {
+export class AmoyRpcService implements RpcService, OnModuleInit {
   private initPromise!: Promise<void>;
 
   private readonly https: string;
@@ -42,7 +42,7 @@ export class MumbaiRpcService implements RpcService, OnModuleInit {
     this.contractEventListByAddressMap = new Map<string, string[]>();
 
     const https = this.configService.get<string>(
-      'endpoints.polygon.mumbai.url.https',
+      'endpoints.polygon.amoy.url.https',
     );
     if (https === undefined) {
       throw new Error('config error');
@@ -50,7 +50,7 @@ export class MumbaiRpcService implements RpcService, OnModuleInit {
     this.https = https;
 
     const wss = this.configService.get<string>(
-      'endpoints.polygon.mumbai.url.wss',
+      'endpoints.polygon.amoy.url.wss',
     );
     if (wss === undefined) {
       throw new Error('config error');

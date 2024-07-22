@@ -83,8 +83,8 @@ const MetamaskIndex: Component<MetamaskIndexProps> = (props): JSX.Element => {
         switch (network) {
           case 'sepolia':
             return import.meta.env.VITE_SEPOLIA_API;
-          case 'mumbai':
-            return import.meta.env.VITE_MUMBAI_API;
+          case 'amoy':
+            return import.meta.env.VITE_AMOY_API;
           default:
             return null;
         }
@@ -240,20 +240,20 @@ const MetamaskIndex: Component<MetamaskIndexProps> = (props): JSX.Element => {
 
           break;
         }
-        case 'mumbai': {
+        case 'amoy': {
           await provider()?.request({
             method: 'wallet_addEthereumChain',
             params: [
               {
                 chainId: '0x13881',
-                chainName: 'Mumbai',
+                chainName: 'Amoy',
                 nativeCurrency: {
                   name: 'Matic',
                   symbol: 'MATIC',
                   decimals: 18,
                 },
-                rpcUrls: ['https://rpc-mumbai.maticvigil.com/'],
-                blockExplorerUrls: ['https://mumbai.polygonscan.com/'],
+                rpcUrls: ['https://rpc-amoy.maticvigil.com/'],
+                blockExplorerUrls: ['https://amoy.polygonscan.com/'],
               },
             ],
           });

@@ -57,7 +57,7 @@ network:
           - 'Transfer'
           - 'Approval'
 
-  mumbai:
+  amoy:
     contracts:
       - name: 'DexCalc'
         address:

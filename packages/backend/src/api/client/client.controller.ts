@@ -2,7 +2,7 @@
 import { Controller, Get, Header, Post, Query, Body } from '@nestjs/common';
 import { HardhatClientService } from './client.hardhat.service';
 import { SepoliaClientService } from './client.sepolia.service';
-import { MumbaiClientService } from './client.mumbai.service';
+import { AmoyClientService } from './client.amoy.service';
 import {
   ApiQuery,
   ApiBody,
@@ -28,7 +28,7 @@ export class ClientController {
   constructor(
     private readonly hardhatClientService: HardhatClientService,
     private readonly sepoliaClientService: SepoliaClientService,
-    private readonly mumbaiClientService: MumbaiClientService,
+    private readonly amoyClientService: AmoyClientService,
   ) {}
 
   @Get('getClientList')
@@ -74,8 +74,8 @@ export class ClientController {
         case 'sepolia': {
           return await this.sepoliaClientService.getClient(dto);
         }
-        case 'mumbai': {
-          return await this.mumbaiClientService.getClient(dto);
+        case 'amoy': {
+          return await this.amoyClientService.getClient(dto);
         }
         default:
           break;

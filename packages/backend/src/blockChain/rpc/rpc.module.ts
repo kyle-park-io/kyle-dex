@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { ContractModule } from '../contract/contract.module';
 import { HardhatRpcService } from './rpc.hardhat.service';
 import { SepoliaRpcService } from './rpc.sepolia.service';
-import { MumbaiRpcService } from './rpc.mumbai.service';
+import { AmoyRpcService } from './rpc.amoy.service';
 
 @Module({
   imports: [ContractModule],
@@ -16,10 +16,10 @@ import { MumbaiRpcService } from './rpc.mumbai.service';
       useClass: SepoliaRpcService,
     },
     {
-      provide: 'MumbaiRpc',
-      useClass: MumbaiRpcService,
+      provide: 'AmoyRpc',
+      useClass: AmoyRpcService,
     },
   ],
-  exports: ['HardhatRpc', 'SepoliaRpc', 'MumbaiRpc'],
+  exports: ['HardhatRpc', 'SepoliaRpc', 'AmoyRpc'],
 })
 export class RpcModule {}

@@ -4,11 +4,11 @@ import { ConfigService } from '@nestjs/config';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { HardhatAccountService } from './account.hardhat.service';
 import { SepoliaAccountService } from './account.sepolia.service';
-import { MumbaiAccountService } from './account.mumbai.service';
+import { AmoyAccountService } from './account.amoy.service';
 import { RpcServiceFactory } from '../rpc/rpc.factory';
 import { HardhatRpcService } from '../rpc/rpc.hardhat.service';
 import { SepoliaRpcService } from '../rpc/rpc.sepolia.service';
-import { MumbaiRpcService } from '../rpc/rpc.mumbai.service';
+import { AmoyRpcService } from '../rpc/rpc.amoy.service';
 import { RpcModule } from '../rpc/rpc.module';
 
 @Module({
@@ -36,11 +36,11 @@ import { RpcModule } from '../rpc/rpc.module';
     // },
     // { provide: 'HardhatRpc', useClass: HardhatRpcService },
     // { provide: 'SepoliaRpc', useClass: SepoliaRpcService },
-    // { provide: 'MumbaiRpc', useClass: MumbaiRpcService },
+    // { provide: 'AmoyRpc', useClass: AmoyRpcService },
     { provide: 'HardhatAccount', useClass: HardhatAccountService },
     { provide: 'SepoliaAccount', useClass: SepoliaAccountService },
-    { provide: 'MumbaiAccount', useClass: MumbaiAccountService },
+    { provide: 'AmoyAccount', useClass: AmoyAccountService },
   ],
-  exports: ['CONFIG', 'HardhatAccount', 'SepoliaAccount', 'MumbaiAccount'],
+  exports: ['CONFIG', 'HardhatAccount', 'SepoliaAccount', 'AmoyAccount'],
 })
 export class AccountModule {}

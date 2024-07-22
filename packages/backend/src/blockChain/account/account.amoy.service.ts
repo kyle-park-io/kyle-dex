@@ -9,7 +9,7 @@ import { ethers, type JsonRpcProvider, type Wallet } from 'ethers';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 
 @Injectable()
-export class MumbaiAccountService implements AccountService {
+export class AmoyAccountService implements AccountService {
   // map
   private readonly walletMap: Map<string, Wallet>;
 
@@ -21,7 +21,7 @@ export class MumbaiAccountService implements AccountService {
     private readonly logger: LoggerService,
     // extra
     @Inject('CONFIG') private readonly config,
-    @Inject('MumbaiRpc') private readonly rpcService: RpcService,
+    @Inject('AmoyRpc') private readonly rpcService: RpcService,
   ) {
     this.walletMap = new Map<string, Wallet>();
   }

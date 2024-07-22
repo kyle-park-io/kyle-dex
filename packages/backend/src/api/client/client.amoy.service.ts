@@ -5,7 +5,7 @@ import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { type ClientDto } from './dto/client.request';
 
 @Injectable()
-export class MumbaiClientService {
+export class AmoyClientService {
   constructor(
     // config
     private readonly configService: ConfigService,
@@ -13,7 +13,7 @@ export class MumbaiClientService {
     @Inject(WINSTON_MODULE_NEST_PROVIDER)
     private readonly logger: LoggerService,
     // account
-    @Inject('MumbaiAccount')
+    @Inject('AmoyAccount')
     private readonly accountService: AccountService,
   ) {}
 

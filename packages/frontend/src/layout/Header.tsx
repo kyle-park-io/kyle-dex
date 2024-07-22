@@ -57,7 +57,7 @@ const Header: Component = (): JSX.Element => {
   // button color
   const [hardhatButtonColor, setHardhatButtonColor] = createSignal('blue');
   const [sepoliaButtonColor, setSepoliaButtonColor] = createSignal('white');
-  const [mumbaiButtonColor, setMumbaiButtonColor] = createSignal('white');
+  const [amoyButtonColor, setAmoyButtonColor] = createSignal('white');
 
   // account
   const [accountButtonId, setAccountButtonId] = createSignal(null);
@@ -92,7 +92,7 @@ const Header: Component = (): JSX.Element => {
       setIsLocal(true);
       setHardhatButtonColor('white');
       setSepoliaButtonColor('white');
-      setMumbaiButtonColor('white');
+      setAmoyButtonColor('white');
       setNetwork('null');
       setGlobalNetwork({ network: 'null' });
       setAccountButtonAddress('null');
@@ -105,7 +105,7 @@ const Header: Component = (): JSX.Element => {
         setIsLocal(true);
         setHardhatButtonColor('blue');
         setSepoliaButtonColor('white');
-        setMumbaiButtonColor('white');
+        setAmoyButtonColor('white');
         setAccountButtonAddress('null');
         setGlobalAccount({ address: 'null' });
         setNetwork(networkKey);
@@ -117,7 +117,7 @@ const Header: Component = (): JSX.Element => {
         setIsLocal(false);
         setHardhatButtonColor('white');
         setSepoliaButtonColor('blue');
-        setMumbaiButtonColor('white');
+        setAmoyButtonColor('white');
         setAccountButtonAddress('null');
         if (!isMetamaskConnected() && network() === 'hardhat') {
           setGlobalAccount({ address: 'null' });
@@ -134,13 +134,13 @@ const Header: Component = (): JSX.Element => {
         setIsLocal(false);
         setHardhatButtonColor('white');
         setSepoliaButtonColor('white');
-        setMumbaiButtonColor('blue');
+        setAmoyButtonColor('blue');
         setAccountButtonAddress('null');
         if (!isMetamaskConnected() && network() === 'hardhat') {
           setGlobalAccount({ address: 'null' });
         }
         setNetwork(networkKey);
-        setGlobalNetwork({ network: 'mumbai' });
+        setGlobalNetwork({ network: 'amoy' });
         if (isMetamaskConnected()) {
           setMetamaskChange(true);
         }
@@ -183,7 +183,7 @@ const Header: Component = (): JSX.Element => {
   // error
   const [hardhatError, setHardhatError] = createSignal<Error | null>(null);
   const [sepoliaError, setSepoliaError] = createSignal<Error | null>(null);
-  const [mumbaiError, setMumbaiError] = createSignal<Error | null>(null);
+  const [amoyError, setAmoyError] = createSignal<Error | null>(null);
   // props
   const propsHandleHardhatChange = (err): void => {
     setHardhatError(err);
@@ -191,13 +191,13 @@ const Header: Component = (): JSX.Element => {
   const propsHandleSepoliaChange = (err): void => {
     setSepoliaError(err);
   };
-  const propsHandleMumbaiChange = (err): void => {
-    setMumbaiError(err);
+  const propsHandleAmoyChange = (err): void => {
+    setAmoyError(err);
   };
 
   console.log(hardhatError());
   console.log(sepoliaError());
-  console.log(mumbaiError());
+  console.log(amoyError());
 
   const [accountList, setAccountList] = createSignal([]);
   onMount(() => {
@@ -244,7 +244,7 @@ const Header: Component = (): JSX.Element => {
         />
         <MetamaskIndex
           chainId="0x13881"
-          network="mumbai"
+          network="amoy"
           currentNetwork={network()}
           loadMetamask={loadMetamask()}
           handleLoadMetamask={propsHandleLoadMetamask}
@@ -254,7 +254,7 @@ const Header: Component = (): JSX.Element => {
           handleDisconnect={propsHandleMetamaskDisconnect}
           change={metamaskChange()}
           handleChange={propsHandleMetamaskChange}
-          onError={propsHandleMumbaiChange}
+          onError={propsHandleAmoyChange}
         />
 
         <Container fluid>
@@ -346,12 +346,12 @@ const Header: Component = (): JSX.Element => {
                           </p>
                           <p>
                             <button
-                              style={{ background: mumbaiButtonColor() }}
+                              style={{ background: amoyButtonColor() }}
                               onClick={() => {
-                                updateNetwork('mumbai');
+                                updateNetwork('amoy');
                               }}
                             >
-                              <span class="tw-text-black">Mumbai</span>
+                              <span class="tw-text-black">Amoy</span>
                             </button>
                           </p>
                         </div>
