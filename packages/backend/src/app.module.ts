@@ -1,8 +1,11 @@
-import { Module } from '@nestjs/common';
+import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 // static
 import { ServeStaticModule } from '@nestjs/serve-static';
+// middleware
+import { SpaMiddleware } from './middleware/spa.middleware';
 // eventEmitter
 import { EventEmitterModule } from '@nestjs/event-emitter';
 // config
@@ -23,8 +26,15 @@ import path from 'path';
 @Module({
   imports: [
     // static
-    ServeStaticModule.forRoot({
-      rootPath: path.resolve('build'),
+    ServeStaticModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => [
+        {
+          rootPath: path.resolve('build'),
+          serveRoot: configService.get<string>('server.staticPath'),
+        },
+      ],
+      inject: [ConfigService],
     }),
     // eventEmitter
     EventEmitterModule.forRoot(),
@@ -46,7 +56,11 @@ import path from 'path';
     // metamask
     MetamaskModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  // controllers: [AppController],
+  // providers: [AppService],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(SpaMiddleware).forRoutes('*');
+  }
+}

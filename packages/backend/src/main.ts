@@ -55,13 +55,14 @@ async function bootstrap(): Promise<void> {
     if (port === undefined) {
       throw new Error('not exist port');
     }
-    await init();
+    // global prefix
+    const prefix = configService.get<string>('server.globalPrefix');
+    if (prefix === undefined) {
+      throw new Error('not exist prefix');
+    }
+    // app.setGlobalPrefix(prefix);
 
-    // server.use(express.static(buildPath));
-    // server.use('*', (req: Request, res: Response) => {
-    //   console.log('check : ', req.url);
-    //   res.sendFile(path.join(buildPath, 'index.html'));
-    // });
+    await init();
 
     // start server
     console.log(`Server is running on http://localhost:${port}`);
