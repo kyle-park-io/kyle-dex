@@ -20,6 +20,10 @@
   ],
   "scripts": {
     "build": "tsc && vite build",
+    "build-prod": "tsc && vite build --config vite.config.prod.ts",
+    "clean": "rimraf dist",
+    "clean-build": "yarn run clean && yarn run build",
+    "clean-build-prod": "yarn run clean && yarn run build-prod",
     "dev": "vite",
     "preview": "vite preview",
     "test": "node ./__tests__/frontend.test.js"
