@@ -3,4 +3,4 @@
 currentDir=$(pwd)
 
 cd ${currentDir}/packages/backend
-./push2gke.sh
+./push2gke_artifact.sh
