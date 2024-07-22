@@ -14,7 +14,7 @@ export class SpaMiddleware implements NestMiddleware {
       return next();
     }
 
-    console.log('index.tml req: ', originalUrl);
+    console.log('index.html req: ', originalUrl);
     res.sendFile(path.resolve('build', 'index.html'));
   }
 }
