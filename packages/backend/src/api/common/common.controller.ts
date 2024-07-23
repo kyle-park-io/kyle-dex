@@ -40,9 +40,10 @@ import {
   type ProcessContractWithETHDto,
 } from '../../blockChain/common/dto/common.dto';
 import { formatEther, formatUnits, parseEther, parseUnits } from 'ethers';
+import { constants } from '../../constants/constants';
 
 @ApiTags('common')
-@Controller('api/common')
+@Controller(`${constants.apiPrefix}/api/common`)
 export class CommonController {
   constructor(
     // logger

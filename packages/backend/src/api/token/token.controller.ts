@@ -16,9 +16,10 @@ import {
 } from '@nestjs/swagger';
 import { BalanceOfDto } from './dto/token.request.dto';
 import { ResponseBalanceOfDto } from './dto/token.response.dto';
+import { constants } from '../../constants/constants';
 
 @ApiTags('token')
-@Controller('api/token')
+@Controller(`${constants.apiPrefix}/api/token`)
 export class TokenController {
   constructor(private readonly tokenService: TokenService) {}
 

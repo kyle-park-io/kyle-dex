@@ -19,9 +19,10 @@ import {
 // dto
 import { CalcPairDto, Create2Dto } from './dto/utils.request.dto';
 import { ResponsePairDto } from './dto/utils.response.dto';
+import { constants } from '../../constants/constants';
 
 @ApiTags('utils')
-@Controller('api/utils')
+@Controller(`${constants.apiPrefix}/api/utils`)
 export class UtilsController {
   constructor(private readonly utilsService: UtilsService) {}
 

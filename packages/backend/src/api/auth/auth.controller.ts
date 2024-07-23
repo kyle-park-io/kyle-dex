@@ -29,9 +29,10 @@ import {
 import { CreateTokenDto, CheckTokenDto } from './dto/auth.request.dto';
 import { ResponseCreateTokenDto } from './dto/auth.response.dto';
 import { type JWT } from './interfaces/auth.interface';
+import { constants } from '../../constants/constants';
 
 @ApiTags('auth')
-@Controller('api/auth')
+@Controller(`${constants.apiPrefix}/api/auth`)
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 

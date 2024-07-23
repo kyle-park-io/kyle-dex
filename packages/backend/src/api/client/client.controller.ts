@@ -21,9 +21,10 @@ import {
 // dto
 import { ClientDto } from './dto/client.request';
 import { ResponseClientDto } from './dto/client.response';
+import { constants } from '../../constants/constants';
 
 @ApiTags('client')
-@Controller('api/client')
+@Controller(`${constants.apiPrefix}/api/client`)
 export class ClientController {
   constructor(
     private readonly hardhatClientService: HardhatClientService,

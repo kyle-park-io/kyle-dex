@@ -1,6 +1,6 @@
 import { Injectable, NestMiddleware } from '@nestjs/common';
-import path from 'path';
 import { Request, Response, NextFunction } from 'express';
+import path from 'path';
 
 @Injectable()
 export class SpaMiddleware implements NestMiddleware {
@@ -8,6 +8,7 @@ export class SpaMiddleware implements NestMiddleware {
     const { originalUrl } = req;
     if (
       originalUrl.startsWith('/api') ||
+      originalUrl.startsWith('/api-dex') ||
       originalUrl.startsWith('/dex-static')
     ) {
       console.log('not index.html req: ', originalUrl);

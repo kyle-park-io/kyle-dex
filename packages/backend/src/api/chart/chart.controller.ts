@@ -24,9 +24,10 @@ import {
   GetClientEventDto,
   GetClientEventAllDto,
 } from './dto/chart.request';
+import { constants } from '../../constants/constants';
 
 @ApiTags('chart')
-@Controller('api/chart')
+@Controller(`${constants.apiPrefix}/api/chart`)
 export class ChartController {
   constructor(private readonly chartService: ChartService) {}
 
