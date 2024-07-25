@@ -20,6 +20,27 @@ import NotFoundPage from './components/404/NotFoundPage';
 // utils
 import Resize from './utils/Resize';
 
+// default
+import { globalState } from './constants/constants';
+function initializeLocalStorage() {
+  if (!localStorage.getItem('network')) {
+    localStorage.setItem('network', 'hardhat');
+    console.log('Default network set in localStorage:', 'hardhat');
+  }
+  if (!localStorage.getItem('address')) {
+    localStorage.setItem('address', globalState.hardhat_admin_address);
+    console.log(
+      'Default address set in localStorage:',
+      globalState.hardhat_admin_address,
+    );
+  }
+  if (!localStorage.getItem('isConnected')) {
+    localStorage.setItem('isConnected', '0');
+    console.log('Default isConnected set in localStorage:', '0');
+  }
+}
+initializeLocalStorage();
+
 const root = document.getElementById('root');
 if (root != null) {
   render(
