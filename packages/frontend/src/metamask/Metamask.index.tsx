@@ -69,9 +69,9 @@ const MetamaskIndex: Component<MetamaskIndexProps> = (props): JSX.Element => {
       const getInfuraUrl = (network: string): string | null => {
         switch (network) {
           case 'sepolia':
-            return globalState.sepolia_url;
+            return import.meta.env.VITE_INFURA_SEPOLIA_API_URL;
           case 'amoy':
-            return globalState.amoy_url;
+            return import.meta.env.VITE_INFURA_AMOY_API_URL;
           default:
             return null;
         }

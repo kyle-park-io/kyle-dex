@@ -8,9 +8,6 @@ const [globalState, setGlobalState] = createStore({
   api_url: 'https://jungho.dev/api-dex/api',
   isProd,
   isOpen: true,
-  sepolia_url: 'https://sepolia.infura.io/v3/3373b9cbe9f14d19973475a064bbc8c9',
-  amoy_url:
-    'https://polygon-amoy.infura.io/v3/3373b9cbe9f14d19973475a064bbc8c9',
   hardhat_admin_address: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
 });
 
