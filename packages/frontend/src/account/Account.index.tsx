@@ -4,6 +4,7 @@ import { useParams } from '@solidjs/router';
 import { getClient } from './Account.axios';
 import { type AccountInfo } from './interfaces/account.interface';
 import { Spinner, Container, Row, Col } from 'solid-bootstrap';
+import { globalState } from '../constants/constants';
 
 const AccountIndex: Component = (): JSX.Element => {
   const params = useParams();
@@ -13,19 +14,14 @@ const AccountIndex: Component = (): JSX.Element => {
   const [loading, setLoading] = createSignal(false);
   const [account, setAccount] = createSignal<AccountInfo>();
 
-  const env = import.meta.env.VITE_ENV;
-  let apiUrl;
-  if (env === 'DEV') {
-    apiUrl = import.meta.env.VITE_DEV_API_URL;
-  } else if (env === 'PROD') {
-    apiUrl = import.meta.env.VITE_PROD_API_URL;
+  const apiUrl = globalState.api_url;
+  if (globalState.isProd) {
     setIsProd(true);
-  } else {
-    throw new Error('env error');
   }
+  setIsProd(true);
 
   createEffect(() => {
-    if (isProd()) {
+    if (globalState.isOpen) {
       if (params.network !== 'null' && params.address !== 'null') {
         async function fetchData(): Promise<void> {
           try {
@@ -55,7 +51,7 @@ const AccountIndex: Component = (): JSX.Element => {
 
   return (
     <>
-      <Container fluid>
+      <Container fluid class="tw-p-4">
         <Row>
           <Col md={12}>
             <h1>Account Info</h1>
@@ -83,7 +79,17 @@ const AccountIndex: Component = (): JSX.Element => {
                           <p>balance : {account()?.balance}</p>
                         </div>
                       ) : (
-                        <div>Please select account!</div>
+                        <>
+                          {params.network === 'null' ? (
+                            <>
+                              <div>Please select network!</div>
+                            </>
+                          ) : (
+                            <>
+                              <div>Please select account!</div>
+                            </>
+                          )}
+                        </>
                       )}
                     </div>
                   )}

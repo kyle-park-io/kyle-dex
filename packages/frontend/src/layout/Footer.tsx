@@ -30,7 +30,7 @@ const Footer: Component = (): JSX.Element => {
             xs={4}
             class="tw-flex tw-justify-center tw-items-center tw-h-8 tw-text-white"
           >
-            <footer>
+            <footer class="tw-text-xs sm:tw-text-base">
               <span>© 2024 kyle-park-io</span>
             </footer>
           </Col>

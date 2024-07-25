@@ -1,17 +1,15 @@
 import { type Component, type JSX } from 'solid-js';
 import { useNavigate } from '@solidjs/router';
 import { Container, Row, Col } from 'solid-bootstrap';
-
 import {
   ChartCard,
   StakingCard,
   SwapCard,
   BridgeCard,
 } from '../components/card/Card';
+import { globalState } from '../constants/constants';
 
 const App: Component = (): JSX.Element => {
-  const isProd = true;
-
   const navigate = useNavigate();
   const handleChartClick = (): void => {
     navigate('/dex/chart');
@@ -28,26 +26,26 @@ const App: Component = (): JSX.Element => {
 
   return (
     <>
-      {isProd ? (
+      {globalState.isOpen ? (
         <>
-          <Container fluid>
+          <Container fluid class="tw-p-4">
             <Row class="tw-items-center tw-h-full">
-              <Col md={3} class="tw-flex tw-justify-center tw-gap-4">
+              <Col md={3} xs={6} class="tw-flex tw-justify-center tw-gap-4">
                 <button onClick={handleChartClick} class="transparent">
                   <ChartCard></ChartCard>
                 </button>
               </Col>
-              <Col md={3} class="tw-flex tw-justify-center tw-gap-4">
-                <button onClick={handleStakingClick} class="transparent">
+              <Col md={3} xs={6} class="tw-flex tw-justify-center tw-gap-4">
+                <button onClick={handleStakingClick} class="transparent ">
                   <StakingCard></StakingCard>
                 </button>
               </Col>
-              <Col md={3} class="tw-flex tw-justify-center tw-gap-4">
+              <Col md={3} xs={6} class="tw-flex tw-justify-center tw-gap-4">
                 <button onClick={handleSwapClick} class="transparent">
                   <SwapCard></SwapCard>
                 </button>
               </Col>
-              <Col md={3} class="tw-flex tw-justify-center tw-gap-4">
+              <Col md={3} xs={6} class="tw-flex tw-justify-center tw-gap-4">
                 <button onClick={handleBridgeClick} class="transparent">
                   <BridgeCard></BridgeCard>
                 </button>

@@ -11,7 +11,7 @@ import './Card.css';
 export const ChartCard: Component = (): JSX.Element => {
   return (
     <>
-      <Card style={{ width: '16rem', height: '25rem' }}>
+      <Card style={{ width: '100%', height: '25rem' }}>
         <Card.Img variant="top" src={Chart} style={{ height: '20rem' }} />
         <Card.Body class="tw-text-black">
           <Card.Title>CHART</Card.Title>
@@ -24,7 +24,7 @@ export const ChartCard: Component = (): JSX.Element => {
 export const StakingCard: Component = (): JSX.Element => {
   return (
     <>
-      <Card style={{ width: '16rem', height: '25rem' }}>
+      <Card style={{ width: '100%', height: '25rem' }}>
         <Card.Img variant="top" src={Staking} style={{ height: '20rem' }} />
         <Card.Body class="tw-text-black">
           <Card.Title>STAKING</Card.Title>
@@ -37,7 +37,7 @@ export const StakingCard: Component = (): JSX.Element => {
 export const SwapCard: Component = (): JSX.Element => {
   return (
     <>
-      <Card style={{ width: '16rem', height: '25rem' }}>
+      <Card style={{ width: '100%', height: '25rem' }}>
         <Card.Img variant="top" src={Swap} style={{ height: '20rem' }} />
         <Card.Body class="tw-text-black">
           <Card.Title>SWAP</Card.Title>
@@ -50,7 +50,7 @@ export const SwapCard: Component = (): JSX.Element => {
 export const BridgeCard: Component = (): JSX.Element => {
   return (
     <>
-      <Card style={{ width: '16rem', height: '25rem' }}>
+      <Card style={{ width: '100%', height: '25rem' }}>
         <Card.Img variant="top" src={Bridge} style={{ height: '20rem' }} />
         <Card.Body class="tw-text-black">
           <Card.Title>BRIDGE</Card.Title>
