@@ -17,6 +17,9 @@ import DexSwap from './dex/Dex.swap';
 import DexBridge from './dex/Dex.bridge';
 import NotFoundPage from './components/404/NotFoundPage';
 
+// utils
+import Resize from './utils/Resize';
+
 const root = document.getElementById('root');
 if (root != null) {
   render(
@@ -44,6 +47,8 @@ if (root != null) {
             <Footer></Footer>
           </div>
         </Router>
+        {/* resize */}
+        <Resize />
       </div>
     ),
     root,
