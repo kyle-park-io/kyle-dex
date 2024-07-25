@@ -2,12 +2,17 @@
 @tailwind components;
 @tailwind utilities;
 
+/* header */
 .offscreen {
   position: absolute;
   left: -9999px;
 }
 
-.transparent {
+/* transparent block */
+.transparent,
+.transparent:hover,
+.transparent:focus,
+.transparent:active {
   background-color: transparent;
   border-color: transparent;
   color: currentColor;
@@ -16,34 +21,10 @@
   outline: none;
 }
 
-.transparent:hover {
-  background-color: transparent;
-  border-color: transparent;
-  color: currentColor;
-  box-shadow: none;
-  outline: none;
-}
-
-.transparent:focus {
-  background-color: transparent;
-  border-color: transparent;
-  color: currentColor;
-  box-shadow: none;
-  outline: none;
-}
-
-.transparent:active {
-  background-color: transparent;
-  border-color: transparent;
-  color: currentColor;
-  box-shadow: none;
-  outline: none;
-}
-
 /* xs: 기본 스타일, 미디어 쿼리 없이 정의 */
 body {
   overflow-y: scroll;
-  font-size: 6px;
+  font-size: 16px;
 }
 
 /* sm: 576px 이상 */
