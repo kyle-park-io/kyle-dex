@@ -2,6 +2,7 @@ export interface MetamaskIndexProps {
   chainId: string;
   network: string;
   currentNetwork: string;
+  connectNum: number;
   loadMetamask: boolean;
   handleLoadMetamask: () => void;
   isConnected: boolean;

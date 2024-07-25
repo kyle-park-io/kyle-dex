@@ -5,8 +5,8 @@ import { useLocation, useNavigate } from '@solidjs/router';
 import { type MetamaskIndexProps } from './interfaces/component.interfaces';
 // metamask
 import { MetaMaskSDK, type SDKProvider } from '@metamask/sdk';
-
 import { globalAccount, setGlobalAccount } from '../global/global.store';
+import { globalState } from '../constants/constants';
 
 const [isProcessing, setIsProcessing] = createSignal(false);
 
@@ -17,34 +17,22 @@ const MetamaskIndex: Component<MetamaskIndexProps> = (props): JSX.Element => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const [isProd, setIsProd] = createSignal(false);
-  const env = import.meta.env.VITE_ENV;
-  let url;
-  if (env === 'DEV') {
-    url = import.meta.env.VITE_DEV_URL;
-  } else if (env === 'PROD') {
-    url = import.meta.env.VITE_PROD_URL;
-    setIsProd(true);
-  } else {
-    throw new Error('env error');
-  }
-  console.log(url);
-
   createEffect(() => {
-    if (isProd()) {
-      if (
-        props.network === props.currentNetwork &&
-        props.network !== 'hardhat'
-      ) {
-        if (!isProcessing()) {
-          if (props.loadMetamask) {
-            void go();
-          } else {
-            if (props.isConnected) {
-              if (props.disconnect) {
-                void disconnectNetwork();
-              } else if (props.change) {
-                void changeNetwork();
+    if (globalState.isOpen) {
+      if (props.connectNum >= 0) {
+        if (props.network === props.currentNetwork) {
+          if (props.network !== 'hardhat') {
+            if (!isProcessing()) {
+              if (props.loadMetamask) {
+                void go();
+              } else {
+                if (props.isConnected) {
+                  if (props.disconnect) {
+                    void disconnectNetwork();
+                  } else if (props.change) {
+                    void changeNetwork();
+                  }
+                }
               }
             }
           }
@@ -59,13 +47,12 @@ const MetamaskIndex: Component<MetamaskIndexProps> = (props): JSX.Element => {
     try {
       setIsProcessing(true);
 
-      if (metamask() === undefined) {
-        await initMetamask();
-      }
+      // if (metamask() === undefined) {
+      // }
+      await initMetamask();
       await connectNetwork();
 
       props.handleLoadMetamask();
-      props.handleConnect();
 
       setIsProcessing(false);
     } catch (err) {
@@ -82,15 +69,15 @@ const MetamaskIndex: Component<MetamaskIndexProps> = (props): JSX.Element => {
       const getInfuraUrl = (network: string): string | null => {
         switch (network) {
           case 'sepolia':
-            return import.meta.env.VITE_SEPOLIA_API;
+            return globalState.sepolia_url;
           case 'amoy':
-            return import.meta.env.VITE_AMOY_API;
+            return globalState.amoy_url;
           default:
             return null;
         }
       };
       const infuraUrl = getInfuraUrl(props.network);
-      if (infuraUrl === null) {
+      if (infuraUrl === null || infuraUrl === undefined) {
         throw new Error('infura url error');
       }
 
@@ -105,8 +92,8 @@ const MetamaskIndex: Component<MetamaskIndexProps> = (props): JSX.Element => {
       await MMSDK.init();
       setMetamask(MMSDK);
 
-      const provider = metamask()?.getProvider(); // You can also access via window.ethereum
-      setProvider(provider);
+      const provider2 = metamask()?.getProvider(); // You can also access via window.ethereum
+      setProvider(provider2);
 
       startListener();
     } catch (err) {
@@ -124,6 +111,11 @@ const MetamaskIndex: Component<MetamaskIndexProps> = (props): JSX.Element => {
         throw new Error('provider is undefined');
       }
 
+      const accounts = await provider()?.request({
+        method: 'eth_requestAccounts',
+      });
+      console.log(accounts);
+
       const chainId = await provider()?.request({ method: 'eth_chainId' });
       if (chainId !== props.chainId) {
         try {
@@ -135,9 +127,23 @@ const MetamaskIndex: Component<MetamaskIndexProps> = (props): JSX.Element => {
           if (err instanceof Error) {
             props.onError(err);
           } else {
-            if (typeof err === 'object' && err !== null && 'code' in err) {
+            if (
+              typeof err === 'object' &&
+              err !== null &&
+              'code' in err &&
+              'message' in err
+            ) {
               if (err.code === 4902) {
                 await addNetwork();
+                return;
+              }
+              if (err.code === 4001) {
+                props.onError(new Error(String(err.message)));
+                return;
+              }
+              if (err.code === -32602) {
+                props.onError(new Error(String(err.message)));
+                return;
               }
             } else {
               props.onError(new Error(String(err)));
@@ -148,11 +154,16 @@ const MetamaskIndex: Component<MetamaskIndexProps> = (props): JSX.Element => {
 
       const connect = await metamask()?.connect();
       const addr = connect?.[0];
-      setGlobalAccount({
-        address: addr,
-      });
+      // TODO: global status
+      localStorage.setItem('isConnected', '1');
+      localStorage.setItem('address', addr);
+      // setGlobalAccount({
+      //   address: addr,
+      // });
+      props.handleConnect();
       if (location.pathname.startsWith('/dex/account')) {
-        navigate(`/dex/account/${props.network}/${globalAccount.address}`);
+        // navigate(`/dex/account/${props.network}/${globalAccount.address}`);
+        navigate(`/dex/account/${props.network}/${addr}`);
       }
     } catch (err) {
       if (err instanceof Error) {
@@ -169,11 +180,15 @@ const MetamaskIndex: Component<MetamaskIndexProps> = (props): JSX.Element => {
 
       metamask()?.terminate();
 
-      setGlobalAccount({
-        address: 'null',
-      });
+      // TODO: global status
+      localStorage.setItem('address', 'null');
+      localStorage.setItem('isConnected', '0');
+      // setGlobalAccount({
+      //   address: 'null',
+      // });
       if (location.pathname.startsWith('/dex/account')) {
-        navigate(`/dex/account/${props.network}/${globalAccount.address}`);
+        // navigate(`/dex/account/${props.network}/${globalAccount.address}`);
+        navigate(`/dex/account/${props.network}/null`);
       }
       props.handleDisconnect();
 
@@ -201,13 +216,16 @@ const MetamaskIndex: Component<MetamaskIndexProps> = (props): JSX.Element => {
 
       const connect = await metamask()?.connect();
       const addr = connect?.[0];
-      setGlobalAccount({
-        address: addr,
-      });
+      // TODO: global status
+      localStorage.setItem('address', addr);
+      // setGlobalAccount({
+      //   address: addr,
+      // });
       if (location.pathname.startsWith('/dex/account')) {
-        navigate(
-          `/dex/account/${props.currentNetwork}/${globalAccount.address}`,
-        );
+        // navigate(
+        //   `/dex/account/${props.currentNetwork}/${globalAccount.address}`,
+        // );
+        navigate(`/dex/account/${props.currentNetwork}/${addr}`);
       }
       props.handleChange();
 
@@ -237,7 +255,6 @@ const MetamaskIndex: Component<MetamaskIndexProps> = (props): JSX.Element => {
               },
             ],
           });
-
           break;
         }
         case 'amoy': {
@@ -245,15 +262,15 @@ const MetamaskIndex: Component<MetamaskIndexProps> = (props): JSX.Element => {
             method: 'wallet_addEthereumChain',
             params: [
               {
-                chainId: '0x13881',
+                chainId: '0x13882',
                 chainName: 'Amoy',
                 nativeCurrency: {
                   name: 'Matic',
                   symbol: 'MATIC',
                   decimals: 18,
                 },
-                rpcUrls: ['https://rpc-amoy.maticvigil.com/'],
-                blockExplorerUrls: ['https://amoy.polygonscan.com/'],
+                rpcUrls: ['https://rpc-amoy.polygon.technology/'],
+                blockExplorerUrls: ['https://www.oklink.com/amoy/'],
               },
             ],
           });
@@ -275,13 +292,16 @@ const MetamaskIndex: Component<MetamaskIndexProps> = (props): JSX.Element => {
     provider()?.on('accountsChanged', handleAccountsChanged);
     function handleAccountsChanged(accounts): void {
       const addr = accounts[0];
-      setGlobalAccount({
-        address: addr,
-      });
+      // TODO: global status
+      localStorage.setItem('address', addr);
+      // setGlobalAccount({
+      //   address: addr,
+      // });
       if (location.pathname.startsWith('/dex/account')) {
-        navigate(
-          `/dex/account/${props.currentNetwork}/${globalAccount.address}`,
-        );
+        // navigate(
+        //   `/dex/account/${props.currentNetwork}/${globalAccount.address}`,
+        // );
+        navigate(`/dex/account/${props.currentNetwork}/${addr}`);
       }
     }
   }

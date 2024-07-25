@@ -1,5 +1,5 @@
 import { type Component, type JSX } from 'solid-js';
-import { createSignal, onMount, For } from 'solid-js';
+import { createSignal, createEffect, onMount, For } from 'solid-js';
 import { useNavigate, useLocation } from '@solidjs/router';
 import { Container, Row, Col, Nav } from 'solid-bootstrap';
 import HomeLogo from '/home.svg?url';
@@ -18,19 +18,10 @@ import {
   setGlobalAccount,
 } from '../global/global.store';
 
+import { globalState } from '../constants/constants';
+
 const Header: Component = (): JSX.Element => {
-  const env = import.meta.env.VITE_ENV;
-  let url;
-  let apiUrl;
-  if (env === 'DEV') {
-    url = import.meta.env.VITE_DEV_URL;
-    apiUrl = import.meta.env.VITE_DEV_API_URL;
-  } else if (env === 'PROD') {
-    url = import.meta.env.VITE_PROD_URL;
-    apiUrl = import.meta.env.VITE_PROD_API_URL;
-  } else {
-    throw new Error('env error');
-  }
+  const apiUrl = globalState.api_url;
 
   const location = useLocation();
   // navigate
@@ -42,10 +33,12 @@ const Header: Component = (): JSX.Element => {
     navigate('/dex');
   };
   const handleHomeClick = (): void => {
-    window.location.href = `${url}`;
+    if (globalState.isProd) {
+      window.location.href = globalState.url;
+    }
   };
-  const handleAccountClick = (): void => {
-    navigate(`/dex/account/${network()}/${globalAccount.address}`);
+  const handleAccountClick = (address: string): void => {
+    navigate(`/dex/account/${network()}/${address}`);
   };
 
   // toggle
@@ -55,7 +48,8 @@ const Header: Component = (): JSX.Element => {
   const toggleDropdown2 = (): boolean => setIsOpen2(!isOpen2());
 
   // button color
-  const [hardhatButtonColor, setHardhatButtonColor] = createSignal('blue');
+  // const [hardhatButtonColor, setHardhatButtonColor] = createSignal('blue');
+  const [hardhatButtonColor, setHardhatButtonColor] = createSignal('white');
   const [sepoliaButtonColor, setSepoliaButtonColor] = createSignal('white');
   const [amoyButtonColor, setAmoyButtonColor] = createSignal('white');
 
@@ -67,21 +61,29 @@ const Header: Component = (): JSX.Element => {
     setAccountButtonId(id);
     console.log(accountButtonId());
     const address = event.currentTarget.getAttribute('id');
-    if (globalAccount.address !== address) {
+    // TODO: global status
+    if (localStorage.getItem('address') !== address) {
       setAccountButtonAddress(address);
-      setGlobalAccount({ address });
+      localStorage.setItem('address', address);
+      // setGlobalAccount({ address });
     } else {
       setAccountButtonAddress('null');
-      setGlobalAccount({ address: 'null' });
+      localStorage.setItem('address', 'null');
+      // setGlobalAccount({ address: 'null' });
     }
     if (location.pathname.startsWith('/dex/account')) {
-      handleAccountClick();
+      handleAccountClick(localStorage.getItem('address') as string);
     }
   };
 
   // network status
   const [isLocal, setIsLocal] = createSignal(true);
-  const [network, setNetwork] = createSignal('hardhat');
+  const [isRefresh, setIsRefresh] = createSignal(true);
+  // const [network, setNetwork] = createSignal('hardhat');
+  const [network, setNetwork] = createSignal(
+    localStorage.getItem('network') as string,
+  );
+  const [connectNum, setConnectNum] = createSignal(0);
   const [loadMetamask, setLoadMetamask] = createSignal(false);
   const [isMetamaskConnected, setIsMetamaskConnected] = createSignal(false);
   const [metamaskDisconnect, setMetamaskDisconnect] = createSignal(false);
@@ -94,11 +96,12 @@ const Header: Component = (): JSX.Element => {
       setSepoliaButtonColor('white');
       setAmoyButtonColor('white');
       setNetwork('null');
-      setGlobalNetwork({ network: 'null' });
+      // setGlobalNetwork({ network: 'null' });
+      localStorage.setItem('network', 'null');
       setAccountButtonAddress('null');
-      setGlobalAccount({ address: 'null' });
+      // setGlobalAccount({ address: 'null' });
       if (location.pathname.startsWith('/dex/account')) {
-        handleAccountClick();
+        handleAccountClick('null');
       }
     } else {
       if (networkKey === 'hardhat') {
@@ -106,12 +109,14 @@ const Header: Component = (): JSX.Element => {
         setHardhatButtonColor('blue');
         setSepoliaButtonColor('white');
         setAmoyButtonColor('white');
-        setAccountButtonAddress('null');
-        setGlobalAccount({ address: 'null' });
         setNetwork(networkKey);
-        setGlobalNetwork({ network: 'hardhat' });
+        // setGlobalNetwork({ network: 'hardhat' });
+        localStorage.setItem('network', 'hardhat');
+        localStorage.setItem('address', globalState.hardhat_admin_address);
+        setAccountButtonAddress(globalState.hardhat_admin_address);
+        // setGlobalAccount({ address: globalState.hardhat_admin_address });
         if (location.pathname.startsWith('/dex/account')) {
-          handleAccountClick();
+          handleAccountClick(globalState.hardhat_admin_address);
         }
       } else if (networkKey === 'sepolia') {
         setIsLocal(false);
@@ -119,16 +124,21 @@ const Header: Component = (): JSX.Element => {
         setSepoliaButtonColor('blue');
         setAmoyButtonColor('white');
         setAccountButtonAddress('null');
-        if (!isMetamaskConnected() && network() === 'hardhat') {
-          setGlobalAccount({ address: 'null' });
-        }
         setNetwork(networkKey);
-        setGlobalNetwork({ network: 'sepolia' });
-        if (isMetamaskConnected()) {
+        localStorage.setItem('network', 'sepolia');
+        if (!isMetamaskConnected()) {
+          if (localStorage.getItem('isConnected') === '0') {
+            if (location.pathname.startsWith('/dex/account')) {
+              handleAccountClick('null');
+            }
+          } else {
+            handleSetMetamask();
+          }
+        } else {
           setMetamaskChange(true);
-        }
-        if (location.pathname.startsWith('/dex/account')) {
-          handleAccountClick();
+          if (location.pathname.startsWith('/dex/account')) {
+            handleAccountClick(localStorage.getItem('address') as string);
+          }
         }
       } else {
         setIsLocal(false);
@@ -136,27 +146,75 @@ const Header: Component = (): JSX.Element => {
         setSepoliaButtonColor('white');
         setAmoyButtonColor('blue');
         setAccountButtonAddress('null');
-        if (!isMetamaskConnected() && network() === 'hardhat') {
-          setGlobalAccount({ address: 'null' });
-        }
         setNetwork(networkKey);
-        setGlobalNetwork({ network: 'amoy' });
-        if (isMetamaskConnected()) {
+        localStorage.setItem('network', 'amoy');
+        if (!isMetamaskConnected()) {
+          if (localStorage.getItem('isConnected') === '0') {
+            if (location.pathname.startsWith('/dex/account')) {
+              handleAccountClick('null');
+            }
+          } else {
+            handleSetMetamask();
+          }
+        } else {
           setMetamaskChange(true);
+          if (location.pathname.startsWith('/dex/account')) {
+            handleAccountClick(localStorage.getItem('address') as string);
+          }
         }
-        setNetwork(networkKey);
+      }
+    }
+  };
+
+  const updateNetwork2 = (networkKey: string): void => {
+    if (networkKey === 'hardhat') {
+      setIsLocal(true);
+      setHardhatButtonColor('blue');
+      setSepoliaButtonColor('white');
+      setAmoyButtonColor('white');
+      setNetwork(networkKey);
+      setAccountButtonAddress(localStorage.getItem('address') as string);
+      if (location.pathname.startsWith('/dex/account')) {
+        handleAccountClick(localStorage.getItem('address') as string);
+      }
+    } else if (networkKey === 'sepolia') {
+      setIsLocal(false);
+      setHardhatButtonColor('white');
+      setSepoliaButtonColor('blue');
+      setAmoyButtonColor('white');
+      setAccountButtonAddress('null');
+      setNetwork(networkKey);
+      if (localStorage.getItem('isConnected') === '0') {
         if (location.pathname.startsWith('/dex/account')) {
-          handleAccountClick();
+          handleAccountClick('null');
         }
+      } else {
+        handleSetMetamask();
+      }
+    } else {
+      setIsLocal(false);
+      setHardhatButtonColor('white');
+      setSepoliaButtonColor('white');
+      setAmoyButtonColor('blue');
+      setAccountButtonAddress('null');
+      setNetwork(networkKey);
+      if (localStorage.getItem('isConnected') === '0') {
+        if (location.pathname.startsWith('/dex/account')) {
+          handleAccountClick('null');
+        }
+      } else {
+        handleSetMetamask();
       }
     }
   };
 
   // metamask
   const handleSetMetamask = (): void => {
+    // TODO: check
+    setConnectNum(connectNum() + 1);
     setLoadMetamask(true);
     if (location.pathname.startsWith('/dex/account')) {
-      handleAccountClick();
+      handleAccountClick(localStorage.getItem('address') as string);
     }
   };
   const propsHandleLoadMetamask = (): void => {
@@ -171,9 +229,9 @@ const Header: Component = (): JSX.Element => {
   const propsHandleMetamaskDisconnect = (): void => {
     setIsMetamaskConnected(false);
     setMetamaskDisconnect(false);
-    setGlobalAccount({ address: 'null' });
+    // setGlobalAccount({ address: 'null' });
     if (location.pathname.startsWith('/dex/account')) {
-      handleAccountClick();
+      handleAccountClick('null');
     }
   };
   const propsHandleMetamaskChange = (): void => {
@@ -195,9 +253,32 @@ const Header: Component = (): JSX.Element => {
     setAmoyError(err);
   };
 
-  console.log(hardhatError());
-  console.log(sepoliaError());
-  console.log(amoyError());
+  // createEffect
+  createEffect(() => {
+    // set network
+    if (isRefresh()) {
+      const currentNetwork = localStorage.getItem('network');
+      if (currentNetwork === 'hardhat') {
+        updateNetwork2('hardhat');
+      }
+      if (currentNetwork === 'sepolia') {
+        updateNetwork2('sepolia');
+      }
+      if (currentNetwork === 'amoy') {
+        updateNetwork2('amoy');
+      }
+      setIsRefresh(false);
+    }
+    if (
+      hardhatError() !== null ||
+      sepoliaError() !== null ||
+      amoyError() !== null
+    ) {
+      console.log(hardhatError());
+      console.log(sepoliaError());
+      console.log(amoyError());
+    }
+  });
 
   const [accountList, setAccountList] = createSignal([]);
   onMount(() => {
@@ -218,6 +299,7 @@ const Header: Component = (): JSX.Element => {
           chainId="0x"
           network="hardhat"
           currentNetwork={network()}
+          connectNum={connectNum()}
           loadMetamask={loadMetamask()}
           handleLoadMetamask={propsHandleLoadMetamask}
           isConnected={isMetamaskConnected()}
@@ -232,6 +314,7 @@ const Header: Component = (): JSX.Element => {
           chainId="0xaa36a7"
           network="sepolia"
           currentNetwork={network()}
+          connectNum={connectNum()}
           loadMetamask={loadMetamask()}
           handleLoadMetamask={propsHandleLoadMetamask}
           isConnected={isMetamaskConnected()}
@@ -243,9 +326,10 @@ const Header: Component = (): JSX.Element => {
           onError={propsHandleSepoliaChange}
         />
         <MetamaskIndex
-          chainId="0x13881"
+          chainId="0x13882"
           network="amoy"
           currentNetwork={network()}
+          connectNum={connectNum()}
           loadMetamask={loadMetamask()}
           handleLoadMetamask={propsHandleLoadMetamask}
           isConnected={isMetamaskConnected()}
@@ -273,7 +357,7 @@ const Header: Component = (): JSX.Element => {
               </button>
             </Col>
             <Col lg={4} md={4} sm={4} xs={4} class="tw-flex tw-justify-end">
-              <Nav defaultActiveKey="#" as="ul">
+              <Nav defaultActiveKey="#" as="ul" class="tw-flex-nowrap">
                 <Nav.Item as="li">
                   <Nav.Link eventKey="connect">
                     {!isLocal() && !isMetamaskConnected() ? (
@@ -362,7 +446,7 @@ const Header: Component = (): JSX.Element => {
                 <Nav.Item as="li">
                   <Nav.Link eventKey="account">
                     {isLocal() && network() !== 'null' && (
-                      <div>
+                      <>
                         <button onMouseEnter={toggleDropdown2}>Account</button>
                         {isOpen2() && (
                           <div
@@ -392,12 +476,19 @@ const Header: Component = (): JSX.Element => {
                             </For>
                           </div>
                         )}
-                      </div>
+                      </>
                     )}
                   </Nav.Link>
                 </Nav.Item>
                 <Nav.Item as="li">
-                  <Nav.Link eventKey="account" onClick={handleAccountClick}>
+                  <Nav.Link
+                    eventKey="account"
+                    onClick={() =>
+                      handleAccountClick(
+                        localStorage.getItem('address') as string,
+                      )
+                    }
+                  >
                     <span class="tw-text-black">Account</span>
                   </Nav.Link>
                 </Nav.Item>
