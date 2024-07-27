@@ -9,16 +9,11 @@ import { globalState } from '../constants/constants';
 const AccountIndex: Component = (): JSX.Element => {
   const params = useParams();
 
-  const [isProd, setIsProd] = createSignal(false);
   const [error, setError] = createSignal<Error | null>(null);
   const [loading, setLoading] = createSignal(false);
   const [account, setAccount] = createSignal<AccountInfo>();
 
   const apiUrl = globalState.api_url;
-  if (globalState.isProd) {
-    setIsProd(true);
-  }
-  setIsProd(true);
 
   createEffect(() => {
     if (globalState.isOpen) {

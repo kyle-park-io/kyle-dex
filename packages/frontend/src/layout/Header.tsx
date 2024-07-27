@@ -11,13 +11,6 @@ import './Header.css';
 // metamask
 import MetamaskIndex from '../metamask/Metamask.index';
 
-// global
-import {
-  setGlobalNetwork,
-  globalAccount,
-  setGlobalAccount,
-} from '../global/global.store';
-
 import { globalState } from '../constants/constants';
 
 const Header: Component = (): JSX.Element => {
