@@ -35,7 +35,7 @@ export class HardhatEventListenerService implements OnModuleInit {
     private readonly rpcService: RpcService,
     // extra
     private readonly fsService: FsService,
-    private readonly eventEmitterService: EventEmitterService,
+    // private readonly eventEmitterService: EventEmitterService,
   ) {}
 
   async getInitializationPromise(): Promise<void> {
@@ -75,6 +75,19 @@ export class HardhatEventListenerService implements OnModuleInit {
           const txHash = payload.log.transactionHash;
           const topics = [...payload.log.topics];
           const data = payload.log.data;
+
+          // check tx cache
+          if (
+            cacheService.get(`hardhat.${payload.log.address}.${txHash}`) !==
+            undefined
+          ) {
+            console.log(
+              'already processed event: ',
+              payload.log.address,
+              txHash,
+            );
+            return;
+          }
 
           const log: LogDescription | null =
             connectedContract.interface.parseLog({
@@ -131,6 +144,19 @@ export class HardhatEventListenerService implements OnModuleInit {
           const txHash = payload.log.transactionHash;
           const topics = [...payload.log.topics];
           const data = payload.log.data;
+
+          // check tx cache
+          if (
+            cacheService.get(`hardhat.${payload.log.address}.${txHash}`) !==
+            undefined
+          ) {
+            console.log(
+              'already processed event: ',
+              payload.log.address,
+              txHash,
+            );
+            return;
+          }
 
           const log: LogDescription | null =
             connectedContract.interface.parseLog({
@@ -261,11 +287,11 @@ export class HardhatEventListenerService implements OnModuleInit {
                 reserveObj,
               );
               await this.setEventListener('Pair', pair);
-              // sse
-              this.eventEmitterService.create(
-                'PairCreated',
-                JSON.stringify(pairObj),
-              );
+              // // sse
+              // this.eventEmitterService.create(
+              //   'PairCreated',
+              //   JSON.stringify(pairObj),
+              // );
               break;
             }
             default:
@@ -508,6 +534,9 @@ export class HardhatEventListenerService implements OnModuleInit {
           this.logger.log('merong~');
           break;
       }
+
+      // set cache
+      cacheService.set(`hardhat.${contractAddress}.${txHash}`, timestamp);
     } catch (err) {
       this.logger.error(err);
       throw err;
