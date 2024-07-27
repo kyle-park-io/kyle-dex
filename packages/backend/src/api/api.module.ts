@@ -6,10 +6,12 @@ import { UtilsModule } from './utils/utils.module';
 import { ChartModule } from './chart/chart.module';
 import { ClientModule } from './client/client.module';
 import { PairModule } from './pair/pair.module';
+import { NetworkModule } from './network/network.module';
 
 @Module({
   imports: [
     AuthModule,
+    NetworkModule,
     CommonModule,
     TokenModule,
     UtilsModule,

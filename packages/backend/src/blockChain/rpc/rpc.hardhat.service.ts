@@ -18,6 +18,8 @@ import { setTimeout } from 'timers/promises';
 export class HardhatRpcService implements RpcService, OnModuleInit {
   private initPromise!: Promise<void>;
 
+  private isConnected: boolean;
+
   private readonly http: string;
   private readonly ws: string;
   private readonly provider: JsonRpcProvider;
@@ -63,6 +65,7 @@ export class HardhatRpcService implements RpcService, OnModuleInit {
     this.ws = ws;
 
     this.provider = new JsonRpcProvider(this.http);
+    this.isConnected = false;
   }
 
   async getInitializationPromise(): Promise<void> {
@@ -161,7 +164,7 @@ export class HardhatRpcService implements RpcService, OnModuleInit {
     }
   };
 
-  async connectNetwork(): Promise<void> {
+  async initConnectNetwork(): Promise<void> {
     try {
       const provider = this.getProvider();
       const network = await provider.getNetwork();
@@ -171,6 +174,29 @@ export class HardhatRpcService implements RpcService, OnModuleInit {
       await setTimeout(3000);
       await this.connectNetwork();
     }
+  }
+
+  async connectNetwork(): Promise<void> {
+    try {
+      const provider = this.getProvider();
+      const network = await provider.getNetwork();
+      this.logger.log(JSON.stringify(network, undefined, 2));
+    } catch (err) {
+      this.logger.error(err);
+      throw err;
+    }
+  }
+
+  async reconnectNetwork(): Promise<void> {
+    await this.connectNetwork();
+  }
+
+  getNetworkStatus(): boolean {
+    return this.isConnected;
+  }
+
+  changeNetworkStatus(value: boolean): void {
+    this.isConnected = value;
   }
 
   async addContract(): Promise<void> {
@@ -215,7 +241,9 @@ export class HardhatRpcService implements RpcService, OnModuleInit {
 
   async initializeAsync(): Promise<void> {
     await this.contractService.getInitializationPromise();
-    await this.connectNetwork();
+    if (process.env['hardhat'] !== '0') {
+      await this.initConnectNetwork();
+    }
     await this.addContract();
   }
 

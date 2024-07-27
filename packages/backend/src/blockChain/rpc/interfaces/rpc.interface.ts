@@ -7,7 +7,15 @@ export interface RpcService {
 
   getProvider(): JsonRpcProvider;
 
+  initConnectNetwork(): Promise<void>;
+
   connectNetwork(): Promise<void>;
+
+  reconnectNetwork(): Promise<void>;
+
+  getNetworkStatus(): boolean;
+
+  changeNetworkStatus(value: boolean): void;
 
   addContract(): Promise<void>;
 
