@@ -12,6 +12,7 @@ import helmet from 'helmet';
 import { setupCLI } from './init/commander';
 import { checkIfExists } from './init/config';
 import { createGKEConfigDirectory } from './init/init';
+import { startCronJobs } from './init/cron';
 
 async function bootstrap(): Promise<void> {
   try {
@@ -77,6 +78,11 @@ async function bootstrap(): Promise<void> {
 
     // create data directory
     await createGKEConfigDirectory();
+
+    // cron
+    if (process.env['hardhat'] !== '0') {
+      startCronJobs();
+    }
 
     // start server
     console.log(`Server is running on http://localhost:${port}`);

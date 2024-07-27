@@ -45,7 +45,7 @@ export class NetworkController {
     enum: NetworkType,
   })
   @ApiOkResponse({
-    description: 'reconnect network success',
+    description: 'get network success',
   })
   async getNetwork(
     @Query('network') network: NetworkType,
