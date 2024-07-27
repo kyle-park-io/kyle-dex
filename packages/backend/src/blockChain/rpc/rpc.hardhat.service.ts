@@ -243,6 +243,7 @@ export class HardhatRpcService implements RpcService, OnModuleInit {
     await this.contractService.getInitializationPromise();
     if (process.env['hardhat'] !== '0') {
       await this.initConnectNetwork();
+      this.changeNetworkStatus(true);
     }
     await this.addContract();
   }
