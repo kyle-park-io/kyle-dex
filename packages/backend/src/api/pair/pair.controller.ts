@@ -27,9 +27,10 @@ import {
   ResponseTokensDto,
   ResponseEstimateLiquidityDto,
 } from './dto/pair.response';
+import { constants } from '../../constants/constants';
 
 @ApiTags('pair')
-@Controller('pair')
+@Controller(`${constants.apiPrefix}/api/pair`)
 export class PairController {
   constructor(private readonly pairService: PairService) {}
 
