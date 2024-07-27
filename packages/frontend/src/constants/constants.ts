@@ -1,6 +1,5 @@
 import { createStore } from 'solid-js/store';
 
-// false : true
 const isProd = process.env.NODE_ENV === 'development' ? false : true;
 
 const [globalState, setGlobalState] = createStore({
