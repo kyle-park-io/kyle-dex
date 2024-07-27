@@ -161,13 +161,10 @@ export class AmoyRpcService implements RpcService, OnModuleInit {
 
   async initConnectNetwork(): Promise<void> {
     try {
-      const provider = this.getProvider();
-      const network = await provider.getNetwork();
-      this.logger.log(JSON.stringify(network, undefined, 2));
-    } catch (err) {
-      this.logger.error(err);
-      await setTimeout(3000);
       await this.connectNetwork();
+    } catch (err) {
+      await setTimeout(3000);
+      await this.initConnectNetwork();
     }
   }
 
