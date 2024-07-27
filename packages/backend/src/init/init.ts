@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 
-export async function init(): Promise<void> {
+export async function createGKEConfigDirectory(): Promise<void> {
   const dataOutputPath = path.resolve('data');
 
   if (!fs.existsSync(dataOutputPath)) {

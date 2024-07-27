@@ -9,10 +9,17 @@ import { DetailedErrorFilter } from './common/expection/exception';
 import { ExpressAdapter } from '@nestjs/platform-express';
 import express, { type Request, type Response } from 'express';
 import helmet from 'helmet';
-import { init } from './init/init';
+import { setupCLI } from './init/commander';
+import { checkIfExists } from './init/config';
+import { createGKEConfigDirectory } from './init/init';
 
 async function bootstrap(): Promise<void> {
   try {
+    // setup cli
+    if (require.main === module) {
+      setupCLI();
+    }
+
     const server = express();
     const app = await NestFactory.create(
       AppModule,
@@ -49,6 +56,12 @@ async function bootstrap(): Promise<void> {
     const document = SwaggerModule.createDocument(app, options);
     SwaggerModule.setup('dex/api-docs', app, document);
 
+    // file check
+    const fileArray = ['config-prod/prod.yaml', 'artifacts'];
+    for (const value of fileArray) {
+      checkIfExists(value);
+    }
+
     // config
     const configService = app.get(ConfigService);
     const port = configService.get<string>('server.port');
@@ -62,7 +75,8 @@ async function bootstrap(): Promise<void> {
     }
     // app.setGlobalPrefix(prefix);
 
-    await init();
+    // create data directory
+    await createGKEConfigDirectory();
 
     // start server
     console.log(`Server is running on http://localhost:${port}`);
