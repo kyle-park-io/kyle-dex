@@ -516,7 +516,9 @@ export class HardhatEventListenerService implements OnModuleInit {
 
   async initializeAsync(): Promise<void> {
     await this.rpcService.getInitializationPromise();
-    await this.connectRpc();
+    if (this.rpcService.getNetworkStatus()) {
+      await this.connectRpc();
+    }
   }
 
   async onModuleInit(): Promise<void> {
