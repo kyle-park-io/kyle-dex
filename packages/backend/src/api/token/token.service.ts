@@ -6,6 +6,7 @@ import { RpcService } from '../../blockChain/rpc/interfaces/rpc.interface';
 import { type BalanceOfDto } from './dto/token.request.dto';
 import { type ResponseBalanceOfDto } from './dto/token.response.dto';
 import { type ProcessContractDto } from '../../blockChain/common/dto/common.dto';
+import { NetworkType } from '../network/dto/network.request';
 
 @Injectable()
 export class TokenService {
@@ -17,17 +18,13 @@ export class TokenService {
     private readonly accountService: AccountService,
     @Inject('HardhatRpc')
     private readonly rpcService: RpcService,
+    @Inject('SepoilaRpc')
+    private readonly sepoliaRpcService: RpcService,
+    @Inject('AmoyRpc')
+    private readonly amoyRpcService: RpcService,
   ) {}
 
-  async getTokenContractList(): Promise<any> {
-    try {
-      return this.rpcService.getTokenContractList();
-    } catch (err) {
-      this.logger.error('getTokenContractList error');
-      throw err;
-    }
-  }
-
+  // currently only hardhat network function
   async balanceOf(dto: BalanceOfDto): Promise<ResponseBalanceOfDto> {
     try {
       // user
@@ -64,6 +61,7 @@ export class TokenService {
       }
 
       const args: ProcessContractDto = {
+        network: dto.network,
         userAddress,
         contractAddress,
         function: 'balanceOf',
@@ -72,6 +70,22 @@ export class TokenService {
       return await this.commonService.query(args);
     } catch (err) {
       this.logger.error('balanceOf error');
+      throw err;
+    }
+  }
+
+  async getTokenContractList(network: NetworkType): Promise<any> {
+    try {
+      switch (network) {
+        case NetworkType.hardhat:
+          return this.rpcService.getTokenContractList();
+        case NetworkType.sepolia:
+          return this.sepoliaRpcService.getTokenContractList();
+        case NetworkType.amoy:
+          return this.amoyRpcService.getTokenContractList();
+      }
+    } catch (err) {
+      this.logger.error('getTokenContractList error');
       throw err;
     }
   }

@@ -36,6 +36,7 @@ export class PairService {
   async getReserve(dto: GetReserveDto): Promise<any> {
     try {
       const queryDto: ProcessContractDto = {
+        network: dto.network,
         userAddress: ZeroAddress,
         contractAddress: dto.pairAddress,
         function: 'getReserves',
@@ -50,7 +51,8 @@ export class PairService {
 
   async getTokens(dto: GetTokensDto): Promise<any> {
     try {
-      const cache = cacheService.get('hardhat.pairs.list');
+      // const cache = cacheService.get('hardhat.pairs.list');
+      const cache = cacheService.get(`${dto.network}.pairs.list`);
       if (typeof cache === 'string') {
         const pairList = JSON.parse(cache);
         for (let i = 0; i < pairList.length; i++) {
@@ -77,6 +79,7 @@ export class PairService {
       result.pair = dto.pair;
       // reserve
       const reserve = await this.commonService.query({
+        network: dto.network,
         userAddress: ZeroAddress,
         contractAddress: dto.pair,
         function: 'getReserves',
@@ -84,6 +87,7 @@ export class PairService {
       });
       // totalSupply
       const totalSupply = await this.commonService.query({
+        network: dto.network,
         userAddress: ZeroAddress,
         contractAddress: dto.pair,
         function: 'totalSupply',

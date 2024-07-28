@@ -97,6 +97,7 @@ export class CommonController {
       }
 
       const args: ProcessContractDto = {
+        network: dto.network,
         userAddress,
         contractAddress,
         function: dto.function,
@@ -152,6 +153,7 @@ export class CommonController {
       }
 
       const args: ProcessContractDto = {
+        network: 'hardhat',
         userAddress,
         contractAddress,
         function: dto.function,

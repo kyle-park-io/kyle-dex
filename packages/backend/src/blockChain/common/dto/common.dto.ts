@@ -4,6 +4,14 @@ import { IsString } from 'class-validator';
 export class ProcessContractDto {
   @IsString()
   @ApiProperty({
+    description: 'network name',
+    example: 'hardhat',
+    required: true,
+  })
+  readonly network!: string;
+
+  @IsString()
+  @ApiProperty({
     description: 'user address',
     example: '0x0000000000000000000000000000000000000000',
     required: true,

@@ -17,6 +17,7 @@ import {
 import { BalanceOfDto } from './dto/token.request.dto';
 import { ResponseBalanceOfDto } from './dto/token.response.dto';
 import { constants } from '../../constants/constants';
+import { NetworkType } from '../network/dto/network.request';
 
 @ApiTags('token')
 @Controller(`${constants.apiPrefix}/api/token`)
@@ -52,14 +53,20 @@ export class TokenController {
     summary: 'getTokenContractList',
     description: 'getTokenContractList',
   })
-  @ApiCreatedResponse({
+  @ApiQuery({
+    name: 'network',
+    enum: NetworkType,
+  })
+  @ApiOkResponse({
     description: 'getTokenContractList success',
     // type: ResponseBalanceOfDto,
   })
   @ApiInternalServerErrorResponse({ description: 'Internal server error' })
-  async getTokenContractList(): Promise<any> {
+  async getTokenContractList(
+    @Query('network') network: NetworkType,
+  ): Promise<any> {
     try {
-      return await this.tokenService.getTokenContractList();
+      return await this.tokenService.getTokenContractList(network);
     } catch (err) {
       console.error(err);
       throw err;

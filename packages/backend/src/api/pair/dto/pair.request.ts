@@ -3,6 +3,14 @@ import { IsString, IsOptional } from 'class-validator';
 import { IsAddress } from '../../../common/decorator/custom.decorator';
 
 export class GetReserveDto {
+  @IsString()
+  @ApiProperty({
+    description: 'network name',
+    example: 'hardhat',
+    required: true,
+  })
+  readonly network!: string;
+
   @IsAddress('check address type', { message: 'not address type' })
   @ApiProperty({
     description: 'pair address',
@@ -13,6 +21,14 @@ export class GetReserveDto {
 }
 
 export class GetTokensDto {
+  @IsString()
+  @ApiProperty({
+    description: 'network name',
+    example: 'hardhat',
+    required: true,
+  })
+  readonly network!: string;
+
   @IsAddress('check address type', { message: 'not address type' })
   @ApiProperty({
     description: 'pair address',
@@ -23,6 +39,14 @@ export class GetTokensDto {
 }
 
 export class EstimateLiquidityDto {
+  @IsString()
+  @ApiProperty({
+    description: 'network name',
+    example: 'hardhat',
+    required: true,
+  })
+  readonly network!: string;
+
   @IsAddress('check address type', { message: 'not address type' })
   @ApiProperty({
     description: 'pair address',

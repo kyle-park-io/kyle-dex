@@ -20,6 +20,7 @@ import {
 import { CalcPairDto, Create2Dto } from './dto/utils.request.dto';
 import { ResponsePairDto } from './dto/utils.response.dto';
 import { constants } from '../../constants/constants';
+import { NetworkType } from '../network/dto/network.request';
 
 @ApiTags('utils')
 @Controller(`${constants.apiPrefix}/api/utils`)
@@ -33,6 +34,10 @@ export class UtilsController {
     summary: 'getWETH',
     description: 'getWETH',
   })
+  @ApiQuery({
+    name: 'network',
+    enum: NetworkType,
+  })
   @ApiOkResponse({
     description: 'getWETH success',
     type: String,
@@ -40,9 +45,9 @@ export class UtilsController {
   @ApiInternalServerErrorResponse({
     description: 'Internal server error',
   })
-  async getWETH(): Promise<string> {
+  async getWETH(@Query('network') network: NetworkType): Promise<string> {
     try {
-      return await this.utilsService.getWETH();
+      return await this.utilsService.getWETH(network);
     } catch (err) {
       console.log(err);
       throw err;
@@ -56,6 +61,10 @@ export class UtilsController {
     summary: 'getFactory',
     description: 'getFactory',
   })
+  @ApiQuery({
+    name: 'network',
+    enum: NetworkType,
+  })
   @ApiOkResponse({
     description: 'getFactory success',
     type: String,
@@ -63,9 +72,9 @@ export class UtilsController {
   @ApiInternalServerErrorResponse({
     description: 'Internal server error',
   })
-  async getFactory(): Promise<string> {
+  async getFactory(@Query('network') network: NetworkType): Promise<string> {
     try {
-      return await this.utilsService.getFactory();
+      return await this.utilsService.getFactory(network);
     } catch (err) {
       console.log(err);
       throw err;
@@ -79,6 +88,10 @@ export class UtilsController {
     summary: 'getRouter',
     description: 'getRouter',
   })
+  @ApiQuery({
+    name: 'network',
+    enum: NetworkType,
+  })
   @ApiOkResponse({
     description: 'getRouter success',
     type: String,
@@ -86,9 +99,9 @@ export class UtilsController {
   @ApiInternalServerErrorResponse({
     description: 'Internal server error',
   })
-  async getRouter(): Promise<string> {
+  async getRouter(@Query('network') network: NetworkType): Promise<string> {
     try {
-      return await this.utilsService.getRouter();
+      return await this.utilsService.getRouter(network);
     } catch (err) {
       console.log(err);
       throw err;

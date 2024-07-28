@@ -3,6 +3,14 @@ import { IsString, IsOptional } from 'class-validator';
 import { IsAddress } from '../../../common/decorator/custom.decorator';
 
 export class CalcPairDto {
+  @IsString()
+  @ApiProperty({
+    description: 'network name',
+    example: 'hardhat',
+    required: true,
+  })
+  readonly network!: string;
+
   @IsOptional()
   @IsString()
   @ApiProperty({

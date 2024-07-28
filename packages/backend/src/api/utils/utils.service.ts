@@ -13,6 +13,7 @@ import {
   getCreate2Address,
   ZeroAddress,
 } from 'ethers';
+import { NetworkType } from '../network/dto/network.request';
 
 @Injectable()
 export class UtilsService {
@@ -21,27 +22,37 @@ export class UtilsService {
     private readonly logger: LoggerService,
     private readonly commonService: CommonService,
     @Inject('HardhatAccount')
-    private readonly accountService: AccountService,
+    private readonly hardhatAccountService: AccountService,
     @Inject('HardhatRpc')
-    private readonly rpcService: RpcService,
+    private readonly hardhatRpcService: RpcService,
+    @Inject('SepoilaRpc')
+    private readonly sepoliaRpcService: RpcService,
+    @Inject('AmoyRpc')
+    private readonly amoyRpcService: RpcService,
+
     private readonly fsService: FsService,
   ) {}
 
-  async getWETH(): Promise<string> {
+  async getWETH(network: NetworkType): Promise<string> {
     try {
       // contract
       const contractAddress: string | undefined =
-        this.rpcService.getContractAddress('Router');
+        network === 'hardhat'
+          ? this.hardhatRpcService.getContractAddress('Router')
+          : network === 'sepolia'
+            ? this.sepoliaRpcService.getContractAddress('Router')
+            : this.amoyRpcService.getContractAddress('Router');
       if (contractAddress === undefined) {
         throw new Error('contract is not existed');
       }
+
       const args: ProcessContractDto = {
+        network,
         userAddress: ZeroAddress,
         contractAddress,
         function: 'WETH',
         args: [],
       };
-
       const result = await this.commonService.query(args);
       return result.WETH;
     } catch (err) {
@@ -50,21 +61,26 @@ export class UtilsService {
     }
   }
 
-  async getFactory(): Promise<string> {
+  async getFactory(network: NetworkType): Promise<string> {
     try {
       // contract
       const contractAddress: string | undefined =
-        this.rpcService.getContractAddress('Router');
+        network === 'hardhat'
+          ? this.hardhatRpcService.getContractAddress('Router')
+          : network === 'sepolia'
+            ? this.sepoliaRpcService.getContractAddress('Router')
+            : this.amoyRpcService.getContractAddress('Router');
       if (contractAddress === undefined) {
         throw new Error('contract is not existed');
       }
+
       const args: ProcessContractDto = {
+        network,
         userAddress: ZeroAddress,
         contractAddress,
         function: 'factory',
         args: [],
       };
-
       const result = await this.commonService.query(args);
       return result.factory;
     } catch (err) {
@@ -73,13 +89,18 @@ export class UtilsService {
     }
   }
 
-  async getRouter(): Promise<string> {
+  async getRouter(network: NetworkType): Promise<string> {
     try {
-      const address = this.rpcService.getContractAddress('Router');
-      if (address === undefined) {
+      const contractAddress: string | undefined =
+        network === 'hardhat'
+          ? this.hardhatRpcService.getContractAddress('Router')
+          : network === 'sepolia'
+            ? this.sepoliaRpcService.getContractAddress('Router')
+            : this.amoyRpcService.getContractAddress('Router');
+      if (contractAddress === undefined) {
         throw new Error('router address is not existed');
       }
-      return address;
+      return contractAddress;
     } catch (err) {
       this.logger.error(err);
       throw err;
@@ -96,31 +117,38 @@ export class UtilsService {
       } else if (dto.userAddress !== undefined) {
         userAddress = dto.userAddress;
       } else if (dto.userName !== undefined) {
-        const wallet = this.accountService.getWalletByName(dto.userName);
+        const wallet = this.hardhatAccountService.getWalletByName(dto.userName);
         if (wallet === undefined) {
           throw new Error('user is not existed');
         }
         userAddress = wallet.address;
       }
       if (dto.userName !== undefined && dto.userAddress !== undefined) {
-        const address = this.accountService.getAddressByName(dto.userName);
+        const address = this.hardhatAccountService.getAddressByName(
+          dto.userName,
+        );
         if (dto.userAddress !== address) {
           throw new Error('user name is unmatched by user address');
         }
       }
       // contract
       const contractAddress: string | undefined =
-        this.rpcService.getContractAddress(dto.contractName);
+        dto.network === 'hardhat'
+          ? this.hardhatRpcService.getContractAddress(dto.contractName)
+          : dto.network === 'sepolia'
+            ? this.sepoliaRpcService.getContractAddress(dto.contractName)
+            : this.amoyRpcService.getContractAddress(dto.contractName);
       if (contractAddress === undefined) {
         throw new Error('contract is not existed');
       }
+
       const args: ProcessContractDto = {
+        network: dto.network,
         userAddress,
         contractAddress,
         function: 'calcPair',
         args: [dto.factory, dto.tokenA, dto.tokenB],
       };
-
       const result = await this.commonService.query(args);
       return result.calcPair;
     } catch (err) {

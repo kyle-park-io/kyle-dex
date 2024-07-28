@@ -3,6 +3,14 @@ import { IsAddress } from '../../../common/decorator/custom.decorator';
 import { IsOptional, IsString } from 'class-validator';
 
 export class BalanceOfDto {
+  @IsString()
+  @ApiProperty({
+    description: 'network name',
+    example: 'hardhat',
+    required: true,
+  })
+  readonly network!: string;
+
   @IsOptional()
   @IsString()
   @ApiProperty({
