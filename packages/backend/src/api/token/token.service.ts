@@ -18,7 +18,7 @@ export class TokenService {
     private readonly accountService: AccountService,
     @Inject('HardhatRpc')
     private readonly rpcService: RpcService,
-    @Inject('SepoilaRpc')
+    @Inject('SepoliaRpc')
     private readonly sepoliaRpcService: RpcService,
     @Inject('AmoyRpc')
     private readonly amoyRpcService: RpcService,

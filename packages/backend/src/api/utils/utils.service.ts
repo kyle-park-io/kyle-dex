@@ -25,7 +25,7 @@ export class UtilsService {
     private readonly hardhatAccountService: AccountService,
     @Inject('HardhatRpc')
     private readonly hardhatRpcService: RpcService,
-    @Inject('SepoilaRpc')
+    @Inject('SepoliaRpc')
     private readonly sepoliaRpcService: RpcService,
     @Inject('AmoyRpc')
     private readonly amoyRpcService: RpcService,
