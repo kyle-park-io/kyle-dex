@@ -11,6 +11,7 @@ import { type RpcService } from './interfaces/rpc.interface';
 import { ContractService } from '../contract/contract.service';
 import { FsService } from '../utils/fs.service';
 import { type ContractConfig } from '../contract/interfaces/contract.interface';
+import { type TokenContractType } from './types/types';
 import { ethers, JsonRpcProvider, Interface, type Contract } from 'ethers';
 import { setTimeout } from 'timers/promises';
 
@@ -31,7 +32,7 @@ export class HardhatRpcService implements RpcService, OnModuleInit {
   private readonly contractAddressMap: Map<string, string>;
   private readonly contractEventListByAddressMap: Map<string, string[]>;
   // array
-  private readonly tokenContractList: Contract[];
+  private readonly tokenContractList: TokenContractType[];
 
   constructor(
     private readonly configService: ConfigService,
@@ -109,7 +110,7 @@ export class HardhatRpcService implements RpcService, OnModuleInit {
     return this.contractService.getContractList();
   }
 
-  getTokenContractList(): Contract[] {
+  getTokenContractList(): TokenContractType[] {
     return this.tokenContractList;
   }
 
@@ -219,7 +220,12 @@ export class HardhatRpcService implements RpcService, OnModuleInit {
 
           // token
           if (value.name.includes('token')) {
-            this.tokenContractList.push(contract);
+            const token: TokenContractType = {
+              name: value.name,
+              address: value.address,
+              // deployer:
+            };
+            this.tokenContractList.push(token);
           }
 
           if (value.eventList !== undefined) {

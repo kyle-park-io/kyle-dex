@@ -10,6 +10,7 @@ import { type RpcService } from './interfaces/rpc.interface';
 import { ContractService } from '../contract/contract.service';
 import { FsService } from '../utils/fs.service';
 import { type ContractConfig } from '../contract/interfaces/contract.interface';
+import { type TokenContractType } from './types/types';
 import { ethers, JsonRpcProvider, Interface, type Contract } from 'ethers';
 import { setTimeout } from 'timers/promises';
 
@@ -29,6 +30,8 @@ export class SepoliaRpcService implements RpcService, OnModuleInit {
   private readonly contractNameMap: Map<string, string>;
   private readonly contractAddressMap: Map<string, string>;
   private readonly contractEventListByAddressMap: Map<string, string[]>;
+  // array
+  private readonly tokenContractList: TokenContractType[];
 
   constructor(
     private readonly configService: ConfigService,
@@ -42,6 +45,7 @@ export class SepoliaRpcService implements RpcService, OnModuleInit {
     this.contractNameMap = new Map<string, string>();
     this.contractAddressMap = new Map<string, string>();
     this.contractEventListByAddressMap = new Map<string, string[]>();
+    this.tokenContractList = [];
 
     const https = this.configService.get<string>(
       'endpoints.ethereum.sepolia.url.https',
@@ -104,8 +108,8 @@ export class SepoliaRpcService implements RpcService, OnModuleInit {
     return this.contractService.getContractList();
   }
 
-  getTokenContractList(): Contract[] {
-    return [];
+  getTokenContractList(): TokenContractType[] {
+    return this.tokenContractList;
   }
 
   getContractEventList(name?: string, address?: string): string[] | undefined {
@@ -211,6 +215,16 @@ export class SepoliaRpcService implements RpcService, OnModuleInit {
           this.contractByAddressMap.set(value.address, contract);
           this.contractNameMap.set(value.address, value.name);
           this.contractAddressMap.set(value.name, value.address);
+
+          // token
+          if (value.name.includes('token')) {
+            const token: TokenContractType = {
+              name: value.name,
+              address: value.address,
+              // deployer:
+            };
+            this.tokenContractList.push(token);
+          }
 
           if (value.eventList !== undefined) {
             this.contractEventListByAddressMap.set(
