@@ -205,6 +205,7 @@ export class HardhatRpcService implements RpcService, OnModuleInit {
       try {
         for (const value of contractsList) {
           if (value.name === 'Pair') continue;
+          if (value.address === null) continue;
 
           const abi = await this.fsService.getAbi(value.name);
           const interface2 = new Interface(Object.values(abi));

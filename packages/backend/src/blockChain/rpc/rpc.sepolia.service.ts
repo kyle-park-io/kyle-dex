@@ -197,12 +197,13 @@ export class SepoliaRpcService implements RpcService, OnModuleInit {
 
   async addContract(): Promise<void> {
     const contractsList = this.configService.get<ContractConfig[]>(
-      'network.hardhat.contracts',
+      'network.sepolia.contracts',
     );
     if (contractsList !== undefined) {
       try {
         for (const value of contractsList) {
           if (value.name === 'Pair') continue;
+          if (value.address === null) continue;
 
           const abi = await this.fsService.getAbi(value.name);
           const interface2 = new Interface(Object.values(abi));
