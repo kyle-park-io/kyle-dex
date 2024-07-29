@@ -28,7 +28,7 @@ const Footer: Component = (): JSX.Element => {
             md={6}
             sm={4}
             xs={4}
-            class="tw-flex tw-justify-center tw-items-center tw-h-8 tw-text-white"
+            class="tw-flex tw-items-center tw-justify-center tw-h-8 tw-text-white"
           >
             <footer class="tw-text-xs sm:tw-text-base">
               <span>© 2024 kyle-park-io</span>
