@@ -11,7 +11,7 @@ import './Header.css';
 // metamask
 import MetamaskIndex from '../metamask/Metamask.index';
 
-import { globalState } from '../constants/constants';
+import { globalState } from '../global/constants';
 
 const Header: Component = (): JSX.Element => {
   const apiUrl = globalState.api_url;

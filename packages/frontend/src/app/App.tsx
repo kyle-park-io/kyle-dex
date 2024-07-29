@@ -7,7 +7,7 @@ import {
   SwapCard,
   BridgeCard,
 } from '../components/card/Card';
-import { globalState } from '../constants/constants';
+import { globalState } from '../global/constants';
 
 const App: Component = (): JSX.Element => {
   const navigate = useNavigate();

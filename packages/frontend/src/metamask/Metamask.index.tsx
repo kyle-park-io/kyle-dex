@@ -5,7 +5,7 @@ import { useLocation, useNavigate } from '@solidjs/router';
 import { type MetamaskIndexProps } from './interfaces/component.interfaces';
 // metamask
 import { MetaMaskSDK, type SDKProvider } from '@metamask/sdk';
-import { globalState } from '../constants/constants';
+import { globalState } from '../global/constants';
 
 const [isProcessing, setIsProcessing] = createSignal(false);
 

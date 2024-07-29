@@ -21,7 +21,7 @@ import NotFoundPage from './components/404/NotFoundPage';
 import Resize from './utils/Resize';
 
 // default
-import { globalState } from './constants/constants';
+import { globalState } from './global/constants';
 function initializeLocalStorage() {
   if (!localStorage.getItem('network')) {
     localStorage.setItem('network', 'hardhat');

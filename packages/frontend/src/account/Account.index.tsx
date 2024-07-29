@@ -4,7 +4,7 @@ import { useParams } from '@solidjs/router';
 import { getClient } from './Account.axios';
 import { type AccountInfo } from './interfaces/account.interface';
 import { Spinner, Container, Row, Col } from 'solid-bootstrap';
-import { globalState } from '../constants/constants';
+import { globalState } from '../global/constants';
 
 const AccountIndex: Component = (): JSX.Element => {
   const params = useParams();
