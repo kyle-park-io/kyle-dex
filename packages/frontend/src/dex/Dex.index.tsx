@@ -30,7 +30,7 @@ const DexChartIndex: Component = (): JSX.Element => {
   };
 
   return (
-    <>
+    <div class="tw-w-full">
       <DexHeader></DexHeader>
       <Container fluid>
         <Row>
@@ -68,7 +68,7 @@ const DexChartIndex: Component = (): JSX.Element => {
           </Col>
         </Row>
       </Container>
-    </>
+    </div>
   );
 };
 

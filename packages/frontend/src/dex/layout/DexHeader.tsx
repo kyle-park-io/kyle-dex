@@ -1,52 +1,66 @@
 import { type Component, type JSX } from 'solid-js';
-import { useNavigate } from '@solidjs/router';
-import { Container, Row, Col } from 'solid-bootstrap';
+import { useNavigate, useLocation } from '@solidjs/router';
+import { setFromDexNavigate } from '../../global/global.store';
+import { Container } from 'solid-bootstrap';
 
 export const DexHeader: Component = (): JSX.Element => {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleChartClick = (): void => {
-    navigate('/dex/chart');
+    if (location.pathname !== '/dex/chart') {
+      setFromDexNavigate({ value: true });
+      navigate('/dex/chart');
+    }
   };
   const handleStakingClick = (): void => {
-    navigate('/dex/staking');
+    if (location.pathname !== '/dex/staking') {
+      setFromDexNavigate({ value: true });
+      navigate('/dex/staking');
+    }
   };
   const handleSwapClick = (): void => {
-    navigate('/dex/swap');
+    if (location.pathname !== '/dex/swap') {
+      setFromDexNavigate({ value: true });
+      navigate('/dex/swap');
+    }
   };
   const handleBridgeClick = (): void => {
-    navigate('/dex/bridge');
+    if (location.pathname !== '/dex/bridge') {
+      setFromDexNavigate({ value: true });
+      navigate('/dex/bridge');
+    }
   };
 
   return (
     <>
-      <Container fluid>
-        <Row class="tw-gap-4 tw-items-center tw-justify-center">
-          <Col
+      <Container fluid class="tw-h-10 tw-p-0">
+        <div class="tw-h-full tw-flex tw-gap-4">
+          <div
+            class="tw-flex-1 tw-flex  tw-items-center tw-justify-center tw-bg-purple-300 tw-cursor-pointer"
             onClick={handleChartClick}
-            class="tw-flex tw-items-center tw-justify-center tw-bg-purple-300 tx-p-4 tw-cursor-pointer"
           >
             Chart
-          </Col>
-          <Col
+          </div>
+          <div
+            class="tw-flex-1 tw-flex tw-items-center tw-justify-center tw-bg-purple-300 tw-cursor-pointer"
             onClick={handleStakingClick}
-            class="tw-flex tw-items-center tw-justify-center tw-bg-purple-300 tx-p-4 tw-cursor-pointer"
           >
             Staking
-          </Col>
-          <Col
+          </div>
+          <div
+            class="tw-flex-1 tw-flex  tw-items-center tw-justify-center tw-bg-purple-300 tw-cursor-pointer"
             onClick={handleSwapClick}
-            class="tw-flex tw-items-center tw-justify-center tw-bg-purple-300 tx-p-4 tw-cursor-pointer"
           >
             Swap
-          </Col>
-          <Col
+          </div>
+          <div
+            class="tw-flex-1 tw-flex tw-items-center tw-justify-center tw-bg-purple-300 tw-cursor-pointer"
             onClick={handleBridgeClick}
-            class="tw-flex tw-items-center tw-justify-center tw-bg-purple-300 tx-p-4 tw-cursor-pointer"
           >
             Bridge
-          </Col>
-        </Row>
+          </div>
+        </div>
       </Container>
     </>
   );
