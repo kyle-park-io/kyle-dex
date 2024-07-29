@@ -2,9 +2,11 @@
 import {
   getPairReserveAll,
   getPairsCurrentReserve,
+} from '../dex/axios/Dex.axios.pair';
+import {
   getClientPairsEvent,
   // getClientPairEvent,
-} from '../dex/Dex.axios';
+} from '../dex/axios/Dex.axios.client';
 import { type ChartData, type ChartOptions } from 'chart.js';
 
 const env = import.meta.env.VITE_ENV;

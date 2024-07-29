@@ -1,7 +1,7 @@
 import { type Component, type JSX } from 'solid-js';
 import { createSignal, createEffect, For } from 'solid-js';
 import { type ClientPairProps } from '../interfaces/component.interfaces';
-import { getClientPairEvent } from '../Dex.axios';
+import { getClientPairEvent } from '../axios/Dex.axios.client';
 import { ListGroup, ListGroupItem } from 'solid-bootstrap';
 
 import { globalNetwork, globalAccount } from '../../global/global.store';

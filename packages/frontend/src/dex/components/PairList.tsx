@@ -2,7 +2,7 @@ import { type Component, type JSX } from 'solid-js';
 import { createSignal, createEffect, For } from 'solid-js';
 import { type PairListProps } from '../interfaces/component.interfaces';
 // import { type Pair2 } from '../interfaces/trade.interface';
-import { getPairList } from '../Dex.axios';
+import { getPairList } from '../axios/Dex.axios.pair';
 import { ListGroup, ListGroupItem, Button } from 'solid-bootstrap';
 
 import { globalNetwork } from '../../global/global.store';

@@ -1,7 +1,7 @@
 import { type Component, type JSX } from 'solid-js';
 import { createSignal, createEffect, For } from 'solid-js';
 import { type PairEventProps } from '../interfaces/component.interfaces';
-import { getPairEventAll } from '../Dex.axios';
+import { getPairEventAll } from '../axios/Dex.axios.pair';
 import { ListGroup, ListGroupItem } from 'solid-bootstrap';
 
 import { globalNetwork } from '../../global/global.store';
