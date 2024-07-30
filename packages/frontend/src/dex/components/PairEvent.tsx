@@ -4,8 +4,6 @@ import { type PairEventProps } from '../interfaces/component.interfaces';
 import { getPairEventAll } from '../axios/Dex.axios.pair';
 import { ListGroup, ListGroupItem } from 'solid-bootstrap';
 
-import { globalNetwork } from '../../global/global.store';
-
 const [isCalled, setIsCalled] = createSignal(false);
 
 export const PairEvent: Component<PairEventProps> = (props): JSX.Element => {
@@ -23,7 +21,10 @@ export const PairEvent: Component<PairEventProps> = (props): JSX.Element => {
 
   createEffect(() => {
     if (isCalled()) {
-      if (props.currentPair !== '' && globalNetwork.network !== 'null') {
+      if (
+        props.currentPair !== '' &&
+        (localStorage.getItem('network') as string) !== 'null'
+      ) {
         void test();
       } else {
         setItems([]);
@@ -35,7 +36,7 @@ export const PairEvent: Component<PairEventProps> = (props): JSX.Element => {
 
   async function test(): Promise<void> {
     const data = await getPairEventAll(api, {
-      network: globalNetwork.network,
+      network: localStorage.getItem('network') as string,
       pairAddress: props.currentPair,
     });
     const test: any[] = [];

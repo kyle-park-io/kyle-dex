@@ -5,8 +5,6 @@ import { type PairListProps } from '../interfaces/component.interfaces';
 import { getPairList } from '../axios/Dex.axios.pair';
 import { ListGroup, ListGroupItem, Button } from 'solid-bootstrap';
 
-import { globalNetwork } from '../../global/global.store';
-
 const [isCalled, setIsCalled] = createSignal(false);
 
 // const [items, setItems] = createSignal<Pair[]>([]);
@@ -32,7 +30,9 @@ export const PairList: Component<PairListProps> = (props): JSX.Element => {
   });
 
   async function test(): Promise<void> {
-    const data = await getPairList(api, { network: globalNetwork.network });
+    const data = await getPairList(api, {
+      network: localStorage.getItem('network') as string,
+    });
     const test: any[] = [];
     for (let i = 0; i < data.length; i++) {
       test.push({ pair: data[i].eventData.pair });

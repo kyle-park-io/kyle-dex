@@ -153,15 +153,10 @@ const MetamaskIndex: Component<MetamaskIndexProps> = (props): JSX.Element => {
 
       const connect = await metamask()?.connect();
       const addr = connect?.[0];
-      // TODO: global status
       localStorage.setItem('isConnected', '1');
       localStorage.setItem('address', addr);
-      // setGlobalAccount({
-      //   address: addr,
-      // });
       props.handleConnect();
       if (location.pathname.startsWith('/dex/account')) {
-        // navigate(`/dex/account/${props.network}/${globalAccount.address}`);
         navigate(`/dex/account/${props.network}/${addr}`);
       }
     } catch (err) {
@@ -179,14 +174,9 @@ const MetamaskIndex: Component<MetamaskIndexProps> = (props): JSX.Element => {
 
       metamask()?.terminate();
 
-      // TODO: global status
       localStorage.setItem('address', 'null');
       localStorage.setItem('isConnected', '0');
-      // setGlobalAccount({
-      //   address: 'null',
-      // });
       if (location.pathname.startsWith('/dex/account')) {
-        // navigate(`/dex/account/${props.network}/${globalAccount.address}`);
         navigate(`/dex/account/${props.network}/null`);
       }
       props.handleDisconnect();
@@ -215,15 +205,8 @@ const MetamaskIndex: Component<MetamaskIndexProps> = (props): JSX.Element => {
 
       const connect = await metamask()?.connect();
       const addr = connect?.[0];
-      // TODO: global status
       localStorage.setItem('address', addr);
-      // setGlobalAccount({
-      //   address: addr,
-      // });
       if (location.pathname.startsWith('/dex/account')) {
-        // navigate(
-        //   `/dex/account/${props.currentNetwork}/${globalAccount.address}`,
-        // );
         navigate(`/dex/account/${props.currentNetwork}/${addr}`);
       }
       props.handleChange();
@@ -291,15 +274,8 @@ const MetamaskIndex: Component<MetamaskIndexProps> = (props): JSX.Element => {
     provider()?.on('accountsChanged', handleAccountsChanged);
     function handleAccountsChanged(accounts): void {
       const addr = accounts[0];
-      // TODO: global status
       localStorage.setItem('address', addr);
-      // setGlobalAccount({
-      //   address: addr,
-      // });
       if (location.pathname.startsWith('/dex/account')) {
-        // navigate(
-        //   `/dex/account/${props.currentNetwork}/${globalAccount.address}`,
-        // );
         navigate(`/dex/account/${props.currentNetwork}/${addr}`);
       }
     }

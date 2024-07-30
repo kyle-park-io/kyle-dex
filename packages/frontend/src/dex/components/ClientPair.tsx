@@ -4,8 +4,6 @@ import { type ClientPairProps } from '../interfaces/component.interfaces';
 import { getClientPairEvent } from '../axios/Dex.axios.client';
 import { ListGroup, ListGroupItem } from 'solid-bootstrap';
 
-import { globalNetwork, globalAccount } from '../../global/global.store';
-
 const [isCalled, setIsCalled] = createSignal(false);
 
 export const ClientPair: Component<ClientPairProps> = (props): JSX.Element => {
@@ -25,8 +23,8 @@ export const ClientPair: Component<ClientPairProps> = (props): JSX.Element => {
     if (isCalled()) {
       if (
         props.currentPair !== '' &&
-        globalNetwork.network !== 'null' &&
-        globalAccount.address !== 'null'
+        (localStorage.getItem('network') as string) !== 'null' &&
+        (localStorage.getItem('address') as string) !== 'null'
       ) {
         void test();
       } else {
@@ -40,8 +38,8 @@ export const ClientPair: Component<ClientPairProps> = (props): JSX.Element => {
   async function test(): Promise<void> {
     try {
       const data = await getClientPairEvent(api, {
-        network: globalNetwork.network,
-        userAddress: globalAccount.address,
+        network: localStorage.getItem('network') as string,
+        userAddress: localStorage.getItem('address') as string,
         pairAddress: props.currentPair,
       });
 

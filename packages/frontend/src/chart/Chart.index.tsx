@@ -8,7 +8,6 @@ import {
   getMyAllData,
   getMyAllDataByEvent,
 } from './Chart.data';
-import { globalNetwork, globalAccount } from '../global/global.store';
 
 import { Scatter } from 'solid-chartjs';
 import {
@@ -54,7 +53,9 @@ export const ChartIndex: Component<ChartProps> = (props): JSX.Element => {
   const [pairOption, setPairOption] = createSignal<ChartOptions>({});
 
   async function all(): Promise<void> {
-    const { data, dataset, option } = await getAllData(globalNetwork.network);
+    const { data, dataset, option } = await getAllData(
+      localStorage.getItem('network') as string,
+    );
     setAllData(data);
     setAllData2(dataset);
     setAllOption(option);
@@ -65,30 +66,30 @@ export const ChartIndex: Component<ChartProps> = (props): JSX.Element => {
 
   async function myAll(): Promise<void> {
     const { data, dataset, option } = await getMyAllData(
-      globalNetwork.network,
-      globalAccount.address,
+      localStorage.getItem('network') as string,
+      localStorage.getItem('address') as string,
     );
     setMyAllData(data);
     setMyAllData2(dataset);
     setMyAllOption(option);
 
     const { data2, dataset2, option2 } = await getMyAllDataByEvent(
-      globalNetwork.network,
-      globalAccount.address,
+      localStorage.getItem('network') as string,
+      localStorage.getItem('address') as string,
       'Mint',
     );
     setMyAllDataMint(data2);
     setMyAllDataMint2(dataset2);
     setMyAllOptionMint(option2);
 
-    setCurrentAccount(globalAccount.address);
+    setCurrentAccount(localStorage.getItem('address') as string);
     setCurrentPair('');
     setCurrentChart('all');
   }
 
   async function pair(): Promise<void> {
     const { data, dataset, option } = await getPairData(
-      globalNetwork.network,
+      localStorage.getItem('network') as string,
       props.currentPair,
     );
     setPairData(data);
@@ -103,7 +104,7 @@ export const ChartIndex: Component<ChartProps> = (props): JSX.Element => {
 
   createEffect(() => {
     if (isCalled()) {
-      if (globalNetwork.network !== 'null') {
+      if ((localStorage.getItem('network') as string) !== 'null') {
         if (props.currentChart.includes('all')) {
           // if (!currentChart().includes('all')) {
           // }
@@ -112,8 +113,8 @@ export const ChartIndex: Component<ChartProps> = (props): JSX.Element => {
           // TODO
           if (
             props.currentChart.includes('my') &&
-            globalAccount.address !== 'null' &&
-            currentAccount() !== globalAccount.address
+            (localStorage.getItem('address') as string) !== 'null' &&
+            currentAccount() !== (localStorage.getItem('address') as string)
           ) {
             void myAll();
           }
@@ -129,8 +130,8 @@ export const ChartIndex: Component<ChartProps> = (props): JSX.Element => {
             }
             if (
               props.currentChart.includes('my') &&
-              globalAccount.address !== 'null' &&
-              currentAccount() !== globalAccount.address
+              (localStorage.getItem('address') as string) !== 'null' &&
+              currentAccount() !== (localStorage.getItem('address') as string)
             ) {
               // void allACC();
             }
