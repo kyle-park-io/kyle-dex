@@ -4,6 +4,7 @@ import { useNavigate, useLocation } from '@solidjs/router';
 import { Container, Row, Col, Nav } from 'solid-bootstrap';
 import HomeLogo from '/home.svg?url';
 import { getClientList } from '../account/Account.axios';
+import { setFromHeaderNavigate } from '../global/global.store';
 
 // css
 import './Header.css';
@@ -54,15 +55,12 @@ const Header: Component = (): JSX.Element => {
     setAccountButtonId(id);
     console.log(accountButtonId());
     const address = event.currentTarget.getAttribute('id');
-    // TODO: global status
     if (localStorage.getItem('address') !== address) {
       setAccountButtonAddress(address);
       localStorage.setItem('address', address);
-      // setGlobalAccount({ address });
     } else {
       setAccountButtonAddress('null');
       localStorage.setItem('address', 'null');
-      // setGlobalAccount({ address: 'null' });
     }
     if (location.pathname.startsWith('/dex/account')) {
       handleAccountClick(localStorage.getItem('address') as string);
@@ -89,12 +87,13 @@ const Header: Component = (): JSX.Element => {
       setSepoliaButtonColor('white');
       setAmoyButtonColor('white');
       setNetwork('null');
-      // setGlobalNetwork({ network: 'null' });
       localStorage.setItem('network', 'null');
       setAccountButtonAddress('null');
-      // setGlobalAccount({ address: 'null' });
       if (location.pathname.startsWith('/dex/account')) {
         handleAccountClick('null');
+      }
+      if (location.pathname.startsWith('/dex/staking')) {
+        navigate('/dex/staking');
       }
     } else {
       if (networkKey === 'hardhat') {
@@ -103,13 +102,15 @@ const Header: Component = (): JSX.Element => {
         setSepoliaButtonColor('white');
         setAmoyButtonColor('white');
         setNetwork(networkKey);
-        // setGlobalNetwork({ network: 'hardhat' });
         localStorage.setItem('network', 'hardhat');
         localStorage.setItem('address', globalState.hardhat_admin_address);
         setAccountButtonAddress(globalState.hardhat_admin_address);
-        // setGlobalAccount({ address: globalState.hardhat_admin_address });
         if (location.pathname.startsWith('/dex/account')) {
           handleAccountClick(globalState.hardhat_admin_address);
+        }
+        if (location.pathname.startsWith('/dex/staking')) {
+          setFromHeaderNavigate({ value: true });
+          navigate('/dex/staking/hardhat');
         }
       } else if (networkKey === 'sepolia') {
         setIsLocal(false);
@@ -133,6 +134,10 @@ const Header: Component = (): JSX.Element => {
             handleAccountClick(localStorage.getItem('address') as string);
           }
         }
+        if (location.pathname.startsWith('/dex/staking')) {
+          setFromHeaderNavigate({ value: true });
+          navigate('/dex/staking/sepolia');
+        }
       } else {
         setIsLocal(false);
         setHardhatButtonColor('white');
@@ -155,6 +160,10 @@ const Header: Component = (): JSX.Element => {
             handleAccountClick(localStorage.getItem('address') as string);
           }
         }
+        if (location.pathname.startsWith('/dex/staking')) {
+          setFromHeaderNavigate({ value: true });
+          navigate('/dex/staking/amoy');
+        }
       }
     }
   };
@@ -170,6 +179,10 @@ const Header: Component = (): JSX.Element => {
       if (location.pathname.startsWith('/dex/account')) {
         handleAccountClick(localStorage.getItem('address') as string);
       }
+      if (location.pathname.startsWith('/dex/staking')) {
+        setFromHeaderNavigate({ value: true });
+        navigate('/dex/staking/hardhat');
+      }
     } else if (networkKey === 'sepolia') {
       setIsLocal(false);
       setHardhatButtonColor('white');
@@ -184,6 +197,10 @@ const Header: Component = (): JSX.Element => {
       } else {
         handleSetMetamask();
       }
+      if (location.pathname.startsWith('/dex/staking')) {
+        setFromHeaderNavigate({ value: true });
+        navigate('/dex/staking/sepolia');
+      }
     } else {
       setIsLocal(false);
       setHardhatButtonColor('white');
@@ -197,6 +214,10 @@ const Header: Component = (): JSX.Element => {
         }
       } else {
         handleSetMetamask();
+      }
+      if (location.pathname.startsWith('/dex/staking')) {
+        setFromHeaderNavigate({ value: true });
+        navigate('/dex/staking/amoy');
       }
     }
   };
@@ -222,7 +243,6 @@ const Header: Component = (): JSX.Element => {
   const propsHandleMetamaskDisconnect = (): void => {
     setIsMetamaskConnected(false);
     setMetamaskDisconnect(false);
-    // setGlobalAccount({ address: 'null' });
     if (location.pathname.startsWith('/dex/account')) {
       handleAccountClick('null');
     }
@@ -259,6 +279,11 @@ const Header: Component = (): JSX.Element => {
       }
       if (currentNetwork === 'amoy') {
         updateNetwork2('amoy');
+      }
+      if (currentNetwork === 'null') {
+        if (location.pathname.startsWith('/dex/staking')) {
+          navigate('/dex/staking');
+        }
       }
       setIsRefresh(false);
     }

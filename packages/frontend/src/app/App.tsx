@@ -8,6 +8,7 @@ import {
   BridgeCard,
 } from '../components/card/Card';
 import { globalState } from '../global/constants';
+import { setFromAppNavigate } from '../global/global.store';
 
 const App: Component = (): JSX.Element => {
   const navigate = useNavigate();
@@ -15,7 +16,21 @@ const App: Component = (): JSX.Element => {
     navigate('/dex/chart');
   };
   const handleStakingClick = (): void => {
-    navigate('/dex/staking');
+    if ((localStorage.getItem('network') as string) === 'null') {
+      navigate('/dex/staking');
+    }
+    if ((localStorage.getItem('network') as string) === 'hardhat') {
+      setFromAppNavigate({ value: true });
+      navigate('/dex/staking/hardhat');
+    }
+    if ((localStorage.getItem('network') as string) === 'sepolia') {
+      setFromAppNavigate({ value: true });
+      navigate('/dex/staking/sepolia');
+    }
+    if ((localStorage.getItem('network') as string) === 'amoy') {
+      setFromAppNavigate({ value: true });
+      navigate('/dex/staking/amoy');
+    }
   };
   const handleSwapClick = (): void => {
     navigate('/dex/swap');

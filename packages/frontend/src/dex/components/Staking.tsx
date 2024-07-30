@@ -1,15 +1,23 @@
 import { type Component, type JSX } from 'solid-js';
-import { createSignal, createEffect } from 'solid-js';
-import { fromDexNavigate, setFromDexNavigate } from '../../global/global.store';
+import { createSignal, createEffect, onMount } from 'solid-js';
+import { useParams } from '@solidjs/router';
+import {
+  fromDexNavigate,
+  setFromDexNavigate,
+  fromHeaderNavigate,
+  setFromHeaderNavigate,
+  fromAppNavigate,
+  setFromAppNavigate,
+} from '../../global/global.store';
 import { getPairList, getPairCurrentReserve } from '../axios/Dex.axios.pair';
 import { getTokenContractList } from '../axios/Dex.axios.token';
 import { getFactory, calcPair } from '../axios/Dex.axios.utils';
 import { Container, Form, Row, Col } from 'solid-bootstrap';
 import { globalState } from '../../global/constants';
-import { globalNetwork } from '../../global/global.store';
 import axios from 'axios';
 
 const [isCalled, setIsCalled] = createSignal(false);
+const [isNetwork, setIsNetwork] = createSignal(false);
 
 const [pairs, setPairs] = createSignal<any[]>([]);
 const [tokens, setTokens] = createSignal<any[]>([]);
@@ -19,6 +27,8 @@ const [tokens, setTokens] = createSignal<any[]>([]);
 
 export const Staking: Component = (): JSX.Element => {
   const api = globalState.api_url;
+
+  const params = useParams();
 
   // reserve
   const [isReserve, setIsReserve] = createSignal(false);
@@ -35,6 +45,7 @@ export const Staking: Component = (): JSX.Element => {
       setSelectedTokenA(e.target.value);
     } else {
       setSelectedTokenA(e.target.value);
+      setSelectedPair('');
       setGetReserve(true);
     }
   };
@@ -44,6 +55,7 @@ export const Staking: Component = (): JSX.Element => {
       setSelectedTokenB(e.target.value);
     } else {
       setSelectedTokenB(e.target.value);
+      setSelectedPair('');
       setGetReserve(true);
     }
   };
@@ -56,23 +68,20 @@ export const Staking: Component = (): JSX.Element => {
   const [method, setMethod] = createSignal('t');
   const handleChangeT = async (event): Promise<void> => {
     setMethod(event.target.value);
-
     const t = await getTokenContractList(api, {
-      network: globalNetwork.network,
+      network: localStorage.getItem('network') as string,
     });
     setTokens(t);
-
     setSelectedTokenA(t[0].address);
     setSelectedTokenB(t[1].address);
     setSelectedPair('');
-
     setGetReserve(true);
   };
   const handleChangeP = async (event): Promise<void> => {
     setMethod(event.target.value);
-
-    const data = await getPairList(api, { network: globalNetwork.network });
-
+    const data = await getPairList(api, {
+      network: localStorage.getItem('network') as string,
+    });
     const set: any[] = [];
     for (let i = 0; i < data.length; i++) {
       set.push({
@@ -82,18 +91,23 @@ export const Staking: Component = (): JSX.Element => {
       });
     }
     setPairs(set);
-
     setSelectedPair(set[0].pair);
     setSelectedTokenA(set[0].tokenA);
     setSelectedTokenB(set[0].tokenA);
-
     setGetReserve(true);
   };
 
   // init
   createEffect(() => {
-    if (!isCalled() || fromDexNavigate.value) {
-      void init();
+    if (isNetwork()) {
+      if (
+        !isCalled() ||
+        fromDexNavigate.value ||
+        fromHeaderNavigate.value ||
+        fromAppNavigate.value
+      ) {
+        void init();
+      }
     }
   });
   const init = async (): Promise<void> => {
@@ -101,7 +115,7 @@ export const Staking: Component = (): JSX.Element => {
 
     // token list
     const t = await getTokenContractList(api, {
-      network: globalNetwork.network,
+      network: localStorage.getItem('network') as string,
     });
     setTokens(t);
 
@@ -111,6 +125,8 @@ export const Staking: Component = (): JSX.Element => {
     setGetReserve(true);
 
     setFromDexNavigate({ value: false });
+    setFromHeaderNavigate({ value: false });
+    setFromAppNavigate({ value: false });
   };
 
   // pair effect
@@ -126,11 +142,11 @@ export const Staking: Component = (): JSX.Element => {
 
       if (pair === '') {
         const factory = await getFactory(api, {
-          network: globalNetwork.network,
+          network: localStorage.getItem('network') as string,
         });
 
         const res = await calcPair(api, {
-          network: globalNetwork.network,
+          network: localStorage.getItem('network') as string,
           userName: 'user1',
           contractName: 'DexCalc',
           factory,
@@ -138,10 +154,11 @@ export const Staking: Component = (): JSX.Element => {
           tokenB: selectedTokenB(),
         });
         pair = res;
+        setSelectedPair(res);
       }
 
       const r = await getPairCurrentReserve(api, {
-        network: globalNetwork.network,
+        network: localStorage.getItem('network') as string,
         pairAddress: pair,
       });
       setReserve(r.eventData);
@@ -155,89 +172,113 @@ export const Staking: Component = (): JSX.Element => {
     }
   };
 
+  // network
+  onMount(() => {
+    if ((localStorage.getItem('network') as string) !== 'null') {
+      setIsNetwork(true);
+    }
+  });
+  createEffect(() => {
+    if (params.id === undefined) {
+      setIsNetwork(false);
+    } else {
+      setIsNetwork(true);
+    }
+  });
+
   return (
     <>
       <Container fluid class="tw-p-4 tw-bg-gray-300">
-        <Row>
-          <Col md={4}>
-            <Form.Group>
-              <Form.Label>Method</Form.Label>
-              <Form.Check
-                checked
-                name="method"
-                type="radio"
-                label="Select Tokens"
-                value="t"
-                onChange={handleChangeT}
-              />
-              <Form.Check
-                name="method"
-                type="radio"
-                label="Select Pair"
-                value="p"
-                onChange={handleChangeP}
-              />
-            </Form.Group>
-            <Form.Group>
-              {method() === 't' ? (
-                <>
-                  <Form.Label>Token A</Form.Label>
-                  <Form.Select
-                    aria-label="Select Token A"
-                    onChange={handleTokenAChange}
-                    value={selectedTokenA()}
-                  >
-                    {tokens().map((token) => (
-                      <option value={token.address}>{token.address}</option>
-                    ))}
-                  </Form.Select>
-                  <Form.Label>Token B</Form.Label>
-                  <Form.Select
-                    aria-label="Select Token B"
-                    onChange={handleTokenBChange}
-                    value={selectedTokenB()}
-                  >
-                    {tokens()
-                      // .filter((token) => token.address !== selectedTokenA())
-                      .map((token) => (
-                        <option value={token.address}>{token.address}</option>
-                      ))}
-                  </Form.Select>
-                </>
-              ) : (
-                <>
-                  <Form.Label>Pair</Form.Label>
-                  <Form.Select
-                    aria-label="Select Pair"
-                    onChange={handlePairChange}
-                    value={selectedPair()}
-                  >
-                    {pairs().map((pair) => (
-                      <option value={pair.pair}>{pair.pair}</option>
-                    ))}
-                  </Form.Select>
-                </>
-              )}
-            </Form.Group>
-          </Col>
-          <Col md={4}>
-            {isReserve() ? (
-              <>
-                <ul class="list-unstyled">
-                  <li>토큰은 이름순으로 정렬되어 보여집니다</li>
-                  <li>pair: {selectedPair()}</li>
-                  <li>tokenA: {selectedTokenA()}</li>
-                  <li>tokenB: {selectedTokenB()}</li>
-                  <li>reserveA: {reserve().reserve0}</li>
-                  <li>reserveB: {reserve().reserve1}</li>
-                </ul>
-              </>
-            ) : (
-              <>Pair 지금 없당 스테이킹 ㄱㄱ</>
-            )}
-          </Col>
-          <Col md={4}>버튼</Col>
-        </Row>
+        {!isNetwork() ? (
+          <>
+            <div>Select network please!</div>
+          </>
+        ) : (
+          <>
+            <Row>
+              <Col md={4}>
+                <Form.Group>
+                  <Form.Label>Method</Form.Label>
+                  <Form.Check
+                    checked
+                    name="method"
+                    type="radio"
+                    label="Select Tokens"
+                    value="t"
+                    onChange={handleChangeT}
+                  />
+                  <Form.Check
+                    name="method"
+                    type="radio"
+                    label="Select Pair"
+                    value="p"
+                    onChange={handleChangeP}
+                  />
+                </Form.Group>
+                <Form.Group>
+                  {method() === 't' ? (
+                    <>
+                      <Form.Label>Token A</Form.Label>
+                      <Form.Select
+                        aria-label="Select Token A"
+                        onChange={handleTokenAChange}
+                        value={selectedTokenA()}
+                      >
+                        {tokens().map((token) => (
+                          <option value={token.address}>{token.address}</option>
+                        ))}
+                      </Form.Select>
+                      <Form.Label>Token B</Form.Label>
+                      <Form.Select
+                        aria-label="Select Token B"
+                        onChange={handleTokenBChange}
+                        value={selectedTokenB()}
+                      >
+                        {tokens()
+                          // .filter((token) => token.address !== selectedTokenA())
+                          .map((token) => (
+                            <option value={token.address}>
+                              {token.address}
+                            </option>
+                          ))}
+                      </Form.Select>
+                    </>
+                  ) : (
+                    <>
+                      <Form.Label>Pair</Form.Label>
+                      <Form.Select
+                        aria-label="Select Pair"
+                        onChange={handlePairChange}
+                        value={selectedPair()}
+                      >
+                        {pairs().map((pair) => (
+                          <option value={pair.pair}>{pair.pair}</option>
+                        ))}
+                      </Form.Select>
+                    </>
+                  )}
+                </Form.Group>
+              </Col>
+              <Col md={4}>
+                {isReserve() ? (
+                  <>
+                    <ul class="list-unstyled">
+                      <li>토큰은 이름순으로 정렬되어 보여집니다</li>
+                      <li>pair: {selectedPair()}</li>
+                      <li>tokenA: {selectedTokenA()}</li>
+                      <li>tokenB: {selectedTokenB()}</li>
+                      <li>reserveA: {reserve().reserve0}</li>
+                      <li>reserveB: {reserve().reserve1}</li>
+                    </ul>
+                  </>
+                ) : (
+                  <>Pair 지금 없당 스테이킹 ㄱㄱ</>
+                )}
+              </Col>
+              <Col md={4}>버튼</Col>
+            </Row>
+          </>
+        )}
       </Container>
     </>
   );

@@ -5,10 +5,10 @@ export const [fromDexNavigate, setFromDexNavigate] = createStore({
   value: false,
 });
 
-export const [globalNetwork, setGlobalNetwork] = createStore({
-  network: 'hardhat',
+export const [fromHeaderNavigate, setFromHeaderNavigate] = createStore({
+  value: false,
 });
 
-export const [globalAccount, setGlobalAccount] = createStore({
-  address: 'null',
+export const [fromAppNavigate, setFromAppNavigate] = createStore({
+  value: false,
 });
