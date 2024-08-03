@@ -58,6 +58,7 @@ if (root != null) {
                 component={AccountIndex}
               />
               <Route path="/dex/chart" component={DexChartIndex} />
+              <Route path="/dex/chart/:id" component={DexChartIndex} />
               <Route path="/dex/staking" component={DexStaking} />
               <Route path="/dex/staking/:id" component={DexStaking} />
               <Route path="/dex/swap" component={DexSwap} />

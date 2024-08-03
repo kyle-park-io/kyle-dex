@@ -13,7 +13,18 @@ import { setFromAppNavigate } from '../global/global.store';
 const App: Component = (): JSX.Element => {
   const navigate = useNavigate();
   const handleChartClick = (): void => {
-    navigate('/dex/chart');
+    if ((localStorage.getItem('network') as string) === 'null') {
+      navigate('/dex/chart');
+    }
+    if ((localStorage.getItem('network') as string) === 'hardhat') {
+      navigate('/dex/chart/hardhat');
+    }
+    if ((localStorage.getItem('network') as string) === 'sepolia') {
+      navigate('/dex/chart/sepolia');
+    }
+    if ((localStorage.getItem('network') as string) === 'amoy') {
+      navigate('/dex/chart/amoy');
+    }
   };
   const handleStakingClick = (): void => {
     if ((localStorage.getItem('network') as string) === 'null') {
