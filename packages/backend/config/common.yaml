@@ -11,6 +11,12 @@ network:
         address: '0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9'
       - name: 'Router'
         address: '0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9'
+      # token
+      - name: 'Token'
+        address:
+        eventList:
+          - 'Transfer'
+          - 'Approval'
       - name: 'tokenA'
         address: '0x5FC8d32690cc91D4c39d9d3abcBD16989F875707'
       - name: 'tokenB'
@@ -19,6 +25,7 @@ network:
         address: '0xa513E6E4b8f2a923D98304ec87F64353C4D5C853'
       - name: 'tokenD'
         address: '0x2279B7A0a67DB372996a5FaB50D91eAA73d2eBe6'
+      # pair
       - name: 'Pair'
         address:
         eventList:
@@ -41,12 +48,21 @@ network:
         address:
       - name: 'Router'
         address:
+      # token
+      - name: 'Token'
+        address:
+        eventList:
+          - 'Transfer'
+          - 'Approval'
       - name: 'tokenA'
         address:
       - name: 'tokenB'
         address:
       - name: 'tokenC'
         address:
+      - name: 'tokenD'
+        address:
+      # pair
       - name: 'Pair'
         address:
         eventList:
@@ -69,6 +85,12 @@ network:
         address:
       - name: 'Router'
         address:
+      # token
+      - name: 'Token'
+        address:
+        eventList:
+          - 'Transfer'
+          - 'Approval'
       - name: 'tokenA'
         address:
       - name: 'tokenB'
@@ -77,6 +99,7 @@ network:
         address:
       - name: 'tokenD'
         address:
+      # pair
       - name: 'Pair'
         address:
         eventList:
@@ -98,6 +121,12 @@ contracts:
     address:
   - name: 'Router'
     address:
+  # token
+  - name: 'Token'
+    address:
+    eventList:
+      - 'Transfer'
+      - 'Approval'
   - name: 'tokenA'
     address:
   - name: 'tokenB'
@@ -106,6 +135,7 @@ contracts:
     address:
   - name: 'tokenD'
     address:
+  # pair
   - name: 'Pair'
     address:
     eventList:
