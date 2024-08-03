@@ -16,7 +16,9 @@ import { Container, Form, Row, Col } from 'solid-bootstrap';
 import { globalState } from '../../global/constants';
 import axios from 'axios';
 
-const [isCalled, setIsCalled] = createSignal(false);
+const notExisted = '현재 네트워크에 토큰이 존재하지 않습니다';
+
+// const [isCalled, setIsCalled] = createSignal(false);
 const [isNetwork, setIsNetwork] = createSignal(false);
 
 const [pairs, setPairs] = createSignal<any[]>([]);
@@ -71,37 +73,59 @@ export const Staking: Component = (): JSX.Element => {
     const t = await getTokenContractList(api, {
       network: localStorage.getItem('network') as string,
     });
-    setTokens(t);
-    setSelectedTokenA(t[0].address);
-    setSelectedTokenB(t[1].address);
-    setSelectedPair('');
+    if (t.length === 0) {
+      setTokens([{ address: notExisted }]);
+      setSelectedTokenA(notExisted);
+      setSelectedTokenB(notExisted);
+
+      setSelectedPair(notExisted);
+    } else {
+      setTokens(t);
+      setSelectedTokenA(t[0].address);
+      setSelectedTokenB(t[1].address);
+
+      setSelectedPair('');
+    }
     setGetReserve(true);
   };
   const handleChangeP = async (event): Promise<void> => {
-    setMethod(event.target.value);
-    const data = await getPairList(api, {
-      network: localStorage.getItem('network') as string,
-    });
-    const set: any[] = [];
-    for (let i = 0; i < data.length; i++) {
-      set.push({
-        pair: data[i].eventData.pair,
-        tokenA: data[i].eventData.token0,
-        tokenB: data[i].eventData.token1,
+    try {
+      setMethod(event.target.value);
+      const data = await getPairList(api, {
+        network: localStorage.getItem('network') as string,
       });
+      const set: any[] = [];
+      for (let i = 0; i < data.length; i++) {
+        set.push({
+          pair: data[i].eventData.pair,
+          tokenA: data[i].eventData.token0,
+          tokenB: data[i].eventData.token1,
+        });
+      }
+      setPairs(set);
+      setSelectedPair(set[0].pair);
+      setSelectedTokenA(set[0].tokenA);
+      setSelectedTokenB(set[0].tokenA);
+      setGetReserve(true);
+    } catch (err) {
+      if (axios.isAxiosError(err)) {
+        if (err.response?.status === 404) {
+          setPairs([{ pair: notExisted }]);
+          setSelectedPair(notExisted);
+          setSelectedTokenA(notExisted);
+          setSelectedTokenB(notExisted);
+        }
+      }
     }
-    setPairs(set);
-    setSelectedPair(set[0].pair);
-    setSelectedTokenA(set[0].tokenA);
-    setSelectedTokenB(set[0].tokenA);
-    setGetReserve(true);
   };
 
   // init
   createEffect(() => {
     if (isNetwork()) {
+      // if (!isCalled()) {
+      //   void init();
+      // }
       if (
-        !isCalled() ||
         fromDexNavigate.value ||
         fromHeaderNavigate.value ||
         fromAppNavigate.value
@@ -111,17 +135,55 @@ export const Staking: Component = (): JSX.Element => {
     }
   });
   const init = async (): Promise<void> => {
-    setIsCalled(true);
+    // setIsCalled(true);
 
-    // token list
-    const t = await getTokenContractList(api, {
-      network: localStorage.getItem('network') as string,
-    });
-    setTokens(t);
+    if (method() === 't') {
+      // token list
+      const t = await getTokenContractList(api, {
+        network: localStorage.getItem('network') as string,
+      });
+      if (t.length === 0) {
+        setTokens([{ address: notExisted }]);
+        setSelectedTokenA(notExisted);
+        setSelectedTokenB(notExisted);
 
-    setSelectedTokenA(t[0].address);
-    setSelectedTokenB(t[1].address);
+        setSelectedPair(notExisted);
+      } else {
+        setTokens(t);
+        setSelectedTokenA(t[0].address);
+        setSelectedTokenB(t[1].address);
 
+        setSelectedPair('');
+      }
+    } else {
+      try {
+        const data = await getPairList(api, {
+          network: localStorage.getItem('network') as string,
+        });
+        const set: any[] = [];
+        for (let i = 0; i < data.length; i++) {
+          set.push({
+            pair: data[i].eventData.pair,
+            tokenA: data[i].eventData.token0,
+            tokenB: data[i].eventData.token1,
+          });
+        }
+        setPairs(set);
+        setSelectedPair(set[0].pair);
+        setSelectedTokenA(set[0].tokenA);
+        setSelectedTokenB(set[0].tokenA);
+        setGetReserve(true);
+      } catch (err) {
+        if (axios.isAxiosError(err)) {
+          if (err.response?.status === 404) {
+            setPairs([{ pair: notExisted }]);
+            setSelectedPair(notExisted);
+            setSelectedTokenA(notExisted);
+            setSelectedTokenB(notExisted);
+          }
+        }
+      }
+    }
     setGetReserve(true);
 
     setFromDexNavigate({ value: false });
@@ -139,7 +201,10 @@ export const Staking: Component = (): JSX.Element => {
   const r = async (): Promise<void> => {
     try {
       let pair = selectedPair();
-
+      if (pair === notExisted) {
+        setIsReserve(false);
+        return;
+      }
       if (pair === '') {
         const factory = await getFactory(api, {
           network: localStorage.getItem('network') as string,
@@ -188,10 +253,12 @@ export const Staking: Component = (): JSX.Element => {
 
   return (
     <>
-      <Container fluid class="tw-p-4 tw-bg-gray-300">
+      <Container fluid class="tw-flex-grow tw-p-4 tw-bg-gray-300">
         {!isNetwork() ? (
           <>
-            <div>Select network please!</div>
+            <div class="tw-flex tw-items-center tw-justify-center">
+              Select network please!
+            </div>
           </>
         ) : (
           <>
@@ -272,10 +339,10 @@ export const Staking: Component = (): JSX.Element => {
                     </ul>
                   </>
                 ) : (
-                  <>Pair 지금 없당 스테이킹 ㄱㄱ</>
+                  <>Check Pair</>
                 )}
               </Col>
-              <Col md={4}>버튼</Col>
+              <Col md={4}>Submit</Col>
             </Row>
           </>
         )}
