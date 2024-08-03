@@ -24,8 +24,8 @@ export const Bridge: Component = (): JSX.Element => {
 
   return (
     <>
-      <Container fluid class="tw-p-4 tw-bg-gray-300">
-        <div class="tw-flex tw-items-center tw-justify-center">
+      <Container fluid class="tw-flex-grow tw-p-4 tw-bg-gray-300">
+        <div class="tw-h-full tw-flex tw-items-center tw-justify-center">
           Comming Soon
         </div>
       </Container>

@@ -4,7 +4,7 @@ import { Staking } from './components/Staking';
 
 const DexStaking: Component = (): JSX.Element => {
   return (
-    <div class="tw-w-full">
+    <div class="tw-w-full tw-flex tw-flex-col">
       <DexHeader></DexHeader>
       <Staking></Staking>
     </div>

@@ -4,7 +4,7 @@ import { Bridge } from './components/Bridge';
 
 const DexBridge: Component = (): JSX.Element => {
   return (
-    <div class="tw-w-full">
+    <div class="tw-w-full tw-flex tw-flex-col">
       <DexHeader></DexHeader>
       <Bridge></Bridge>
     </div>
