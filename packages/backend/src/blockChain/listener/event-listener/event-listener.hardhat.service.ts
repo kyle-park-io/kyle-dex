@@ -16,6 +16,7 @@ import {
   type JsonRpcProvider,
   type TransactionResponse,
   type Block,
+  keccak256,
 } from 'ethers';
 import cacheService from '../../../init/cache';
 
@@ -46,7 +47,7 @@ export class HardhatEventListenerService implements OnModuleInit {
     const self = this;
     const contractList = this.rpcService.getContractList();
     for (const contractName of contractList) {
-      if (contractName === 'Pair') continue;
+      if (contractName === 'Pair' || contractName === 'Token') continue;
 
       const address = this.rpcService.getContractAddress(contractName);
       if (address === undefined) {
@@ -59,7 +60,9 @@ export class HardhatEventListenerService implements OnModuleInit {
 
       const provider = this.rpcService.getProvider();
       const connectedContract = contract.connect(provider);
-      const event = this.rpcService.getContractEventList(contractName);
+      const event = contractName.includes('token')
+        ? this.rpcService.getContractEventList('Token')
+        : this.rpcService.getContractEventList(contractName);
       if (event !== undefined) {
         for (const value of event) {
           this.logger.log('event listener open : ', value);
@@ -76,10 +79,20 @@ export class HardhatEventListenerService implements OnModuleInit {
           const topics = [...payload.log.topics];
           const data = payload.log.data;
 
+          const log: LogDescription | null =
+            connectedContract.interface.parseLog({
+              topics,
+              data,
+            });
+          if (log === null) {
+            throw new Error('wrong matching event <-> data');
+          }
           // check tx cache
+          const hashed_log = keccak256(log.signature);
           if (
-            cacheService.get(`hardhat.${payload.log.address}.${txHash}`) !==
-            undefined
+            cacheService.get(
+              `hardhat.${payload.log.address}.${txHash}.${hashed_log}`,
+            ) !== undefined
           ) {
             console.log(
               'already processed event: ',
@@ -89,14 +102,6 @@ export class HardhatEventListenerService implements OnModuleInit {
             return;
           }
 
-          const log: LogDescription | null =
-            connectedContract.interface.parseLog({
-              topics,
-              data,
-            });
-          if (log === null) {
-            throw new Error('wrong matching event <-> data');
-          }
           void self.processEvent(
             payload.log.address,
             blockHash,
@@ -104,6 +109,10 @@ export class HardhatEventListenerService implements OnModuleInit {
             txHash,
             log,
           );
+
+          const eventNum = cacheService.get('hardhat.event.num');
+          console.log('number of loaded events: ', Number(eventNum) + 1);
+          cacheService.set('hardhat.event.num', String(Number(eventNum) + 1));
         } catch (err) {
           console.error(err);
         }
@@ -145,10 +154,19 @@ export class HardhatEventListenerService implements OnModuleInit {
           const topics = [...payload.log.topics];
           const data = payload.log.data;
 
+          const log: LogDescription | null =
+            connectedContract.interface.parseLog({
+              topics,
+              data,
+            });
+          if (log === null) {
+            throw new Error('wrong matching event <-> data');
+          }
           // check tx cache
           if (
-            cacheService.get(`hardhat.${payload.log.address}.${txHash}`) !==
-            undefined
+            cacheService.get(
+              `hardhat.${payload.log.address}.${txHash}.${log.signature}`,
+            ) !== undefined
           ) {
             console.log(
               'already processed event: ',
@@ -158,14 +176,6 @@ export class HardhatEventListenerService implements OnModuleInit {
             return;
           }
 
-          const log: LogDescription | null =
-            connectedContract.interface.parseLog({
-              topics,
-              data,
-            });
-          if (log === null) {
-            throw new Error('wrong matching event <-> data');
-          }
           void self.processEvent(
             payload.log.address,
             blockHash,
@@ -173,6 +183,10 @@ export class HardhatEventListenerService implements OnModuleInit {
             txHash,
             log,
           );
+
+          const eventNum = cacheService.get('hardhat.event.num');
+          console.log('number of loaded events: ', Number(eventNum) + 1);
+          cacheService.set('hardhat.event.num', String(Number(eventNum) + 1));
         } catch (err) {
           console.error(err);
         }
@@ -193,10 +207,13 @@ export class HardhatEventListenerService implements OnModuleInit {
     try {
       const eventName = log.name;
       this.logger.log('event received: ', eventName);
-      const name = this.rpcService.getContractName(contractAddress);
+      let name = this.rpcService.getContractName(contractAddress);
       if (name === undefined) {
         this.logger.error('wrong address');
         throw new Error('wrong address');
+      }
+      if (name.includes('token')) {
+        name = 'Token';
       }
 
       const provider: JsonRpcProvider = this.rpcService.getProvider();
@@ -320,6 +337,7 @@ export class HardhatEventListenerService implements OnModuleInit {
                   syncObj.eventData = eventData;
                 }
               }
+
               await this.fsService.writePairReserveAllArrayToFile(
                 'hardhat',
                 `pair.reserve.all`,
@@ -360,22 +378,23 @@ export class HardhatEventListenerService implements OnModuleInit {
                   mintObj.eventData = eventData;
                 }
               }
+
               await this.fsService.writePairEventAllArrayToFile(
                 'hardhat',
                 'pair.event.all',
                 pair,
                 mintObj,
               );
-              await this.fsService.writeUserEventArrayToFile(
+              await this.fsService.writeUserPairEventArrayToFile(
                 'hardhat',
-                'user.event',
+                'user.pair.event',
                 user,
                 pair,
                 mintObj,
               );
-              await this.fsService.writeUserEventAllArrayToFile(
+              await this.fsService.writeUserPairsEventAllArrayToFile(
                 'hardhat',
-                'user.event.all',
+                'user.pair.event.all',
                 user,
                 mintObj,
               );
@@ -407,16 +426,16 @@ export class HardhatEventListenerService implements OnModuleInit {
                 pair,
                 burnObj,
               );
-              await this.fsService.writeUserEventArrayToFile(
+              await this.fsService.writeUserPairEventArrayToFile(
                 'hardhat',
-                'user.event',
+                'user.pair.event',
                 user,
                 pair,
                 burnObj,
               );
-              await this.fsService.writeUserEventAllArrayToFile(
+              await this.fsService.writeUserPairsEventAllArrayToFile(
                 'hardhat',
-                'user.event.all',
+                'user.pair.event.all',
                 user,
                 burnObj,
               );
@@ -448,24 +467,23 @@ export class HardhatEventListenerService implements OnModuleInit {
                 pair,
                 swapObj,
               );
-              await this.fsService.writeUserEventArrayToFile(
+              await this.fsService.writeUserPairEventArrayToFile(
                 'hardhat',
-                'user.event',
+                'user.pair.event',
                 user,
                 pair,
                 swapObj,
               );
-              await this.fsService.writeUserEventAllArrayToFile(
+              await this.fsService.writeUserPairsEventAllArrayToFile(
                 'hardhat',
-                'user.event.all',
+                'user.pair.event.all',
                 user,
                 swapObj,
               );
               break;
             }
             case 'Transfer': {
-              console.log('transfer');
-
+              const user = from;
               const pair = contractAddress;
               const transferObj: any = {};
               transferObj.timestamp = timestamp;
@@ -501,25 +519,87 @@ export class HardhatEventListenerService implements OnModuleInit {
                 throw new Error('Transfer event error');
               }
 
-              // await this.fsService.writePairEventAllArrayToFile(
-              //   'hardhat',
-              //   'pair.event.all',
-              //   pair,
-              //   mintObj,
-              // );
-              // await this.fsService.writeUserEventArrayToFile(
-              //   'hardhat',
-              //   'user.event',
-              //   user,
-              //   pair,
-              //   mintObj,
-              // );
-              // await this.fsService.writeUserEventAllArrayToFile(
-              //   'hardhat',
-              //   'user.event.all',
-              //   user,
-              //   mintObj,
-              // );
+              await this.fsService.writePairEventAllArrayToFile(
+                'hardhat',
+                'pair.event.all',
+                pair,
+                transferObj,
+              );
+              await this.fsService.writeUserPairEventArrayToFile(
+                'hardhat',
+                'user.pair.event',
+                user,
+                pair,
+                transferObj,
+              );
+              await this.fsService.writeUserPairsEventAllArrayToFile(
+                'hardhat',
+                'user.pair.event.all',
+                user,
+                transferObj,
+              );
+              break;
+            }
+            case 'Approval': {
+              const user = from;
+              const pair = contractAddress;
+              const approvalObj: any = {};
+              approvalObj.timestamp = timestamp;
+              approvalObj.blockHash = blockHash;
+              approvalObj.blockNumber = blockNumber;
+              approvalObj.txHash = txHash;
+              approvalObj.from = from;
+              approvalObj.to = to;
+              approvalObj.pair = pair;
+              approvalObj.event = eventName;
+              const eventData = {};
+              let tokenOwner = '';
+              let tokenSpender = '';
+              let tokenValue = '';
+              for (let i = 0; i < log.fragment.inputs.length; i++) {
+                const key = log.fragment.inputs[i].name;
+                eventData[key] = log.args[i].toString();
+
+                if (key === 'owner') {
+                  tokenOwner = log.args[i].toString();
+                }
+                if (key === 'spender') {
+                  tokenSpender = log.args[i].toString();
+                }
+                if (key === 'value') {
+                  tokenValue = log.args[i].toString();
+                }
+                if (i === log.fragment.inputs.length - 1) {
+                  approvalObj.eventData = eventData;
+                }
+              }
+              if (
+                tokenOwner === '' ||
+                tokenSpender === '' ||
+                tokenValue === ''
+              ) {
+                throw new Error('Approval event error');
+              }
+
+              await this.fsService.writePairEventAllArrayToFile(
+                'hardhat',
+                'pair.event.all',
+                pair,
+                approvalObj,
+              );
+              await this.fsService.writeUserPairEventArrayToFile(
+                'hardhat',
+                'user.pair.event',
+                user,
+                pair,
+                approvalObj,
+              );
+              await this.fsService.writeUserPairsEventAllArrayToFile(
+                'hardhat',
+                'user.pair.event.all',
+                user,
+                approvalObj,
+              );
               break;
             }
             default:
@@ -530,13 +610,143 @@ export class HardhatEventListenerService implements OnModuleInit {
           // await this.fsService.readArrayFromFile('test.json');
           break;
         }
+        case 'Token': {
+          switch (eventName) {
+            case 'Transfer': {
+              const user = from;
+              const token = contractAddress;
+              const transferObj: any = {};
+              transferObj.timestamp = timestamp;
+              transferObj.blockHash = blockHash;
+              transferObj.blockNumber = blockNumber;
+              transferObj.txHash = txHash;
+              transferObj.from = from;
+              transferObj.to = to;
+              transferObj.token = token;
+              transferObj.event = eventName;
+              const eventData = {};
+              let tokenFrom = '';
+              let tokenTo = '';
+              let tokenValue = '';
+              for (let i = 0; i < log.fragment.inputs.length; i++) {
+                const key = log.fragment.inputs[i].name;
+                eventData[key] = log.args[i].toString();
+
+                if (key === 'from') {
+                  tokenFrom = log.args[i].toString();
+                }
+                if (key === 'to') {
+                  tokenTo = log.args[i].toString();
+                }
+                if (key === 'value') {
+                  tokenValue = log.args[i].toString();
+                }
+                if (i === log.fragment.inputs.length - 1) {
+                  transferObj.eventData = eventData;
+                }
+              }
+              if (tokenFrom === '' || tokenTo === '' || tokenValue === '') {
+                throw new Error('Transfer event error');
+              }
+
+              await this.fsService.writeTokenEventAllArrayToFile(
+                'hardhat',
+                'token.event.all',
+                token,
+                transferObj,
+              );
+              await this.fsService.writeUserTokenEventArrayToFile(
+                'hardhat',
+                'user.token.event',
+                user,
+                token,
+                transferObj,
+              );
+              await this.fsService.writeUserTokensEventAllArrayToFile(
+                'hardhat',
+                'user.token.event.all',
+                user,
+                transferObj,
+              );
+              break;
+            }
+            case 'Approval': {
+              const user = from;
+              const token = contractAddress;
+              const approvalObj: any = {};
+              approvalObj.timestamp = timestamp;
+              approvalObj.blockHash = blockHash;
+              approvalObj.blockNumber = blockNumber;
+              approvalObj.txHash = txHash;
+              approvalObj.from = from;
+              approvalObj.to = to;
+              approvalObj.token = token;
+              approvalObj.event = eventName;
+              const eventData = {};
+              let tokenOwner = '';
+              let tokenSpender = '';
+              let tokenValue = '';
+              for (let i = 0; i < log.fragment.inputs.length; i++) {
+                const key = log.fragment.inputs[i].name;
+                eventData[key] = log.args[i].toString();
+
+                if (key === 'owner') {
+                  tokenOwner = log.args[i].toString();
+                }
+                if (key === 'spender') {
+                  tokenSpender = log.args[i].toString();
+                }
+                if (key === 'value') {
+                  tokenValue = log.args[i].toString();
+                }
+                if (i === log.fragment.inputs.length - 1) {
+                  approvalObj.eventData = eventData;
+                }
+              }
+              if (
+                tokenOwner === '' ||
+                tokenSpender === '' ||
+                tokenValue === ''
+              ) {
+                throw new Error('Approval event error');
+              }
+
+              await this.fsService.writeTokenEventAllArrayToFile(
+                'hardhat',
+                'token.event.all',
+                token,
+                approvalObj,
+              );
+              await this.fsService.writeUserTokenEventArrayToFile(
+                'hardhat',
+                'user.token.event',
+                user,
+                token,
+                approvalObj,
+              );
+              await this.fsService.writeUserTokensEventAllArrayToFile(
+                'hardhat',
+                'user.token.event.all',
+                user,
+                approvalObj,
+              );
+            }
+            default:
+              break;
+          }
+          break;
+        }
         default:
           this.logger.log('merong~');
           break;
       }
 
+      const hashed_log = keccak256(log.signature);
       // set cache
-      cacheService.set(`hardhat.${contractAddress}.${txHash}`, timestamp);
+      cacheService.set(
+        `hardhat.${contractAddress}.${txHash}.${hashed_log}`,
+        timestamp,
+      );
     } catch (err) {
       this.logger.error(err);
       throw err;

@@ -19,7 +19,7 @@ export class FsService {
   }
 
   getAbi = async (contractName: string): Promise<any[]> => {
-    if (contractName.includes('token')) {
+    if (contractName.includes('token') || contractName === 'Token') {
       const abiPath = path.resolve('artifacts');
       const jsonInterface = JSON.parse(
         fs.readFileSync(`${abiPath}/Token.json`, 'utf-8'),
@@ -243,8 +243,51 @@ export class FsService {
     }
   };
 
+  // token.event.all
+  writeTokenEventAllArrayToFile = async (
+    network: string,
+    name: string,
+    token: string,
+    body: any,
+  ): Promise<void> => {
+    const path = `${network}/token`;
+    if (fs.existsSync(`${this.dataPath}/${path}/${token}.all.json`)) {
+      const data = await this.readArrayFromFile(path, `${token}.all`);
+      data[0] = body;
+      data.push(body);
+
+      cacheService.set(
+        `${network}.${name}.${token}`,
+        JSON.stringify(data, null, 2),
+      );
+      fs.writeFileSync(
+        `${this.dataPath}/${path}/${token}.all.json`,
+        JSON.stringify(data, null, 2),
+        'utf8',
+      );
+    } else {
+      fs.mkdirSync(`${this.dataPath}/${path}`, {
+        recursive: true,
+      });
+
+      const data: any[] = [];
+      data.push(body);
+      data.push(body);
+
+      cacheService.set(
+        `${network}.${name}.${token}`,
+        JSON.stringify(data, null, 2),
+      );
+      fs.writeFileSync(
+        `${this.dataPath}/${path}/${token}.all.json`,
+        JSON.stringify(data, null, 2),
+        'utf8',
+      );
+    }
+  };
+
   // user.event (1 pair)
-  writeUserEventArrayToFile = async (
+  writeUserPairEventArrayToFile = async (
     network: string,
     name: string,
     user: string,
@@ -285,14 +328,99 @@ export class FsService {
     }
   };
 
-  // user.event.all
-  writeUserEventAllArrayToFile = async (
+  // user.event.all (all pairs)
+  writeUserPairsEventAllArrayToFile = async (
     network: string,
     name: string,
     user: string,
     body: any,
   ): Promise<void> => {
     const path = `${network}/user/reserve`;
+    if (fs.existsSync(`${this.dataPath}/${path}/${user}.json`)) {
+      const data = await this.readArrayFromFile(path, user);
+      data[0] = body;
+      data.push(body);
+
+      cacheService.set(
+        `${network}.${name}.${user}`,
+        JSON.stringify(data, null, 2),
+      );
+      fs.writeFileSync(
+        `${this.dataPath}/${path}/${user}.json`,
+        JSON.stringify(data, null, 2),
+        'utf8',
+      );
+    } else {
+      fs.mkdirSync(`${this.dataPath}/${path}`, {
+        recursive: true,
+      });
+
+      const data: any[] = [];
+      data.push(body);
+      data.push(body);
+
+      cacheService.set(
+        `${network}.${name}.${user}`,
+        JSON.stringify(data, null, 2),
+      );
+      fs.writeFileSync(
+        `${this.dataPath}/${path}/${user}.json`,
+        JSON.stringify(data, null, 2),
+        'utf8',
+      );
+    }
+  };
+
+  // user.event (1 token)
+  writeUserTokenEventArrayToFile = async (
+    network: string,
+    name: string,
+    user: string,
+    pair: string,
+    body: any,
+  ): Promise<void> => {
+    const path = `${network}/user/token`;
+    if (fs.existsSync(`${this.dataPath}/${path}/${user}.${pair}.json`)) {
+      const data = await this.readArrayFromFile(path, `${user}.${pair}`);
+      data[0] = body;
+      data.push(body);
+
+      cacheService.set(
+        `${network}.${name}.${user}.${pair}`,
+        JSON.stringify(data, null, 2),
+      );
+      fs.writeFileSync(
+        `${this.dataPath}/${path}/${user}.${pair}.json`,
+        JSON.stringify(data, null, 2),
+        'utf8',
+      );
+    } else {
+      fs.mkdirSync(`${this.dataPath}/${path}`, { recursive: true });
+
+      const data: any[] = [];
+      data.push(body);
+      data.push(body);
+
+      cacheService.set(
+        `${network}.${name}.${user}.${pair}`,
+        JSON.stringify(data, null, 2),
+      );
+      fs.writeFileSync(
+        `${this.dataPath}/${path}/${user}.${pair}.json`,
+        JSON.stringify(data, null, 2),
+        'utf8',
+      );
+    }
+  };
+
+  // user.event.all (all tokens)
+  writeUserTokensEventAllArrayToFile = async (
+    network: string,
+    name: string,
+    user: string,
+    body: any,
+  ): Promise<void> => {
+    const path = `${network}/user/token`;
     if (fs.existsSync(`${this.dataPath}/${path}/${user}.json`)) {
       const data = await this.readArrayFromFile(path, user);
       data[0] = body;
