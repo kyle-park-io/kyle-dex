@@ -4,9 +4,9 @@ import { DexHeader } from './layout/DexHeader';
 import { Container, Row, Col } from 'solid-bootstrap';
 import { ChartIndex } from '../chart/Chart.index';
 import { ChartList } from '../chart/components/Chart.list';
-import { PairList } from './components/PairList';
-import { PairEvent } from './components/PairEvent';
-import { ClientPair } from './components/ClientPair';
+import { PairList } from './components/pair/PairList';
+import { PairEvent } from './components/pair/PairEvent';
+import { ClientPair } from './components/pair/ClientPair';
 
 const DexChartIndex: Component = (): JSX.Element => {
   const [pair, setPair] = createSignal('');
@@ -30,10 +30,10 @@ const DexChartIndex: Component = (): JSX.Element => {
   };
 
   return (
-    <div class="tw-w-full">
+    <div class="tw-w-full tw-flex tw-flex-col">
       <DexHeader></DexHeader>
-      <Container fluid>
-        <Row>
+      <Container fluid class="tw-flex-grow">
+        <Row class="tw-h-full">
           <Col md={6} class="tw-bg-gray-300 tw-p-4">
             <ChartList
               currentChart={currentChart()}
@@ -42,28 +42,22 @@ const DexChartIndex: Component = (): JSX.Element => {
           </Col>
           <Col md={6} class="tw-bg-gray-300 tw-p-4"></Col>
           <Col md={6} class="tw-bg-blue-300 tw-p-4">
-            <h2>Chart</h2>
-            <div>
-              <ChartIndex
-                currentChart={currentChart()}
-                handleCurrentChart={propsHandleCurrentChart}
-                currentPair={pair()}
-              ></ChartIndex>
-            </div>
+            <ChartIndex
+              currentChart={currentChart()}
+              handleCurrentChart={propsHandleCurrentChart}
+              currentPair={pair()}
+            ></ChartIndex>
           </Col>
           <Col md={2} class="tw-bg-yellow-300 tw-p-4">
-            <h3>Pair</h3>
             <PairList
               currentPair={pair()}
               handleCurrentPair={propsHandleCurrentPair}
             ></PairList>
           </Col>
           <Col md={2} class="tw-bg-green-300 tw-p-4">
-            <h3>Pair Event</h3>
             <PairEvent currentPair={pair()}></PairEvent>
           </Col>
           <Col md={2} class="tw-bg-red-300 tw-p-4">
-            <h3>My Event</h3>
             <ClientPair currentPair={pair()}></ClientPair>
           </Col>
         </Row>
