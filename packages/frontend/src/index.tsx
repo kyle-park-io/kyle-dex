@@ -47,7 +47,8 @@ if (root != null) {
     () => (
       <div class="tw-flex tw-flex-col tw-min-h-screen">
         <Router>
-          <div class="tw-bg-white tw-h-12 tw-overflow-auto">
+          {/* tw-overflow-auto */}
+          <div class="tw-bg-white tw-h-12">
             <Header></Header>
           </div>
           <div class="tw-bg-white tw-flex-grow tw-flex tw-flex-wrap">

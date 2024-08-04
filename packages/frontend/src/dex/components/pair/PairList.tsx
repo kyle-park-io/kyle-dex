@@ -69,7 +69,9 @@ export const PairList: Component<PairListProps> = (props): JSX.Element => {
                         variant="outline-primary"
                         onClick={() => {
                           props.handleCurrentPair(item.pair);
+                          props.handleCurrentFocusedComponent('PairList');
                         }}
+                        class="tw-w-full"
                       >
                         {item.shortPairAddress + '...'}: {item.timestamp}
                       </Button>
