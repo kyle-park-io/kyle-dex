@@ -58,7 +58,7 @@ export class ChartService {
 
   async getClientPairsEvent(dto: GetClientEventAllDto): Promise<any> {
     const data = cacheService.get(
-      `${dto.network}.user.event.all.${dto.userAddress}`,
+      `${dto.network}.user.pair.event.all.${dto.userAddress}`,
     );
     if (data === undefined) {
       throw new NotFoundException('client not found');
@@ -68,7 +68,7 @@ export class ChartService {
 
   async getClientPairEvent(dto: GetClientEventDto): Promise<any> {
     const data = cacheService.get(
-      `${dto.network}.user.event.${dto.userAddress}.${dto.pairAddress}`,
+      `${dto.network}.user.pair.event.${dto.userAddress}.${dto.pairAddress}`,
     );
     if (data === undefined) {
       throw new NotFoundException("client's pair not found");

@@ -17,6 +17,7 @@ import {
   type TransactionResponse,
   type Block,
   keccak256,
+  toUtf8Bytes,
 } from 'ethers';
 import cacheService from '../../../init/cache';
 
@@ -88,7 +89,7 @@ export class HardhatEventListenerService implements OnModuleInit {
             throw new Error('wrong matching event <-> data');
           }
           // check tx cache
-          const hashed_log = keccak256(log.signature);
+          const hashed_log = keccak256(toUtf8Bytes(log.signature));
           if (
             cacheService.get(
               `hardhat.${payload.log.address}.${txHash}.${hashed_log}`,
@@ -741,7 +742,7 @@ export class HardhatEventListenerService implements OnModuleInit {
           break;
       }
 
-      const hashed_log = keccak256(log.signature);
+      const hashed_log = keccak256(toUtf8Bytes(log.signature));
       // set cache
       cacheService.set(
         `hardhat.${contractAddress}.${txHash}.${hashed_log}`,
