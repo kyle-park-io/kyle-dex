@@ -14,6 +14,15 @@ const [isNetwork, setIsNetwork] = createSignal(false);
 // const [items, setItems] = createSignal<Pair2[]>([]);
 const [pairExisted, setPairExisted] = createSignal(false);
 const [pairs, setPairs] = createSignal<string[]>([]);
+const [pairButtonId, setPairButtonId] = createSignal<number>(-1);
+const handlePairButtonClick = (event): void => {
+  const id = event.currentTarget.getAttribute('tabIndex');
+  if (pairButtonId() === id) {
+    setPairButtonId(-1);
+  } else {
+    setPairButtonId(id);
+  }
+};
 
 export const PairList: Component<PairListProps> = (props): JSX.Element => {
   const api = globalState.api_url;
@@ -63,15 +72,20 @@ export const PairList: Component<PairListProps> = (props): JSX.Element => {
               <h3>Pair</h3>
               <ListGroup class="tw-flex-grow">
                 <For each={pairs()}>
-                  {(item: any) => (
+                  {(item: any, index) => (
                     <ListGroupItem>
                       <Button
-                        variant="outline-primary"
-                        onClick={() => {
+                        tabIndex={index()}
+                        style={{
+                          background:
+                            pairButtonId() == index() ? 'lightblue' : 'white',
+                        }}
+                        onClick={(event) => {
+                          handlePairButtonClick(event);
                           props.handleCurrentPair(item.pair);
                           props.handleCurrentFocusedComponent('PairList');
                         }}
-                        class="tw-w-full"
+                        class="tw-w-full tw-border-blue-500 tw-text-black hover:tw-text-blue-500"
                       >
                         {item.shortPairAddress + '...'}: {item.timestamp}
                       </Button>
