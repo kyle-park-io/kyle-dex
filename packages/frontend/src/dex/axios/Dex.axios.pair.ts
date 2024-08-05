@@ -12,6 +12,11 @@ export async function getPairList(url: string, param: any): Promise<any> {
   return res.data;
 }
 
+export async function getPairProperty(url: string, param: any): Promise<any> {
+  const res = await axios.post(`${url}/chart/getPairProperty`, param);
+  return res.data;
+}
+
 export async function getPairCurrentReserve(
   url: string,
   param: any,
@@ -20,7 +25,6 @@ export async function getPairCurrentReserve(
   return res.data;
 }
 
-// not yet
 export async function getPairsCurrentReserve(
   url: string,
   param: any,

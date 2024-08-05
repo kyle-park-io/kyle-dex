@@ -255,6 +255,8 @@ export class HardhatEventListenerService implements OnModuleInit {
               reserveObj.to = to;
               let pair: string = '';
               let index: string = '';
+              let token0: string = '';
+              let token1: string = '';
               const eventData = {};
               for (let i = 0; i < log.fragment.inputs.length; i++) {
                 const key = log.fragment.inputs[i].name;
@@ -265,16 +267,33 @@ export class HardhatEventListenerService implements OnModuleInit {
                 if (key === 'index') {
                   index = log.args[i].toString();
                 }
+                if (key === 'token0') {
+                  token0 = log.args[i].toString();
+                }
+                if (key === 'token1') {
+                  token1 = log.args[i].toString();
+                }
                 if (i === log.fragment.inputs.length - 1) {
                   pairObj.eventData = eventData;
                 }
               }
-              if (pair === '' || index === '') {
+              if (
+                pair === '' ||
+                index === '' ||
+                token0 === '' ||
+                token1 === ''
+              ) {
                 throw new Error('PairCreated event error');
               }
               // TODO : check concurrency
               // set pair-map key
               cacheService.set(`hardhat.pair.index.${pair}`, index);
+
+              // pair property
+              cacheService.set(`hardhat.pair.property.${pair}`, {
+                token0,
+                token1,
+              });
 
               reserveObj.pair = pair;
               reserveObj.event = eventName;
