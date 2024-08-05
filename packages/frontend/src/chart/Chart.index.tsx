@@ -1,18 +1,37 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import { type Component, type JSX } from 'solid-js';
-import { createSignal, createEffect } from 'solid-js';
+import { createSignal, createEffect, onMount } from 'solid-js';
 import { type ChartProps } from './interfaces/component.interfaces';
+import { useParams } from '@solidjs/router';
+import { Spinner } from 'solid-bootstrap';
+// import {
+//   fromHeaderNavigate,
+//   setFromHeaderNavigate,
+// } from '../global/global.store';
 import {
-  getPairData,
+  // getPairData,
   getAllData,
-  getMyAllData,
-  getMyAllDataByEvent,
+  // getMyAllData,
+  // getMyAllDataByEvent,
 } from './Chart.data';
 
-import { Scatter } from 'solid-chartjs';
+// chart.js
+// import 'chart.js/auto';
+import { DefaultChart } from 'solid-chartjs';
 import {
+  Chart,
+  Title,
+  Tooltip,
+  Legend,
+  Colors,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+} from 'chart.js';
+import {
+  type ChartData,
   type ChartOptions,
-  // type ChartData,
   // Chart,
   // Title,
   // Tooltip,
@@ -21,259 +40,161 @@ import {
   // Plugin,
 } from 'chart.js';
 
-// chart.js
-import 'chart.js/auto';
-/**
- * You must register optional elements before using the chart,
- * otherwise you will have the most primitive UI
- */
-// Chart.register(Title, Tooltip, Legend, Colors);
+const [loading, setLoading] = createSignal(false);
 
-const [isCalled, setIsCalled] = createSignal(false);
+const [isNetwork, setIsNetwork] = createSignal(false);
+const [isAccount, setIsAccount] = createSignal(false);
+console.log(isNetwork(), isAccount());
 
 export const ChartIndex: Component<ChartProps> = (props): JSX.Element => {
-  const [currentChart, setCurrentChart] = createSignal('all');
-  const [currentPair, setCurrentPair] = createSignal('');
-  const [currentAccount, setCurrentAccount] = createSignal('null');
+  const params = useParams();
+
+  // const [, setMyAllData] = createSignal<any[]>([]);
+  // const [, setMyAllData2] = createSignal<any>({});
+  // const [, setMyAllOption] = createSignal<ChartOptions>({});
+
+  // const [, setMyAllDataMint] = createSignal<any[]>([]);
+  // const [, setMyAllDataMint2] = createSignal<any>({});
+  // const [, setMyAllOptionMint] = createSignal<ChartOptions>({});
+
+  // const [, setPairData] = createSignal<any[]>([]);
+  // const [pairData2, setPairData2] = createSignal<any>({});
+  // const [pairOption, setPairOption] = createSignal<ChartOptions>({});
 
   const [, setAllData] = createSignal<any[]>([]);
-  const [allData2, setAllData2] = createSignal<any>({});
-  const [allOption, setAllOption] = createSignal<ChartOptions>({});
-
-  const [, setMyAllData] = createSignal<any[]>([]);
-  const [, setMyAllData2] = createSignal<any>({});
-  const [, setMyAllOption] = createSignal<ChartOptions>({});
-
-  const [, setMyAllDataMint] = createSignal<any[]>([]);
-  const [, setMyAllDataMint2] = createSignal<any>({});
-  const [, setMyAllOptionMint] = createSignal<ChartOptions>({});
-
-  const [, setPairData] = createSignal<any[]>([]);
-  const [pairData2, setPairData2] = createSignal<any>({});
-  const [pairOption, setPairOption] = createSignal<ChartOptions>({});
+  const [allDataset, setAllDataset] = createSignal<ChartData>();
+  const [allDataOption, setAllDataOption] = createSignal<ChartOptions>();
 
   async function all(): Promise<void> {
     const { data, dataset, option } = await getAllData(
       localStorage.getItem('network') as string,
     );
     setAllData(data);
-    setAllData2(dataset);
-    setAllOption(option);
+    setAllDataset(dataset);
+    setAllDataOption(option);
 
-    setCurrentPair('');
-    setCurrentChart('all');
+    // setCurrentPair('');
+    props.handleCurrentChart('all');
+
+    setLoading(true);
   }
 
-  async function myAll(): Promise<void> {
-    const { data, dataset, option } = await getMyAllData(
-      localStorage.getItem('network') as string,
-      localStorage.getItem('address') as string,
-    );
-    setMyAllData(data);
-    setMyAllData2(dataset);
-    setMyAllOption(option);
+  // async function myAll(): Promise<void> {
+  //   const { data, dataset, option } = await getMyAllData(
+  //     localStorage.getItem('network') as string,
+  //     localStorage.getItem('address') as string,
+  //   );
+  //   setMyAllData(data);
+  //   setMyAllData2(dataset);
+  //   setMyAllOption(option);
 
-    const { data2, dataset2, option2 } = await getMyAllDataByEvent(
-      localStorage.getItem('network') as string,
-      localStorage.getItem('address') as string,
-      'Mint',
-    );
-    setMyAllDataMint(data2);
-    setMyAllDataMint2(dataset2);
-    setMyAllOptionMint(option2);
+  //   const { data2, dataset2, option2 } = await getMyAllDataByEvent(
+  //     localStorage.getItem('network') as string,
+  //     localStorage.getItem('address') as string,
+  //     'Mint',
+  //   );
+  //   setMyAllDataMint(data2);
+  //   setMyAllDataMint2(dataset2);
+  //   setMyAllOptionMint(option2);
 
-    setCurrentAccount(localStorage.getItem('address') as string);
-    setCurrentPair('');
-    setCurrentChart('all');
-  }
+  //   setCurrentAccount(localStorage.getItem('address') as string);
+  //   setCurrentPair('');
+  //   setCurrentChart('all');
+  // }
 
-  async function pair(): Promise<void> {
-    const { data, dataset, option } = await getPairData(
-      localStorage.getItem('network') as string,
-      props.currentPair,
-    );
-    setPairData(data);
-    setPairData2(dataset);
-    setPairOption(option);
+  // async function pair(): Promise<void> {
+  //   const { data, dataset, option } = await getPairData(
+  //     localStorage.getItem('network') as string,
+  //     props.currentPair,
+  //   );
+  //   setPairData(data);
+  //   setPairData2(dataset);
+  //   setPairOption(option);
 
-    setCurrentPair(props.currentPair);
-    setCurrentChart('pair');
+  //   setCurrentPair(props.currentPair);
+  //   setCurrentChart('pair');
 
-    props.handleCurrentChart('pair');
-  }
+  //   props.handleCurrentChart('pair');
+  // }
 
   createEffect(() => {
-    if (isCalled()) {
-      if ((localStorage.getItem('network') as string) !== 'null') {
-        if (props.currentChart.includes('all')) {
-          // if (!currentChart().includes('all')) {
-          // }
-          console.log('how?');
-          void all();
-          // TODO
-          if (
-            props.currentChart.includes('my') &&
-            (localStorage.getItem('address') as string) !== 'null' &&
-            currentAccount() !== (localStorage.getItem('address') as string)
-          ) {
-            void myAll();
-          }
-        }
-
-        if (props.currentChart.includes('pair')) {
-          if (!currentChart().includes('pair')) {
-            if (
-              props.currentPair !== '' &&
-              props.currentPair !== currentPair()
-            ) {
-              void pair();
-            }
-            if (
-              props.currentChart.includes('my') &&
-              (localStorage.getItem('address') as string) !== 'null' &&
-              currentAccount() !== (localStorage.getItem('address') as string)
-            ) {
-              // void allACC();
-            }
-          }
-        }
-      }
+    if (params.id === undefined) {
+      setIsNetwork(false);
+      setIsAccount(false);
     } else {
-      void all();
-      setIsCalled(true);
+      setLoading(false);
+      setIsNetwork(true);
+
+      if ((localStorage.getItem('network') as string) !== 'null') {
+        void all();
+        setIsAccount(true);
+      } else {
+        setIsAccount(false);
+      }
+
+      // if (props.currentChart.includes('all')) {
+      //   // if (!currentChart().includes('all')) {
+      //   // }
+      //   console.log('how?');
+      //   void all();
+      //   // TODO
+      //   if (
+      //     props.currentChart.includes('my') &&
+      //     (localStorage.getItem('address') as string) !== 'null' &&
+      //     currentAccount() !== (localStorage.getItem('address') as string)
+      //   ) {
+      //     void myAll();
+      //   }
+      // }
+
+      // if (props.currentChart.includes('pair')) {
+      //   if (!currentChart().includes('pair')) {
+      //     if (
+      //       props.currentPair !== '' &&
+      //       props.currentPair !== currentPair()
+      //     ) {
+      //       void pair();
+      //     }
+      //     if (
+      //       props.currentChart.includes('my') &&
+      //       (localStorage.getItem('address') as string) !== 'null' &&
+      //       currentAccount() !== (localStorage.getItem('address') as string)
+      //     ) {
+      //       // void allACC();
+      //     }
+      //   }
+      // }
     }
   });
 
+  onMount(() => {
+    Chart.register(
+      Title,
+      Tooltip,
+      Legend,
+      Colors,
+      CategoryScale,
+      LinearScale,
+      PointElement,
+      LineElement,
+    );
+  });
+
   return (
-    <div>
-      {/* <Line data={chartData} options={chartOptions} width={500} height={500} /> */}
-      {/* <DefaultChart type="line" data={chartData} options={chartOptions} /> */}
-
-      {props.currentChart.includes('all') && (
-        <>
-          {props.currentChart.includes('my') ? (
-            <>
-              {currentAccount() === 'null' ? (
-                <>
-                  <div>Please select account!</div>
-                </>
-              ) : (
-                // <>
-                //   <Scatter
-                //     type="scatter"
-                //     data={myAllData2()}
-                //     options={myAllOption()}
-                //   />
-                // </>
-
-                <>
-                  {props.currentChart.includes('Mint') && (
-                    <>
-                      <Scatter
-                        type="scatter"
-                        data={pairData2()}
-                        options={pairOption()}
-                      />
-                    </>
-                  )}
-                </>
-              )}
-            </>
-          ) : (
-            <>
-              <>
-                <Scatter
-                  type="scatter"
-                  data={allData2()}
-                  options={allOption()}
-                />
-              </>
-            </>
-          )}
-        </>
+    <>
+      {!loading() ? (
+        <div class="tw-h-full tw-flex tw-items-center tw-justify-center">
+          <Spinner animation="border" variant="info" />
+        </div>
+      ) : (
+        <div class="tw-h-full">
+          <DefaultChart
+            type="scatter"
+            data={allDataset()}
+            options={allDataOption()}
+          ></DefaultChart>
+        </div>
       )}
-
-      {props.currentChart.includes('pair') && (
-        <>
-          {currentPair() === '' ? (
-            <>
-              <div>Please select pair!</div>
-            </>
-          ) : (
-            <>
-              {props.currentChart.includes('my') ? (
-                <>
-                  {currentAccount() === 'null' ? (
-                    <>
-                      <div>Please select account!</div>
-                    </>
-                  ) : (
-                    <>
-                      {props.currentChart.includes('Mint') && (
-                        <>
-                          <Scatter
-                            type="scatter"
-                            data={pairData2()}
-                            options={pairOption()}
-                          />
-                        </>
-                      )}
-                      {props.currentChart.includes('Burn') && (
-                        <>
-                          <Scatter
-                            type="scatter"
-                            data={pairData2()}
-                            options={pairOption()}
-                          />
-                        </>
-                      )}
-                      {props.currentChart.includes('Swap') && (
-                        <>
-                          <Scatter
-                            type="scatter"
-                            data={pairData2()}
-                            options={pairOption()}
-                          />
-                        </>
-                      )}
-                    </>
-                  )}
-                </>
-              ) : (
-                <>
-                  {props.currentChart.includes('Mint') && (
-                    <>
-                      <Scatter
-                        type="scatter"
-                        data={pairData2()}
-                        options={pairOption()}
-                      />
-                    </>
-                  )}
-                  {props.currentChart.includes('Burn') && (
-                    <>
-                      <Scatter
-                        type="scatter"
-                        data={pairData2()}
-                        options={pairOption()}
-                      />
-                    </>
-                  )}
-                  {props.currentChart.includes('Swap') && (
-                    <>
-                      <Scatter
-                        type="scatter"
-                        data={pairData2()}
-                        options={pairOption()}
-                      />
-                    </>
-                  )}
-                </>
-              )}
-            </>
-          )}
-        </>
-      )}
-    </div>
+    </>
   );
 };
