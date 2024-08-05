@@ -1,6 +1,7 @@
 export interface ChartProps {
   currentChart: string;
   handleCurrentChart: (chart: string) => void;
+
   currentPair: string;
 }
 

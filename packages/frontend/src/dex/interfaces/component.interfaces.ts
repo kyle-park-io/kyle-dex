@@ -6,11 +6,22 @@ export interface PairListProps {
   handleCurrentFocusedComponent: (component: string) => void;
 }
 
+export interface PairEventListProps {
+  currentPairEvent: string;
+  handleCurrentPairEvent: (event: string) => void;
+
+  currentMyEvent: string;
+  handleCurrentMyEvent: (event: string) => void;
+}
+
 export interface PairEventProps {
   currentPair: string;
 
   currentFocusedComponent: string;
   handleCurrentFocusedComponent: (component: string) => void;
+
+  currentPairEvent: string;
+  handleCurrentPairEvent: (event: string) => void;
 }
 
 export interface ClientPairProps {
@@ -18,4 +29,7 @@ export interface ClientPairProps {
 
   currentFocusedComponent: string;
   handleCurrentFocusedComponent: (component: string) => void;
+
+  currentMyEvent: string;
+  handleCurrentMyEvent: (event: string) => void;
 }
