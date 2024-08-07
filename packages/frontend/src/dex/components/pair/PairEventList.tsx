@@ -4,15 +4,17 @@ import { type PairEventListProps } from '../../interfaces/component.interfaces';
 import { useParams } from '@solidjs/router';
 import { ButtonGroup, Button } from 'solid-bootstrap';
 
+let initialized = false;
+
 const [isNetwork, setIsNetwork] = createSignal(false);
+
+const [pairEvents, setPairEvents] = createSignal<string[]>([]);
+const [myEvents, setMyEvents] = createSignal<string[]>([]);
 
 export const PairEventList: Component<PairEventListProps> = (
   props,
 ): JSX.Element => {
   const params = useParams();
-
-  const [pairEvents, setPairEvents] = createSignal<string[]>([]);
-  const [myEvents, setMyEvents] = createSignal<string[]>([]);
 
   createEffect(() => {
     if (params.id === undefined) {
@@ -23,22 +25,26 @@ export const PairEventList: Component<PairEventListProps> = (
   });
 
   onMount(() => {
-    setPairEvents([
-      'pair-all-event',
-      'pair-event-Mint',
-      'pair-event-Burn',
-      'pair-event-Swap',
-    ]);
-    setMyEvents([
-      'my-all-event',
-      'my-event-Mint',
-      'my-event-Burn',
-      'my-event-Swap',
-      'my-pair-all-event',
-      'my-pair-event-Mint',
-      'my-pair-event-Burn',
-      'my-pair-event-Swap',
-    ]);
+    if (!initialized) {
+      setPairEvents([
+        'pair-all-event',
+        'pair-event-Mint',
+        'pair-event-Burn',
+        'pair-event-Swap',
+      ]);
+      setMyEvents([
+        'my-all-event',
+        'my-event-Mint',
+        'my-event-Burn',
+        'my-event-Swap',
+        'my-pair-all-event',
+        'my-pair-event-Mint',
+        'my-pair-event-Burn',
+        'my-pair-event-Swap',
+      ]);
+
+      initialized = true;
+    }
   });
 
   return (

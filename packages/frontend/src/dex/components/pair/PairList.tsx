@@ -6,6 +6,7 @@ import { useParams } from '@solidjs/router';
 import { getPairList } from '../../axios/Dex.axios.pair';
 import { ListGroup, ListGroupItem, Button } from 'solid-bootstrap';
 import { globalState } from '../../../global/constants';
+import { setFromPairNavigate } from '../../../global/global.store';
 import axios from 'axios';
 
 const [isNetwork, setIsNetwork] = createSignal(false);
@@ -15,19 +16,22 @@ const [isNetwork, setIsNetwork] = createSignal(false);
 const [pairExisted, setPairExisted] = createSignal(false);
 const [pairs, setPairs] = createSignal<string[]>([]);
 const [pairButtonId, setPairButtonId] = createSignal<number>(-1);
-const handlePairButtonClick = (event): void => {
-  const id = event.currentTarget.getAttribute('tabIndex');
-  if (pairButtonId() === id) {
-    setPairButtonId(-1);
-  } else {
-    setPairButtonId(id);
-  }
-};
 
 export const PairList: Component<PairListProps> = (props): JSX.Element => {
   const api = globalState.api_url;
 
   const params = useParams();
+
+  const handlePairButtonClick = (event): void => {
+    const id = event.currentTarget.getAttribute('tabIndex');
+    if (pairButtonId() === id) {
+      setPairButtonId(-1);
+      setFromPairNavigate({ value: true });
+    } else {
+      setPairButtonId(id);
+      setFromPairNavigate({ value: true });
+    }
+  };
 
   createEffect(() => {
     if (params.id === undefined) {

@@ -9,15 +9,21 @@ import { PairEventList } from './components/pair/PairEventList';
 import { PairEvent } from './components/pair/PairEvent';
 import { ClientPair } from './components/pair/ClientPair';
 
-const DexChartIndex: Component = (): JSX.Element => {
-  const [currentChart, setCurrentChart] = createSignal('all');
-  const propsHandleCurrentChart = (chart: string): void => {
-    if (chart === 'all') {
-      // setPair('');
-    }
-    setCurrentChart(chart);
-  };
+const [currentChart, setCurrentChart] = createSignal('all');
+const propsHandleCurrentChart = (chart: string): void => {
+  setCurrentChart(chart);
+};
 
+const [pair, setPair] = createSignal('');
+const propsHandleCurrentPair = (pair2: string): void => {
+  if (pair() === pair2) {
+    setPair('');
+  } else {
+    setPair(pair2);
+  }
+};
+
+const DexChartIndex: Component = (): JSX.Element => {
   // event
   const [currentPairEvent, setCurrentPairEvent] =
     createSignal('pair-all-event');
@@ -33,15 +39,6 @@ const DexChartIndex: Component = (): JSX.Element => {
     createSignal('PairList');
   const propsHandleCurrentFocusedComponent = (component: string): void => {
     setCurrentFocusedComponent(component);
-  };
-
-  const [pair, setPair] = createSignal('');
-  const propsHandleCurrentPair = (pair2: string): void => {
-    if (pair() === pair2) {
-      setPair('');
-    } else {
-      setPair(pair2);
-    }
   };
 
   return (
@@ -66,8 +63,8 @@ const DexChartIndex: Component = (): JSX.Element => {
           <Col md={6} class="tw-bg-blue-300 tw-p-4">
             <ChartIndex
               currentChart={currentChart()}
-              handleCurrentChart={propsHandleCurrentChart}
               currentPair={pair()}
+              handleCurrentChart={propsHandleCurrentChart}
             ></ChartIndex>
           </Col>
           <Col md={2} class="tw-bg-yellow-300 tw-p-4">
