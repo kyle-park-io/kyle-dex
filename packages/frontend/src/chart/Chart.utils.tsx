@@ -39,3 +39,27 @@ export const randomColors = [
   'rgba(72, 61, 139, 0.7)', // Dark Slate Blue
   'rgba(123, 104, 238, 0.7)', // Medium Slate Blue
 ];
+
+export const addDecimalPoint = (
+  value: string,
+  decimalPosition: number,
+): string => {
+  const length = value.length;
+  if (decimalPosition >= length) {
+    return '0.' + '0'.repeat(decimalPosition - length) + value;
+  } else {
+    return (
+      value.slice(0, length - decimalPosition) +
+      '.' +
+      value.slice(length - decimalPosition)
+    );
+  }
+};
+
+export const fallback = () => {
+  return (
+    <div class="tw-w-full tw-h-full tw-flex tw-items-center tw-justify-center">
+      <p>Chart is not available</p>
+    </div>
+  );
+};
