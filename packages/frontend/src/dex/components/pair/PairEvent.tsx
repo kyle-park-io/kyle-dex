@@ -463,6 +463,8 @@ export const PairEvent: Component<PairEventProps> = (props): JSX.Element => {
                   <>
                     <div class="tw-flex-grow tw-flex tw-items-center tw-justify-center">
                       해당 이벤트가 없습니다
+                      <br></br>
+                      Pair: {props.currentPair.slice(0, 10)}...
                     </div>
                   </>
                 )}

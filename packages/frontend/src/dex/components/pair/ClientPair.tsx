@@ -268,13 +268,18 @@ export const ClientPair: Component<ClientPairProps> = (props): JSX.Element => {
         setIsNetwork(true);
         if (pair !== '') {
           if ((localStorage.getItem('address') as string) !== 'null') {
-            void getPairsEvents();
             void getPairEvents();
             setIsAccount(true);
           } else {
             setIsAccount(false);
           }
         } else {
+          if ((localStorage.getItem('address') as string) !== 'null') {
+            void getPairsEvents();
+            setIsAccount(true);
+          } else {
+            setIsAccount(false);
+          }
           setPairEvents([]);
           setPairMintEvents([]);
           setPairBurnEvents([]);
@@ -1033,6 +1038,9 @@ export const ClientPair: Component<ClientPairProps> = (props): JSX.Element => {
                   <>
                     <div class="tw-flex-grow tw-flex tw-items-center tw-justify-center">
                       해당 이벤트가 없습니다
+                      <br></br>
+                      Account: {localStorage.getItem('address')?.slice(0, 10)}
+                      ...
                     </div>
                   </>
                 )}
