@@ -4,7 +4,11 @@ import { useNavigate, useLocation } from '@solidjs/router';
 import { Container, Row, Col, Nav } from 'solid-bootstrap';
 import HomeLogo from '/home.svg?url';
 import { getClientList } from '../account/Account.axios';
-import { setFromHeaderNavigate } from '../global/global.store';
+import {
+  setFromHeaderNavigate,
+  HeaderNavigateType,
+  setFromHeaderNavigate2,
+} from '../global/global.store';
 
 // css
 import './Header.css';
@@ -66,6 +70,7 @@ const Header: Component = (): JSX.Element => {
       handleAccountClick(localStorage.getItem('address') as string);
     }
     setFromHeaderNavigate({ value: true });
+    setFromHeaderNavigate2({ value: true, type: HeaderNavigateType.address });
   };
 
   // network status
@@ -97,6 +102,11 @@ const Header: Component = (): JSX.Element => {
         navigate('/dex/staking');
       }
       if (location.pathname.startsWith('/dex/chart')) {
+        setFromHeaderNavigate({ value: true });
+        setFromHeaderNavigate2({
+          value: true,
+          type: HeaderNavigateType.network,
+        });
         navigate('/dex/chart');
       }
     } else {
@@ -118,6 +128,10 @@ const Header: Component = (): JSX.Element => {
         }
         if (location.pathname.startsWith('/dex/chart')) {
           setFromHeaderNavigate({ value: true });
+          setFromHeaderNavigate2({
+            value: true,
+            type: HeaderNavigateType.network,
+          });
           navigate('/dex/chart/hardhat');
         }
       } else if (networkKey === 'sepolia') {
@@ -128,6 +142,7 @@ const Header: Component = (): JSX.Element => {
         setAccountButtonAddress('null');
         setNetwork(networkKey);
         localStorage.setItem('network', 'sepolia');
+        localStorage.setItem('address', 'null');
         if (!isMetamaskConnected()) {
           if (localStorage.getItem('isConnected') === '0') {
             if (location.pathname.startsWith('/dex/account')) {
@@ -148,6 +163,10 @@ const Header: Component = (): JSX.Element => {
         }
         if (location.pathname.startsWith('/dex/chart')) {
           setFromHeaderNavigate({ value: true });
+          setFromHeaderNavigate2({
+            value: true,
+            type: HeaderNavigateType.network,
+          });
           navigate('/dex/chart/sepolia');
         }
       } else {
@@ -158,6 +177,7 @@ const Header: Component = (): JSX.Element => {
         setAccountButtonAddress('null');
         setNetwork(networkKey);
         localStorage.setItem('network', 'amoy');
+        localStorage.setItem('address', 'null');
         if (!isMetamaskConnected()) {
           if (localStorage.getItem('isConnected') === '0') {
             if (location.pathname.startsWith('/dex/account')) {
@@ -178,6 +198,10 @@ const Header: Component = (): JSX.Element => {
         }
         if (location.pathname.startsWith('/dex/chart')) {
           setFromHeaderNavigate({ value: true });
+          setFromHeaderNavigate2({
+            value: true,
+            type: HeaderNavigateType.network,
+          });
           navigate('/dex/chart/amoy');
         }
       }
@@ -201,6 +225,10 @@ const Header: Component = (): JSX.Element => {
       }
       if (location.pathname.startsWith('/dex/chart')) {
         setFromHeaderNavigate({ value: true });
+        setFromHeaderNavigate2({
+          value: true,
+          type: HeaderNavigateType.network,
+        });
         navigate('/dex/chart/hardhat');
       }
     } else if (networkKey === 'sepolia') {
@@ -223,6 +251,10 @@ const Header: Component = (): JSX.Element => {
       }
       if (location.pathname.startsWith('/dex/chart')) {
         setFromHeaderNavigate({ value: true });
+        setFromHeaderNavigate2({
+          value: true,
+          type: HeaderNavigateType.network,
+        });
         navigate('/dex/chart/sepolia');
       }
     } else {
@@ -245,6 +277,10 @@ const Header: Component = (): JSX.Element => {
       }
       if (location.pathname.startsWith('/dex/chart')) {
         setFromHeaderNavigate({ value: true });
+        setFromHeaderNavigate2({
+          value: true,
+          type: HeaderNavigateType.network,
+        });
         navigate('/dex/chart/amoy');
       }
     }

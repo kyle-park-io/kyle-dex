@@ -14,20 +14,25 @@ const App: Component = (): JSX.Element => {
   const navigate = useNavigate();
   const handleChartClick = (): void => {
     if ((localStorage.getItem('network') as string) === 'null') {
+      setFromAppNavigate({ value: true });
       navigate('/dex/chart');
     }
     if ((localStorage.getItem('network') as string) === 'hardhat') {
+      setFromAppNavigate({ value: true });
       navigate('/dex/chart/hardhat');
     }
     if ((localStorage.getItem('network') as string) === 'sepolia') {
+      setFromAppNavigate({ value: true });
       navigate('/dex/chart/sepolia');
     }
     if ((localStorage.getItem('network') as string) === 'amoy') {
+      setFromAppNavigate({ value: true });
       navigate('/dex/chart/amoy');
     }
   };
   const handleStakingClick = (): void => {
     if ((localStorage.getItem('network') as string) === 'null') {
+      setFromAppNavigate({ value: true });
       navigate('/dex/staking');
     }
     if ((localStorage.getItem('network') as string) === 'hardhat') {

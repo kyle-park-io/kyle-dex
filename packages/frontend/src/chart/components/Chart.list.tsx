@@ -3,13 +3,16 @@ import { createSignal, createEffect, onMount, For } from 'solid-js';
 import { type ChartListProps } from '../interfaces/component.interfaces';
 import { useParams } from '@solidjs/router';
 import { ButtonGroup, Button } from 'solid-bootstrap';
+import { setFromChartListNavigate } from '../../global/global.store';
+
+let initialized = false;
 
 const [isNetwork, setIsNetwork] = createSignal(false);
 
+const [charts, setCharts] = createSignal<string[]>([]);
+
 export const ChartList: Component<ChartListProps> = (props): JSX.Element => {
   const params = useParams();
-
-  const [events, setEvents] = createSignal<string[]>([]);
 
   createEffect(() => {
     if (params.id === undefined) {
@@ -23,7 +26,11 @@ export const ChartList: Component<ChartListProps> = (props): JSX.Element => {
   });
 
   onMount(() => {
-    setEvents(['all', 'one-pair', 'my-pair']);
+    if (!initialized) {
+      setCharts(['all', 'one-pair', 'my-pair']);
+
+      initialized = true;
+    }
   });
 
   return (
@@ -37,15 +44,16 @@ export const ChartList: Component<ChartListProps> = (props): JSX.Element => {
       ) : (
         <>
           <ButtonGroup aria-label="Basic example" class="tw-flex-wrap">
-            <For each={events()}>
-              {(event) => (
+            <For each={charts()}>
+              {(chart) => (
                 <Button
                   variant="secondary"
                   onClick={() => {
-                    props.handleCurrentChart(event);
+                    props.handleCurrentChart(chart);
+                    setFromChartListNavigate({ value: true });
                   }}
                 >
-                  {event}
+                  {chart}
                 </Button>
               )}
             </For>
