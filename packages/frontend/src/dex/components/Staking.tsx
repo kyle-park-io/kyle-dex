@@ -1,25 +1,35 @@
 import { type Component, type JSX } from 'solid-js';
-import { createSignal, createEffect, onMount } from 'solid-js';
-import { useParams } from '@solidjs/router';
+import { createSignal, createEffect } from 'solid-js';
+import { Button, Spinner, CloseButton } from 'solid-bootstrap';
 import {
   fromDexNavigate,
   setFromDexNavigate,
-  fromHeaderNavigate,
-  setFromHeaderNavigate,
   fromAppNavigate,
   setFromAppNavigate,
+  HeaderNavigateType,
+  fromHeaderNavigate,
+  setFromHeaderNavigate,
 } from '../../global/global.store';
 import { getPairList, getPairCurrentReserve } from '../axios/Dex.axios.pair';
-import { getTokenContractList } from '../axios/Dex.axios.token';
-import { getFactory, calcPair } from '../axios/Dex.axios.utils';
+import {
+  getWETH,
+  getTokenContractList,
+  getRouter,
+} from '../axios/Dex.axios.token';
+import { submit, submitWithETH } from '../axios/Dex.axios.submit';
+import {
+  getFactory,
+  calcPair,
+  estimateLiquidity,
+} from '../axios/Dex.axios.utils';
 import { Container, Form, Row, Col } from 'solid-bootstrap';
 import { globalState } from '../../global/constants';
 import axios from 'axios';
 
 const notExisted = '현재 네트워크에 토큰이 존재하지 않습니다';
 
-// const [isCalled, setIsCalled] = createSignal(false);
 const [isNetwork, setIsNetwork] = createSignal(false);
+const [isAccount, setIsAccount] = createSignal(false);
 
 const [pairs, setPairs] = createSignal<any[]>([]);
 const [tokens, setTokens] = createSignal<any[]>([]);
@@ -30,7 +40,12 @@ const [tokens, setTokens] = createSignal<any[]>([]);
 export const Staking: Component = (): JSX.Element => {
   const api = globalState.api_url;
 
-  const params = useParams();
+  // loading
+  const [loading, setLoading] = createSignal(false);
+  const [reserveLoading, setReserveLoading] = createSignal(false);
+  const [calcLoading, setCalcLoading] = createSignal(false);
+  const [isCalculating, setIsCalculating] = createSignal(false);
+  const [resultLoading, setResultLoading] = createSignal(false);
 
   // reserve
   const [isReserve, setIsReserve] = createSignal(false);
@@ -45,25 +60,67 @@ export const Staking: Component = (): JSX.Element => {
     if (e.target.value === selectedTokenB()) {
       setSelectedTokenB(selectedTokenA());
       setSelectedTokenA(e.target.value);
+      setReserve({
+        reserve0: reserve().reserve1,
+        reserve1: reserve().reserve0,
+      });
     } else {
       setSelectedTokenA(e.target.value);
       setSelectedPair('');
       setGetReserve(true);
     }
+    setTokenALiquidity('');
+    setAMsg('Enter the value!');
+    setTokenBLiquidity('');
+    setBMsg('Enter the value!');
+    setTokenACalculatedLiquidity('');
+    setACalculatedLiquidity('');
+    setTokenBCalculatedLiquidity('');
+    setBCalculatedLiquidity('');
+    setResultLoading(false);
   };
   const handleTokenBChange = (e) => {
     if (e.target.value === selectedTokenA()) {
       setSelectedTokenA(selectedTokenB());
       setSelectedTokenB(e.target.value);
+      setReserve({
+        reserve0: reserve().reserve1,
+        reserve1: reserve().reserve0,
+      });
     } else {
       setSelectedTokenB(e.target.value);
       setSelectedPair('');
       setGetReserve(true);
     }
+    setTokenALiquidity('');
+    setAMsg('Enter the value!');
+    setTokenBLiquidity('');
+    setBMsg('Enter the value!');
+    setTokenACalculatedLiquidity('');
+    setACalculatedLiquidity('');
+    setTokenBCalculatedLiquidity('');
+    setBCalculatedLiquidity('');
+    setResultLoading(false);
   };
   const handlePairChange = (e) => {
+    for (let i = 0; i < pairs().length; i++) {
+      if (pairs()[i].pair === e.target.value) {
+        setSelectedTokenA(pairs()[i].tokenA);
+        setSelectedTokenB(pairs()[i].tokenB);
+        break;
+      }
+    }
     setSelectedPair(e.target.value);
     setGetReserve(true);
+    setTokenALiquidity('');
+    setAMsg('Enter the value!');
+    setTokenBLiquidity('');
+    setBMsg('Enter the value!');
+    setTokenACalculatedLiquidity('');
+    setACalculatedLiquidity('');
+    setTokenBCalculatedLiquidity('');
+    setBCalculatedLiquidity('');
+    setResultLoading(false);
   };
 
   // handle method
@@ -73,6 +130,9 @@ export const Staking: Component = (): JSX.Element => {
     const t = await getTokenContractList(api, {
       network: localStorage.getItem('network') as string,
     });
+    const w = await getWETH(api, {
+      network: localStorage.getItem('network') as string,
+    });
     if (t.length === 0) {
       setTokens([{ address: notExisted }]);
       setSelectedTokenA(notExisted);
@@ -80,13 +140,22 @@ export const Staking: Component = (): JSX.Element => {
 
       setSelectedPair(notExisted);
     } else {
-      setTokens(t);
+      setTokens([...t, { name: 'WETH', address: w }]);
       setSelectedTokenA(t[0].address);
       setSelectedTokenB(t[1].address);
 
       setSelectedPair('');
     }
     setGetReserve(true);
+    setTokenALiquidity('');
+    setAMsg('Enter the value!');
+    setTokenBLiquidity('');
+    setBMsg('Enter the value!');
+    setTokenACalculatedLiquidity('');
+    setACalculatedLiquidity('');
+    setTokenBCalculatedLiquidity('');
+    setBCalculatedLiquidity('');
+    setResultLoading(false);
   };
   const handleChangeP = async (event): Promise<void> => {
     try {
@@ -105,8 +174,17 @@ export const Staking: Component = (): JSX.Element => {
       setPairs(set);
       setSelectedPair(set[0].pair);
       setSelectedTokenA(set[0].tokenA);
-      setSelectedTokenB(set[0].tokenA);
+      setSelectedTokenB(set[0].tokenB);
       setGetReserve(true);
+      setTokenALiquidity('');
+      setAMsg('Enter the value!');
+      setTokenBLiquidity('');
+      setBMsg('Enter the value!');
+      setTokenACalculatedLiquidity('');
+      setACalculatedLiquidity('');
+      setTokenBCalculatedLiquidity('');
+      setBCalculatedLiquidity('');
+      setResultLoading(false);
     } catch (err) {
       if (axios.isAxiosError(err)) {
         if (err.response?.status === 404) {
@@ -114,34 +192,503 @@ export const Staking: Component = (): JSX.Element => {
           setSelectedPair(notExisted);
           setSelectedTokenA(notExisted);
           setSelectedTokenB(notExisted);
+          setTokenALiquidity('');
+          setAMsg('Enter the value!');
+          setTokenBLiquidity('');
+          setBMsg('Enter the value!');
+          setTokenACalculatedLiquidity('');
+          setACalculatedLiquidity('');
+          setTokenBCalculatedLiquidity('');
+          setBCalculatedLiquidity('');
+          setResultLoading(false);
         }
       }
     }
   };
 
-  // init
-  createEffect(() => {
-    if (isNetwork()) {
-      // if (!isCalled()) {
-      //   void init();
-      // }
-      if (
-        fromDexNavigate.value ||
-        fromHeaderNavigate.value ||
-        fromAppNavigate.value
-      ) {
-        void init();
+  // estimate liquidity
+  const [tokenALiquidity, setTokenALiquidity] = createSignal('');
+  const [aMsg, setAMsg] = createSignal('Enter the value!');
+  const [aBool, setABool] = createSignal(false);
+  const [tokenBLiquidity, setTokenBLiquidity] = createSignal('');
+  const [bMsg, setBMsg] = createSignal('Enter the value!');
+  const [bBool, setBBool] = createSignal(false);
+  console.log(aMsg, bMsg);
+
+  let a_bool = true;
+  let b_bool = true;
+  let currentAbortController = new AbortController();
+  let currentAbortController2 = new AbortController();
+  const handleTokenALiquidityChange = async (e) => {
+    setResultLoading(false);
+
+    const id = e.target.id;
+    const value = e.target.value;
+
+    a_bool = false;
+    currentAbortController.abort();
+    currentAbortController = new AbortController();
+    try {
+      const result = await performLiquidityTask(
+        id,
+        value,
+        currentAbortController.signal,
+      );
+      if (result) {
+        a_bool = true;
+        await calculate();
+      }
+    } catch (err) {
+      if (err instanceof Error) {
+        if (err.name === 'AbortError') {
+          console.log('Previous handleInputChange call aborted');
+        } else {
+          throw err;
+        }
       }
     }
+  };
+  const handleTokenBLiquidityChange = async (e) => {
+    setResultLoading(false);
+
+    const id = e.target.id;
+    const value = e.target.value;
+
+    b_bool = false;
+    currentAbortController2.abort();
+    currentAbortController2 = new AbortController();
+    try {
+      const result = await performLiquidityTask(
+        id,
+        value,
+        currentAbortController2.signal,
+      );
+      if (result) {
+        b_bool = true;
+        await calculate();
+      }
+    } catch (err) {
+      if (err instanceof Error) {
+        if (err.name === 'AbortError') {
+          console.log('Previous handleInputChange call aborted');
+        } else {
+          throw err;
+        }
+      }
+    }
+  };
+  const performLiquidityTask = (id: string, value: string, signal) => {
+    return new Promise((resolve, reject) => {
+      const timeoutId = setTimeout(() => {
+        switch (id) {
+          case 'aLiquidity': {
+            setAValue(value);
+            break;
+          }
+          case 'bLiquidity': {
+            setBValue(value);
+            break;
+          }
+        }
+        resolve(true);
+      }, 3000);
+
+      // cancel
+      signal.addEventListener('abort', () => {
+        clearTimeout(timeoutId);
+        reject(new DOMException('Aborted', 'AbortError'));
+      });
+    });
+  };
+  const setAValue = (value: string) => {
+    let bool2 = false;
+    if (value === '') {
+      setAMsg('Enter the value!');
+      setABool(false);
+    } else if (/^[0-9]+$/.test(value)) {
+      if (value === '0') {
+        setAMsg('Enter a value greater than 0!');
+        setABool(false);
+      } else if (!value.startsWith('0')) {
+        setAMsg("Let's calculate!");
+        bool2 = true;
+        setABool(true);
+      } else {
+        setAMsg('Invalid number format');
+        setABool(false);
+      }
+    } else {
+      setAMsg('Invalid number format');
+      setABool(false);
+    }
+    if (bool2) {
+      setTokenALiquidity(value);
+    } else {
+      // setTokenALiquidity('');
+    }
+  };
+  const setBValue = (value: string) => {
+    let bool2 = false;
+    if (value === '') {
+      setBMsg('Enter the value!');
+      setBBool(false);
+    } else if (/^[0-9]+$/.test(value)) {
+      if (value === '0') {
+        setBMsg('Enter a value greater than 0!');
+        setBBool(false);
+      } else if (!value.startsWith('0')) {
+        setBMsg("Let's calculate!");
+        bool2 = true;
+        setBBool(true);
+      } else {
+        setBMsg('Invalid number format');
+        setBBool(false);
+      }
+    } else {
+      setBMsg('Invalid number format');
+      setBBool(false);
+    }
+    if (bool2) {
+      setTokenBLiquidity(value);
+    } else {
+      // setTokenBLiquidity('');
+    }
+  };
+
+  const [tokenBCalculatedLiquidity, setTokenBCalculatedLiquidity] =
+    createSignal('');
+  const [bCalculatedLiquidity, setBCalculatedLiquidity] = createSignal('');
+  const [tokenACalculatedLiquidity, setTokenACalculatedLiquidity] =
+    createSignal('');
+  const [aCalculatedLiquidity, setACalculatedLiquidity] = createSignal('');
+
+  const calculate = async () => {
+    if (!a_bool || !b_bool) {
+      setResultLoading(true);
+      return;
+    }
+
+    setIsCalculating(true);
+    const pair = selectedPair();
+    let token0;
+    let token1;
+    let amount0;
+    let amount1;
+    let bool0 = false;
+    let bool1 = false;
+    if (
+      selectedTokenA().toLocaleLowerCase() <
+      selectedTokenB().toLocaleLowerCase()
+    ) {
+      token0 = selectedTokenA();
+      token1 = selectedTokenB();
+      amount0 = tokenALiquidity();
+      amount1 = tokenBLiquidity();
+      if (aBool()) bool0 = true;
+      if (bBool()) bool1 = true;
+    } else {
+      token0 = selectedTokenB();
+      token1 = selectedTokenA();
+      amount0 = tokenBLiquidity();
+      amount1 = tokenALiquidity();
+      if (bBool()) bool0 = true;
+      if (aBool()) bool1 = true;
+    }
+
+    if (bool0 && bool1) {
+      const r = await estimateLiquidity(api, {
+        network: localStorage.getItem('network') as string,
+        pair,
+        tokenA: token0,
+        amountA: amount0,
+        tokenB: token1,
+        amountB: amount1,
+      });
+
+      if (
+        selectedTokenA().toLocaleLowerCase() <
+        selectedTokenB().toLocaleLowerCase()
+      ) {
+        setTokenBCalculatedLiquidity(r.calc1.expected1);
+        setBCalculatedLiquidity(r.calc1.liquidity);
+        setTokenACalculatedLiquidity(r.calc0.expected0);
+        setACalculatedLiquidity(r.calc0.liquidity);
+      } else {
+        setTokenBCalculatedLiquidity(r.calc0.expected0);
+        setBCalculatedLiquidity(r.calc0.liquidity);
+        setTokenACalculatedLiquidity(r.calc1.expected1);
+        setACalculatedLiquidity(r.calc1.liquidity);
+      }
+      setIsCalculating(false);
+      setResultLoading(true);
+      return;
+    }
+    if (bool0) {
+      const r = await estimateLiquidity(api, {
+        network: localStorage.getItem('network') as string,
+        pair,
+        tokenA: token0,
+        amountA: amount0,
+      });
+
+      if (
+        selectedTokenA().toLocaleLowerCase() <
+        selectedTokenB().toLocaleLowerCase()
+      ) {
+        setTokenBCalculatedLiquidity(r.calc1.expected1);
+        setBCalculatedLiquidity(r.calc1.liquidity);
+        setTokenACalculatedLiquidity('');
+        setACalculatedLiquidity('');
+      } else {
+        setTokenACalculatedLiquidity(r.calc1.expected1);
+        setACalculatedLiquidity(r.calc1.liquidity);
+        setTokenBCalculatedLiquidity('');
+        setBCalculatedLiquidity('');
+      }
+      setIsCalculating(false);
+      setResultLoading(true);
+      return;
+    }
+    if (bool1) {
+      const r = await estimateLiquidity(api, {
+        network: localStorage.getItem('network') as string,
+        pair,
+        tokenB: token1,
+        amountB: amount1,
+      });
+
+      if (
+        selectedTokenA().toLocaleLowerCase() <
+        selectedTokenB().toLocaleLowerCase()
+      ) {
+        setTokenACalculatedLiquidity(r.calc0.expected0);
+        setACalculatedLiquidity(r.calc0.liquidity);
+        setTokenBCalculatedLiquidity('');
+        setBCalculatedLiquidity('');
+      } else {
+        setTokenBCalculatedLiquidity(r.calc0.expected0);
+        setBCalculatedLiquidity(r.calc0.liquidity);
+        setTokenACalculatedLiquidity('');
+        setACalculatedLiquidity('');
+      }
+      setIsCalculating(false);
+      setResultLoading(true);
+      return;
+    }
+    setTokenACalculatedLiquidity('');
+    setACalculatedLiquidity('');
+    setTokenBCalculatedLiquidity('');
+    setBCalculatedLiquidity('');
+    setIsCalculating(false);
+    setResultLoading(true);
+  };
+
+  // add liquidity
+  const [tokenALiquidityR, setTokenALiquidityR] = createSignal('');
+  const [aMsgR, setAMsgR] = createSignal('Enter the value!');
+  const [aBoolR, setABoolR] = createSignal(false);
+  const [tokenBLiquidityR, setTokenBLiquidityR] = createSignal('');
+  const [bMsgR, setBMsgR] = createSignal('Enter the value!');
+  const [bBoolR, setBBoolR] = createSignal(false);
+  console.log(aMsgR, bMsgR);
+
+  const handleTokenLiquidityRChange = async (e) => {
+    const id = e.target.id;
+    const value = e.target.value;
+
+    switch (id) {
+      case 'aLiquidityR': {
+        setAValueR(value);
+        break;
+      }
+      case 'bLiquidityR': {
+        setBValueR(value);
+        break;
+      }
+    }
+  };
+  const setAValueR = (value: string) => {
+    if (value === '') {
+      setAMsgR('Enter the value!');
+      setABoolR(false);
+    } else if (/^[0-9]+$/.test(value)) {
+      if (value === '0') {
+        setAMsgR('Enter a value greater than 0!');
+        setABoolR(false);
+      } else if (!value.startsWith('0')) {
+        setAMsgR("Let's inject!");
+        setTokenALiquidityR(value);
+        setABoolR(true);
+      } else {
+        setAMsgR('Invalid number format');
+        setABoolR(false);
+      }
+    } else {
+      setAMsgR('Invalid number format');
+      setABoolR(false);
+    }
+  };
+  const setBValueR = (value: string) => {
+    if (value === '') {
+      setBMsgR('Enter the value!');
+      setBBoolR(false);
+    } else if (/^[0-9]+$/.test(value)) {
+      if (value === '0') {
+        setBMsgR('Enter a value greater than 0!');
+        setBBoolR(false);
+      } else if (!value.startsWith('0')) {
+        setBMsgR("Let's inject!");
+        setTokenBLiquidityR(value);
+        setBBoolR(true);
+      } else {
+        setBMsgR('Invalid number format');
+        setBBoolR(false);
+      }
+    } else {
+      setBMsgR('Invalid number format');
+      setBBoolR(false);
+    }
+  };
+  const [lmodal, setLModal] = createSignal(false);
+  const handleSubmit = () => {
+    if (aBoolR() && bBoolR()) {
+      setLModal(true);
+    }
+  };
+  const handleCancel = () => {
+    setLModal(false);
+  };
+  const handleSubmitR = async () => {
+    // submit
+    const network = localStorage.getItem('network') as string;
+    const address = localStorage.getItem('address') as string;
+    const router = await getRouter(api, { network });
+
+    if (selectedTokenA() === globalState.hardhat_weth_address) {
+      console.log('with eth test A');
+      const result = await submitWithETH(api, {
+        userAddress: address,
+        contractAddress: router,
+        function: 'addLiquidityETH',
+        args: [selectedTokenB(), tokenBLiquidityR(), '0', '0', address, 0],
+        eth: tokenALiquidityR(),
+      });
+      console.log(result);
+    } else if (selectedTokenB() === globalState.hardhat_weth_address) {
+      console.log('with eth test B');
+      const result = await submitWithETH(api, {
+        userAddress: address,
+        contractAddress: router,
+        function: 'addLiquidityETH',
+        args: [selectedTokenA(), tokenALiquidityR(), '0', '0', address, 0],
+        eth: tokenBLiquidityR(),
+      });
+      console.log(result);
+    } else {
+      console.log('basic test');
+      const result = await submit(api, {
+        userAddress: address,
+        contractAddress: router,
+        function: 'addLiquidity',
+        args: [
+          selectedTokenA(),
+          selectedTokenB(),
+          tokenALiquidityR(),
+          tokenBLiquidityR(),
+          '0',
+          '0',
+          address,
+          0,
+        ],
+      });
+      console.log(result);
+    }
+  };
+
+  // init
+  createEffect(() => {
+    const fn = async () => {
+      const network = localStorage.getItem('network') as string;
+      const address = localStorage.getItem('address') as string;
+
+      if (fromDexNavigate.value) {
+        if (network === 'null') {
+          setIsNetwork(false);
+          setFromDexNavigate({ value: false });
+          return;
+        }
+
+        setIsNetwork(true);
+        setLoading(false);
+        setCalcLoading(false);
+        await init();
+        setFromDexNavigate({ value: false });
+        setLoading(true);
+        setCalcLoading(true);
+        return;
+      }
+      if (fromAppNavigate.value) {
+        if (network === 'null') {
+          setIsNetwork(false);
+          setFromAppNavigate({ value: false });
+          return;
+        }
+
+        setIsNetwork(true);
+        setLoading(false);
+        setCalcLoading(false);
+        await init();
+        setFromAppNavigate({ value: false });
+        setLoading(true);
+        setCalcLoading(true);
+        return;
+      }
+      if (fromHeaderNavigate.value) {
+        if (network === 'null') {
+          setIsNetwork(false);
+          setFromHeaderNavigate({ value: false, type: '' });
+          return;
+        }
+
+        if (fromHeaderNavigate.type === HeaderNavigateType.address) {
+          if (address === 'null') {
+            setIsAccount(false);
+          } else {
+            setIsAccount(true);
+          }
+          setFromHeaderNavigate({ value: false, type: '' });
+          return;
+        } else {
+          if (address === 'null') {
+            setIsAccount(false);
+          } else {
+            setIsAccount(true);
+          }
+
+          setIsNetwork(true);
+          setLoading(false);
+          setCalcLoading(false);
+          await init();
+          setFromHeaderNavigate({ value: false });
+          setLoading(true);
+          setCalcLoading(true);
+          return;
+        }
+      }
+    };
+    void fn();
   });
   const init = async (): Promise<void> => {
-    // setIsCalled(true);
-
     if (method() === 't') {
       // token list
       const t = await getTokenContractList(api, {
         network: localStorage.getItem('network') as string,
       });
+      // WETH
+      const w = await getWETH(api, {
+        network: localStorage.getItem('network') as string,
+      });
+
       if (t.length === 0) {
         setTokens([{ address: notExisted }]);
         setSelectedTokenA(notExisted);
@@ -149,7 +696,7 @@ export const Staking: Component = (): JSX.Element => {
 
         setSelectedPair(notExisted);
       } else {
-        setTokens(t);
+        setTokens([...t, { name: 'WETH', address: w }]);
         setSelectedTokenA(t[0].address);
         setSelectedTokenB(t[1].address);
 
@@ -185,10 +732,6 @@ export const Staking: Component = (): JSX.Element => {
       }
     }
     setGetReserve(true);
-
-    setFromDexNavigate({ value: false });
-    setFromHeaderNavigate({ value: false });
-    setFromAppNavigate({ value: false });
   };
 
   // pair effect
@@ -205,6 +748,8 @@ export const Staking: Component = (): JSX.Element => {
         setIsReserve(false);
         return;
       }
+
+      setReserveLoading(false);
       if (pair === '') {
         const factory = await getFactory(api, {
           network: localStorage.getItem('network') as string,
@@ -226,30 +771,28 @@ export const Staking: Component = (): JSX.Element => {
         network: localStorage.getItem('network') as string,
         pairAddress: pair,
       });
-      setReserve(r.eventData);
+      if (
+        selectedTokenA().toLocaleLowerCase() <
+        selectedTokenB().toLocaleLowerCase()
+      ) {
+        setReserve(r.eventData);
+      } else {
+        setReserve({
+          reserve0: r.eventData.reserve1,
+          reserve1: r.eventData.reserve0,
+        });
+      }
       setIsReserve(true);
+      setReserveLoading(true);
     } catch (err) {
       if (axios.isAxiosError(err)) {
         if (err.response?.status === 404) {
           setIsReserve(false);
+          setReserveLoading(true);
         }
       }
     }
   };
-
-  // network
-  onMount(() => {
-    if ((localStorage.getItem('network') as string) !== 'null') {
-      setIsNetwork(true);
-    }
-  });
-  createEffect(() => {
-    if (params.id === undefined) {
-      setIsNetwork(false);
-    } else {
-      setIsNetwork(true);
-    }
-  });
 
   return (
     <>
@@ -264,85 +807,240 @@ export const Staking: Component = (): JSX.Element => {
           <>
             <Row>
               <Col md={4}>
-                <Form.Group>
-                  <Form.Label>Method</Form.Label>
-                  <Form.Check
-                    checked
-                    name="method"
-                    type="radio"
-                    label="Select Tokens"
-                    value="t"
-                    onChange={handleChangeT}
-                  />
-                  <Form.Check
-                    name="method"
-                    type="radio"
-                    label="Select Pair"
-                    value="p"
-                    onChange={handleChangeP}
-                  />
-                </Form.Group>
-                <Form.Group>
-                  {method() === 't' ? (
-                    <>
-                      <Form.Label>Token A</Form.Label>
-                      <Form.Select
-                        aria-label="Select Token A"
-                        onChange={handleTokenAChange}
-                        value={selectedTokenA()}
-                      >
-                        {tokens().map((token) => (
-                          <option value={token.address}>{token.address}</option>
-                        ))}
-                      </Form.Select>
-                      <Form.Label>Token B</Form.Label>
-                      <Form.Select
-                        aria-label="Select Token B"
-                        onChange={handleTokenBChange}
-                        value={selectedTokenB()}
-                      >
-                        {tokens()
-                          // .filter((token) => token.address !== selectedTokenA())
-                          .map((token) => (
-                            <option value={token.address}>
-                              {token.address}
-                            </option>
-                          ))}
-                      </Form.Select>
-                    </>
-                  ) : (
-                    <>
-                      <Form.Label>Pair</Form.Label>
-                      <Form.Select
-                        aria-label="Select Pair"
-                        onChange={handlePairChange}
-                        value={selectedPair()}
-                      >
-                        {pairs().map((pair) => (
-                          <option value={pair.pair}>{pair.pair}</option>
-                        ))}
-                      </Form.Select>
-                    </>
-                  )}
-                </Form.Group>
-              </Col>
-              <Col md={4}>
-                {isReserve() ? (
-                  <>
-                    <ul class="list-unstyled">
-                      <li>토큰은 이름순으로 정렬되어 보여집니다</li>
-                      <li>pair: {selectedPair()}</li>
-                      <li>tokenA: {selectedTokenA()}</li>
-                      <li>tokenB: {selectedTokenB()}</li>
-                      <li>reserveA: {reserve().reserve0}</li>
-                      <li>reserveB: {reserve().reserve1}</li>
-                    </ul>
-                  </>
+                {!loading() ? (
+                  <div class="tw-h-full tw-flex tw-items-center tw-justify-center">
+                    <Spinner animation="border" variant="info" />
+                  </div>
                 ) : (
-                  <>Check Pair</>
+                  <>
+                    <Form.Group>
+                      <Form.Label>Method</Form.Label>
+                      <Form.Check
+                        checked
+                        name="method"
+                        type="radio"
+                        label="Select Tokens"
+                        value="t"
+                        onChange={handleChangeT}
+                      />
+                      <Form.Check
+                        name="method"
+                        type="radio"
+                        label="Select Pair"
+                        value="p"
+                        onChange={handleChangeP}
+                      />
+                    </Form.Group>
+                    <div>cf. WETH: {globalState.hardhat_weth_address}</div>
+                    <br></br>
+                    <Form.Group>
+                      {method() === 't' ? (
+                        <>
+                          <Form.Label>token A</Form.Label>
+                          <Form.Select
+                            aria-label="Select token A"
+                            onChange={handleTokenAChange}
+                            value={selectedTokenA()}
+                          >
+                            {tokens().map((token) => (
+                              <option value={token.address}>
+                                {token.address}
+                              </option>
+                            ))}
+                          </Form.Select>
+                          <Form.Label>token B</Form.Label>
+                          <Form.Select
+                            aria-label="Select token B"
+                            onChange={handleTokenBChange}
+                            value={selectedTokenB()}
+                          >
+                            {tokens()
+                              // .filter((token) => token.address !== selectedTokenA())
+                              .map((token) => (
+                                <option value={token.address}>
+                                  {token.address}
+                                </option>
+                              ))}
+                          </Form.Select>
+                        </>
+                      ) : (
+                        <>
+                          <Form.Label>Pair</Form.Label>
+                          <Form.Select
+                            aria-label="Select Pair"
+                            onChange={handlePairChange}
+                            value={selectedPair()}
+                          >
+                            {pairs().map((pair) => (
+                              <option value={pair.pair}>{pair.pair}</option>
+                            ))}
+                          </Form.Select>
+                        </>
+                      )}
+                    </Form.Group>
+                  </>
                 )}
               </Col>
-              <Col md={4}>Submit</Col>
+              <Col md={4}>
+                {!reserveLoading() ? (
+                  <div class="tw-h-full tw-flex tw-items-center tw-justify-center">
+                    <Spinner animation="border" variant="info" />
+                  </div>
+                ) : (
+                  <>
+                    {isReserve() ? (
+                      <>
+                        <ul class="list-unstyled">
+                          <li>pair: {selectedPair()}</li>
+                          <li>
+                            {selectedTokenA() ===
+                            globalState.hardhat_weth_address ? (
+                              <>tokenA: {selectedTokenA()} (WETH)</>
+                            ) : (
+                              <>tokenA: {selectedTokenA()}</>
+                            )}
+                          </li>
+                          <li>
+                            {selectedTokenB() ===
+                            globalState.hardhat_weth_address ? (
+                              <>tokenB: {selectedTokenB()} (WETH)</>
+                            ) : (
+                              <>tokenB: {selectedTokenB()}</>
+                            )}
+                          </li>
+                          <li>reserveA: {reserve().reserve0}</li>
+                          <li>reserveB: {reserve().reserve1}</li>
+                        </ul>
+                      </>
+                    ) : (
+                      <div class="tw-h-full tw-flex tw-items-center tw-justify-center">
+                        Check Pair
+                      </div>
+                    )}
+                  </>
+                )}
+              </Col>
+              <Col md={4}>
+                {!calcLoading() ? (
+                  <div class="tw-h-full tw-flex tw-items-center tw-justify-center">
+                    <Spinner animation="border" variant="info" />
+                  </div>
+                ) : (
+                  <>
+                    <Form.Group>
+                      <Form.Label>Estimate Liquidity</Form.Label>
+                      <br></br>
+
+                      <Form.Label>token A</Form.Label>
+                      <Form.Control
+                        id="aLiquidity"
+                        value={tokenALiquidity()}
+                        onInput={handleTokenALiquidityChange}
+                        placeholder="Please enter the liquidity to be injected"
+                      ></Form.Control>
+
+                      <Form.Label>token B</Form.Label>
+                      <Form.Control
+                        id="bLiquidity"
+                        value={tokenBLiquidity()}
+                        onInput={handleTokenBLiquidityChange}
+                        placeholder="Please enter the liquidity to be injected"
+                      ></Form.Control>
+                    </Form.Group>
+
+                    <>
+                      {lmodal() && (
+                        <>
+                          <div class="tw-fixed tw-top-1/2 tw-left-1/2 tw-transform tw--translate-x-1/2 tw--translate-y-1/2 tw-z-50">
+                            <CloseButton onClick={handleCancel}></CloseButton>
+                            <pre class="tw-bg-white tw-whitespace-pre-wrap">
+                              <p>!Please check one more</p>
+                              <p>pair: {selectedPair()}</p>
+                              <p>tokenA: {selectedTokenA()}</p>
+                              <p>tokenB: {selectedTokenB()}</p>
+                              <p>amountA: {tokenALiquidityR()}</p>
+                              <p>amountB: {tokenBLiquidityR()}</p>
+                              <Button onClick={handleSubmitR}>Submit</Button>
+                              <Button onClick={handleCancel}>Cancel</Button>
+                            </pre>
+                          </div>
+                        </>
+                      )}
+                    </>
+                  </>
+                )}
+              </Col>
+              <Col md={4}>
+                <>
+                  {!isAccount() ? (
+                    <div class="tw-w-full tw-h-full tw-flex tw-items-center tw-justify-center">
+                      Select account please!
+                    </div>
+                  ) : (
+                    <>
+                      <Form.Group>
+                        <Form.Label>Add Liquidity</Form.Label>
+                        <br></br>
+
+                        <Form.Label>token A</Form.Label>
+                        <Form.Control
+                          id="aLiquidityR"
+                          value={tokenALiquidityR()}
+                          onChange={handleTokenLiquidityRChange}
+                          placeholder="Please enter the liquidity to be injected"
+                        ></Form.Control>
+
+                        <Form.Label>token B</Form.Label>
+                        <Form.Control
+                          id="bLiquidityR"
+                          value={tokenBLiquidityR()}
+                          onChange={handleTokenLiquidityRChange}
+                          placeholder="Please enter the liquidity to be injected"
+                        ></Form.Control>
+                      </Form.Group>
+                      <Button onClick={handleSubmit}>Submit</Button>
+                    </>
+                  )}
+                </>
+              </Col>
+              <Col md={8}>
+                {!resultLoading() ? (
+                  <>
+                    {isCalculating() ? (
+                      <>
+                        <div class="tw-h-full tw-flex tw-items-center tw-justify-center">
+                          <Spinner animation="border" variant="info" />
+                          계산 중
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <div class="tw-h-full tw-flex tw-items-center tw-justify-center">
+                          <Spinner animation="border" variant="info" />
+                          계산 대기 중
+                        </div>
+                      </>
+                    )}
+                  </>
+                ) : (
+                  <div class="tw-h-full tw-w-full tw-flex">
+                    <div class="tw-flex1">
+                      tokenA를 {tokenALiquidity()}만큼 투입시키고 싶다면
+                      <br />
+                      tokenB는 최소 {tokenBCalculatedLiquidity()}만큼이 필요하고
+                      <br />
+                      이에 따른 유동성 보상은 {bCalculatedLiquidity()} 입니다
+                    </div>
+                    <div class="tw-flex1">
+                      tokenB를 {tokenBLiquidity()}만큼 투입시키고 싶다면
+                      <br />
+                      tokenA는 최소 {tokenACalculatedLiquidity()}만큼이 필요하고
+                      <br />
+                      이에 따른 유동성 보상은 {aCalculatedLiquidity()} 입니다
+                    </div>
+                  </div>
+                )}
+              </Col>
             </Row>
           </>
         )}
