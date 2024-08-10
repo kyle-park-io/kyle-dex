@@ -19,6 +19,7 @@ import {
   ApiInternalServerErrorResponse, // 500
 } from '@nestjs/swagger';
 // dto
+import { NetworkType2 } from '../network/dto/network.request';
 import { ClientDto } from './dto/client.request';
 import { ResponseClientDto } from './dto/client.response';
 import { constants } from '../../constants/constants';
@@ -38,6 +39,10 @@ export class ClientController {
     summary: 'getClientList',
     description: 'getClientList',
   })
+  @ApiQuery({
+    name: 'network',
+    enum: NetworkType2,
+  })
   @ApiOkResponse({
     description: 'getClientList success',
     // type:
@@ -45,7 +50,7 @@ export class ClientController {
   @ApiInternalServerErrorResponse({
     description: 'Internal server error',
   })
-  getClientList(): any {
+  getClientList(@Query('network') network: NetworkType2): any {
     try {
       return this.hardhatClientService.getClientList();
     } catch (err) {
