@@ -1,4 +1,4 @@
-import { onMount, type Component, type JSX } from 'solid-js';
+import { type Component, type JSX } from 'solid-js';
 import { createSignal, createEffect, For } from 'solid-js';
 import { type ClientPairProps } from '../../interfaces/component.interfaces';
 import { useParams } from '@solidjs/router';
@@ -373,19 +373,46 @@ export const ClientPair: Component<ClientPairProps> = (props): JSX.Element => {
     }
   }
 
-  onMount(() => {
-    if (params.id === undefined) {
-      setIsNetwork(false);
-      setIsAccount(false);
-    } else {
-      setIsNetwork(true);
-      if ((localStorage.getItem('address') as string) !== 'null') {
-        void getPairsEvents();
+  createEffect(() => {
+    const fn = async () => {
+      const network = localStorage.getItem('network') as string;
+      const address = localStorage.getItem('address') as string;
+
+      if (fromHeaderNavigate.value) {
+        if (network === 'null') {
+          setIsNetwork(false);
+          setIsAccount(false);
+          setCurrentEvent('');
+          setFromHeaderNavigate({ value: false, type: '' });
+          return;
+        }
+
+        setIsNetwork(true);
+        if (address === 'null') {
+          setIsAccount(false);
+
+          setPairsEvents([]);
+          setPairsMintEvents([]);
+          setPairsBurnEvents([]);
+          setPairsSwapEvents([]);
+          setPairsEventCount(0);
+          setPairsMintEventCount(0);
+          setPairsSwapEventCount(0);
+          setPairsBurnEventCount(0);
+          setEventExisted(false);
+          setCurrentEvent('');
+
+          setFromHeaderNavigate({ value: false, type: '' });
+          return;
+        }
+
+        await getPairsEvents();
         setIsAccount(true);
-      } else {
-        setIsAccount(false);
+        setCurrentEvent('my-all-event');
+        setFromHeaderNavigate({ value: false, type: '' });
       }
-    }
+    };
+    void fn();
   });
   async function getPairsEvents(): Promise<void> {
     try {

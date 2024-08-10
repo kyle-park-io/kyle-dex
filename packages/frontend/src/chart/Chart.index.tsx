@@ -8,6 +8,8 @@ import {
   setFromChartListNavigate,
   fromPairNavigate,
   setFromPairNavigate,
+  fromDexNavigate,
+  setFromDexNavigate,
   fromAppNavigate,
   setFromAppNavigate,
   HeaderNavigateType,
@@ -131,8 +133,6 @@ export const ChartIndex: Component<ChartProps> = (props): JSX.Element => {
         ...registerables,
       );
       initialized = true;
-    } else {
-      setLoading(true);
     }
   });
 
@@ -200,10 +200,25 @@ export const ChartIndex: Component<ChartProps> = (props): JSX.Element => {
         setLoading(true);
         return;
       }
+      if (fromDexNavigate.value) {
+        if (network === 'null') {
+          setIsNetwork(false);
+          setFromDexNavigate({ value: false });
+          return;
+        }
+
+        setIsNetwork(true);
+        setLoading(false);
+        await all();
+        props.handleCurrentChart('all');
+        setFromDexNavigate({ value: false });
+        setLoading(true);
+        return;
+      }
       if (fromAppNavigate.value) {
         if (network === 'null') {
-          setFromAppNavigate({ value: false });
           setIsNetwork(false);
+          setFromAppNavigate({ value: false });
           return;
         }
 
