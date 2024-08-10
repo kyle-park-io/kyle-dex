@@ -11,7 +11,7 @@ import { type RpcService } from './interfaces/rpc.interface';
 import { ContractService } from '../contract/contract.service';
 import { FsService } from '../utils/fs.service';
 import { type ContractConfig } from '../contract/interfaces/contract.interface';
-import { type TokenContractType } from './types/types';
+import { type ContractType, type TokenContractType } from './types/types';
 import { ethers, JsonRpcProvider, Interface, type Contract } from 'ethers';
 import { setTimeout } from 'timers/promises';
 
@@ -32,6 +32,7 @@ export class HardhatRpcService implements RpcService, OnModuleInit {
   private readonly contractAddressMap: Map<string, string>;
   private readonly contractEventListByAddressMap: Map<string, string[]>;
   // array
+  private readonly currentDeployedContractList: ContractType[];
   private readonly tokenContractList: TokenContractType[];
 
   constructor(
@@ -47,6 +48,7 @@ export class HardhatRpcService implements RpcService, OnModuleInit {
     this.contractNameMap = new Map<string, string>();
     this.contractAddressMap = new Map<string, string>();
     this.contractEventListByAddressMap = new Map<string, string[]>();
+    this.currentDeployedContractList = [];
     this.tokenContractList = [];
 
     const http = this.configService.get<string>(
@@ -110,6 +112,10 @@ export class HardhatRpcService implements RpcService, OnModuleInit {
     return this.contractService.getContractList();
   }
 
+  getCurrentDeployedContractList(): ContractType[] {
+    return this.currentDeployedContractList;
+  }
+
   getTokenContractList(): TokenContractType[] {
     return this.tokenContractList;
   }
@@ -142,28 +148,6 @@ export class HardhatRpcService implements RpcService, OnModuleInit {
       throw err;
     }
   }
-
-  setContract = (name: string, address: string): void => {
-    const checkContract = this.getContractByName(name);
-    if (checkContract === undefined) {
-      throw new Error(`${name} contract is not existed`);
-    }
-    const interface2 = this.getContractInterfaceByName(name);
-    if (interface2 === undefined) {
-      throw new Error(`${name} contract is not existed`);
-    }
-
-    const contract = new ethers.Contract(address, interface2, this.provider);
-    this.interfaceByAddressMap.set(address, interface2);
-    this.contractByAddressMap.set(address, contract);
-    this.contractNameMap.set(address, name);
-    this.contractAddressMap.set(name, address);
-
-    const eventList = this.getContractEventList(name, undefined);
-    if (eventList !== undefined) {
-      this.contractEventListByAddressMap.set(address, eventList);
-    }
-  };
 
   async initConnectNetwork(): Promise<void> {
     try {
@@ -204,7 +188,8 @@ export class HardhatRpcService implements RpcService, OnModuleInit {
     if (contractsList !== undefined) {
       try {
         for (const value of contractsList) {
-          if (value.name === 'Pair' || value.name === 'Token') continue;
+          if (value.name === 'Token') continue;
+          if (value.name === 'Pair') continue;
           if (value.address === null) continue;
 
           const abi = await this.fsService.getAbi(value.name);
@@ -218,6 +203,10 @@ export class HardhatRpcService implements RpcService, OnModuleInit {
           this.contractByAddressMap.set(value.address, contract);
           this.contractNameMap.set(value.address, value.name);
           this.contractAddressMap.set(value.name, value.address);
+          this.currentDeployedContractList.push({
+            name: value.name,
+            address: value.address,
+          });
 
           // token
           if (value.name.includes('token')) {
@@ -242,6 +231,37 @@ export class HardhatRpcService implements RpcService, OnModuleInit {
       }
     }
   }
+
+  addNewContract = (name: string, address: string): void => {
+    try {
+      const checkContract = this.getContractByName(name);
+      if (checkContract === undefined) {
+        throw new Error(`${name} contract is not existed`);
+      }
+      const interface2 = this.getContractInterfaceByName(name);
+      if (interface2 === undefined) {
+        throw new Error(`${name} contract is not existed`);
+      }
+
+      const contract = new ethers.Contract(address, interface2, this.provider);
+      this.interfaceByAddressMap.set(address, interface2);
+      this.contractByAddressMap.set(address, contract);
+      this.contractNameMap.set(address, name);
+      this.contractAddressMap.set(name, address);
+      this.currentDeployedContractList.push({
+        name,
+        address,
+      });
+
+      const eventList = this.getContractEventList(name, undefined);
+      if (eventList !== undefined) {
+        this.contractEventListByAddressMap.set(address, eventList);
+      }
+    } catch (err) {
+      this.logger.error(err);
+      throw err;
+    }
+  };
 
   async initializeAsync(): Promise<void> {
     await this.contractService.getInitializationPromise();
