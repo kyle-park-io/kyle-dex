@@ -14,6 +14,7 @@ import {
 import { type ResponseTokensDto } from './dto/pair.response';
 import { type ProcessContractDto } from '../../blockChain/common/dto/common.dto';
 import { ZeroAddress } from 'ethers';
+import { isNumberString } from 'class-validator';
 
 @Injectable()
 export class PairService {
@@ -56,11 +57,11 @@ export class PairService {
       if (typeof cache === 'string') {
         const pairList = JSON.parse(cache);
         for (let i = 0; i < pairList.length; i++) {
-          if (pairList[i].pair === dto.pairAddress) {
+          if (pairList[i].eventData.pair === dto.pairAddress) {
             const obj: ResponseTokensDto = {
-              pair: dto.pairAddress,
-              tokenA: pairList[i].token0,
-              tokenB: pairList[i].token1,
+              pair: pairList[i].eventData.pair,
+              tokenA: pairList[i].eventData.token0,
+              tokenB: pairList[i].eventData.token1,
             };
             return obj;
           }
@@ -93,36 +94,75 @@ export class PairService {
         function: 'totalSupply',
         args: [],
       });
+      // token
+      const token0 = await this.commonService.query({
+        network: dto.network,
+        userAddress: ZeroAddress,
+        contractAddress: dto.pair,
+        function: 'token0',
+        args: [],
+      });
+      const token1 = await this.commonService.query({
+        network: dto.network,
+        userAddress: ZeroAddress,
+        contractAddress: dto.pair,
+        function: 'token1',
+        args: [],
+      });
 
       if (dto.tokenA !== undefined && dto.amountA !== undefined) {
-        const calcB =
+        if (token0.token0 !== dto.tokenA) {
+          throw new Error(
+            `token0 is not matched with tokenA\ntoken0: ${token0.token0}\ntokenA: ${dto.tokenA}`,
+          );
+        }
+        if (
+          !isNumberString(dto.amountA) ||
+          BigInt(dto.amountA) <= BigInt('0')
+        ) {
+          throw new Error(`check amountA: ${dto.amountA}`);
+        }
+
+        const calc1 =
           (BigInt(dto.amountA) * BigInt(reserve._reserve1)) /
           BigInt(reserve._reserve0);
-        const liquidityA =
+        const liquidity0 =
           (BigInt(dto.amountA) * BigInt(totalSupply.totalSupply)) /
           BigInt(reserve._reserve0);
-        const liquidityB =
-          (calcB * BigInt(totalSupply.totalSupply)) / BigInt(reserve._reserve1);
-        const liquidity = liquidityA < liquidityB ? liquidityA : liquidityB;
-        result.calcB = {
-          actualA: dto.amountA,
-          expectedB: calcB.toString(),
+        const liquidity1 =
+          (calc1 * BigInt(totalSupply.totalSupply)) / BigInt(reserve._reserve1);
+        const liquidity = liquidity0 < liquidity1 ? liquidity0 : liquidity1;
+        result.calc1 = {
+          actual0: dto.amountA,
+          expected1: calc1.toString(),
           liquidity: liquidity.toString(),
         };
       }
       if (dto.tokenB !== undefined && dto.amountB !== undefined) {
-        const calcA =
+        if (token1.token1 !== dto.tokenB) {
+          throw new Error(
+            `token1 is not matched with tokenB\ntoken1: ${token1.token1}\ntokenB: ${dto.tokenB}`,
+          );
+        }
+        if (
+          !isNumberString(dto.amountB) ||
+          BigInt(dto.amountB) <= BigInt('0')
+        ) {
+          throw new Error(`check amountB: ${dto.amountB}`);
+        }
+
+        const calc0 =
           (BigInt(dto.amountB) * BigInt(reserve._reserve0)) /
           BigInt(reserve._reserve1);
-        const liquidityB =
+        const liquidity1 =
           (BigInt(dto.amountB) * BigInt(totalSupply.totalSupply)) /
           BigInt(reserve._reserve1);
-        const liquidityA =
-          (calcA * BigInt(totalSupply.totalSupply)) / BigInt(reserve._reserve0);
-        const liquidity = liquidityA < liquidityB ? liquidityA : liquidityB;
-        result.calcA = {
-          actualB: dto.amountB,
-          expectedA: calcA.toString(),
+        const liquidity0 =
+          (calc0 * BigInt(totalSupply.totalSupply)) / BigInt(reserve._reserve0);
+        const liquidity = liquidity0 < liquidity1 ? liquidity0 : liquidity1;
+        result.calc0 = {
+          actual1: dto.amountB,
+          expected0: calc0.toString(),
           liquidity: liquidity.toString(),
         };
       }
