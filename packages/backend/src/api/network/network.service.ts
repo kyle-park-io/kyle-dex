@@ -2,6 +2,7 @@ import { Inject, Injectable, LoggerService } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { RpcService } from '../../blockChain/rpc/interfaces/rpc.interface';
+import { HardhatEventListenerService } from '../../blockChain/listener/event-listener/event-listener.hardhat.service';
 // dto
 import { NetworkType } from './dto/network.request';
 import { type JsonRpcProvider } from 'ethers';
@@ -21,6 +22,8 @@ export class NetworkService {
     private readonly sepoliaRpcService: RpcService,
     @Inject('AmoyRpc')
     private readonly amoyRpcService: RpcService,
+    @Inject('HardhatEventListener')
+    private readonly hardhatEventListenerService: HardhatEventListenerService,
   ) {}
 
   getNetwork(network: NetworkType): JsonRpcProvider {
@@ -50,6 +53,28 @@ export class NetworkService {
           break;
         case NetworkType.amoy:
           await this.amoyRpcService.reconnectNetwork();
+          break;
+        default:
+          return 'wrong network';
+      }
+      return 'true';
+    } catch (err) {
+      this.logger.error(err);
+      throw err;
+    }
+  }
+
+  async reconnectEventListener(network: NetworkType): Promise<string> {
+    try {
+      switch (network) {
+        case NetworkType.hardhat:
+          await this.hardhatEventListenerService.reconnectRpc();
+          break;
+        case NetworkType.sepolia:
+          await this.hardhatEventListenerService.reconnectRpc();
+          break;
+        case NetworkType.amoy:
+          await this.hardhatEventListenerService.reconnectRpc();
           break;
         default:
           return 'wrong network';

@@ -84,4 +84,30 @@ export class NetworkController {
       throw err;
     }
   }
+
+  @Get('reconnectEventListener')
+  @Header('Content-Type', 'text/plain')
+  @ApiProduces('text/plain')
+  @ApiOperation({
+    summary: 'reconnectEventListener',
+    description: 'reconnectEventListener',
+  })
+  @ApiQuery({
+    name: 'network',
+    enum: NetworkType,
+  })
+  @ApiOkResponse({
+    description: 'reconnect event-listener success',
+    type: String,
+  })
+  async reconnectEventListener(
+    @Query('network') network: NetworkType,
+  ): Promise<string> {
+    try {
+      return await this.networkService.reconnectEventListener(network);
+    } catch (err) {
+      console.error(err);
+      throw err;
+    }
+  }
 }

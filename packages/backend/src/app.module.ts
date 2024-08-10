@@ -49,8 +49,6 @@ import path from 'path';
     // global
     UtilsModule,
     BlockChainModule,
-    // listener
-    ListenerModule,
     // api
     ApiModule,
     // metamask

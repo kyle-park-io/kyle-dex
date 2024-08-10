@@ -3,3 +3,7 @@ export enum NetworkType {
   sepolia = 'sepolia',
   amoy = 'amoy',
 }
+
+export enum NetworkType2 {
+  hardhat = 'hardhat',
+}

@@ -11,6 +11,7 @@ import { RpcService } from '../../rpc/interfaces/rpc.interface';
 import { FsService } from '../../utils/fs.service';
 import { EventEmitterService } from '../../../event-emitter/event-emitter.service';
 import {
+  type Contract,
   type ContractEventPayload,
   type LogDescription,
   type JsonRpcProvider,
@@ -99,6 +100,7 @@ export class HardhatEventListenerService implements OnModuleInit {
               'already processed event: ',
               payload.log.address,
               txHash,
+              hashed_log,
             );
             return;
           }
@@ -127,10 +129,89 @@ export class HardhatEventListenerService implements OnModuleInit {
     }
   }
 
+  async reconnectRpc(): Promise<void> {
+    const self = this;
+    const contractList = this.rpcService.getCurrentDeployedContractList();
+
+    for (const list of contractList) {
+      const connectedContract = this.rpcService.getContractByAddress(
+        list.address,
+      ) as Contract;
+      if (connectedContract === undefined) {
+        throw new Error('check');
+      }
+
+      // remove
+      await connectedContract.removeAllListeners();
+
+      // add
+      const event = list.name.includes('token')
+        ? this.rpcService.getContractEventList('Token')
+        : list.name.includes('Pair')
+          ? this.rpcService.getContractEventList('Pair')
+          : this.rpcService.getContractEventList(list.name);
+      if (event !== undefined) {
+        for (const value of event) {
+          this.logger.log('event listener open : ', value);
+          await connectedContract.addListener(value, handleEvent);
+        }
+      }
+
+      function handleEvent(...event): void {
+        try {
+          const payload: ContractEventPayload = event[event.length - 1];
+          const blockHash = payload.log.blockHash;
+          const blockNumber = payload.log.blockNumber;
+          const txHash = payload.log.transactionHash;
+          const topics = [...payload.log.topics];
+          const data = payload.log.data;
+
+          const log: LogDescription | null =
+            connectedContract.interface.parseLog({
+              topics,
+              data,
+            });
+          if (log === null) {
+            throw new Error('wrong matching event <-> data');
+          }
+          // check tx cache
+          const hashed_log = keccak256(toUtf8Bytes(log.signature));
+          if (
+            cacheService.get(
+              `hardhat.${payload.log.address}.${txHash}.${hashed_log}`,
+            ) !== undefined
+          ) {
+            console.log(
+              'already processed event: ',
+              payload.log.address,
+              txHash,
+              hashed_log,
+            );
+            return;
+          }
+
+          void self.processEvent(
+            payload.log.address,
+            blockHash,
+            blockNumber,
+            txHash,
+            log,
+          );
+
+          const eventNum = cacheService.get('hardhat.event.num');
+          console.log('number of loaded events: ', Number(eventNum) + 1);
+          cacheService.set('hardhat.event.num', String(Number(eventNum) + 1));
+        } catch (err) {
+          console.error(err);
+        }
+      }
+    }
+  }
+
   async setEventListener(name: string, address: string): Promise<void> {
     try {
       const self = this;
-      this.rpcService.setContract(name, address);
+      this.rpcService.addNewContract(name, address);
 
       const contract = this.rpcService.getContractByAddress(address);
       if (contract === undefined) {
@@ -164,6 +245,7 @@ export class HardhatEventListenerService implements OnModuleInit {
             throw new Error('wrong matching event <-> data');
           }
           // check tx cache
+          const hashed_log = keccak256(toUtf8Bytes(log.signature));
           if (
             cacheService.get(
               `hardhat.${payload.log.address}.${txHash}.${log.signature}`,
@@ -173,6 +255,7 @@ export class HardhatEventListenerService implements OnModuleInit {
               'already processed event: ',
               payload.log.address,
               txHash,
+              hashed_log,
             );
             return;
           }
@@ -323,6 +406,7 @@ export class HardhatEventListenerService implements OnModuleInit {
                 pair,
                 reserveObj,
               );
+              // TODO: pair contract name
               await this.setEventListener('Pair', pair);
               // // sse
               // this.eventEmitterService.create(
