@@ -17,6 +17,9 @@ import DexSwap from './dex/Dex.swap';
 import DexBridge from './dex/Dex.bridge';
 import NotFoundPage from './components/404/NotFoundPage';
 
+// test
+import Test from './test/Test';
+
 // utils
 import Resize from './utils/Resize';
 
@@ -64,6 +67,8 @@ if (root != null) {
               <Route path="/dex/staking/:id" component={DexStaking} />
               <Route path="/dex/swap" component={DexSwap} />
               <Route path="/dex/bridge" component={DexBridge} />
+              {/* test component */}
+              <Route path="/dex/test" component={Test} />
               <Route path="*" component={NotFoundPage} />
             </Routes>
           </div>
