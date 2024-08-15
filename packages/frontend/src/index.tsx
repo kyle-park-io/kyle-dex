@@ -25,19 +25,19 @@ import Resize from './utils/Resize';
 
 // default
 import { globalState } from './global/constants';
-function initializeLocalStorage() {
-  if (!localStorage.getItem('network')) {
+function initializeLocalStorage(): void {
+  if (localStorage.getItem('network') === null) {
     localStorage.setItem('network', 'hardhat');
     console.log('Default network set in localStorage:', 'hardhat');
   }
-  if (!localStorage.getItem('address')) {
+  if (localStorage.getItem('address') === null) {
     localStorage.setItem('address', globalState.hardhat_admin_address);
     console.log(
       'Default address set in localStorage:',
       globalState.hardhat_admin_address,
     );
   }
-  if (!localStorage.getItem('isConnected')) {
+  if (localStorage.getItem('isConnected') === null) {
     localStorage.setItem('isConnected', '0');
     console.log('Default isConnected set in localStorage:', '0');
   }

@@ -47,7 +47,7 @@ COPY artifacts ./artifacts
 COPY scripts ./scripts
 
 # set env
-ENV NODE_ENV="prod"
+ENV NODE_ENV="production"
 
 # alarm port
 EXPOSE 8080

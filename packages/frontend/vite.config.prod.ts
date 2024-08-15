@@ -16,7 +16,7 @@ export default defineConfig({
         chunkFileNames: `assets/[name].dex.[hash].js`, // 비동기 청크 파일의 이름 패턴
         assetFileNames: (assetInfo) => {
           // CSS, 이미지 등의 파일 이름 패턴
-          if (assetInfo.name && assetInfo.name.endsWith('.css')) {
+          if (assetInfo.name != null && assetInfo.name.endsWith('.css')) {
             return `assets/[name].dex.[hash].[ext]`;
           }
           return `assets/[name].dex.[ext]`;
