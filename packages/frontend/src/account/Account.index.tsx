@@ -47,51 +47,53 @@ const AccountIndex: Component = (): JSX.Element => {
   return (
     <>
       <Container fluid class="tw-p-4">
-        <Row>
+        <Row class="tw-h-full tw-flex tw-flex-col">
           <Col md={12}>
             <h1>Account Info</h1>
           </Col>
-          <Col md={12} class="tw-flex tw-items-center tw-justify-center">
-            <div>
-              {!loading() ? (
-                <div>
-                  Loading...
-                  <Spinner animation="border" variant="primary" />
-                </div>
-              ) : (
-                <div>
-                  {error() !== null ? (
-                    <div>{error()?.message}</div>
-                  ) : (
-                    <div>
-                      {account() !== undefined ? (
-                        <div>
-                          <h2>Account</h2>
+          <div class="tw-flex-1 tw-flex tw-justify-center tw-items-center tw-flex-col">
+            {!loading() ? (
+              <>
+                <span>Loading...</span>
+                <Spinner animation="border" variant="primary" />
+              </>
+            ) : (
+              <>
+                {error() !== null ? (
+                  <span>{error()?.message}</span>
+                ) : (
+                  <div>
+                    {account() !== undefined ? (
+                      <div>
+                        <h2>Account</h2>
+                        {account()?.network === 'unknown' ? (
+                          <p>network : hardhat</p>
+                        ) : (
                           <p>network : {account()?.network}</p>
-                          <p>name : {account()?.name}</p>
-                          <p>address : {account()?.address}</p>
-                          <p>nonce : {account()?.nonce}</p>
-                          <p>balance : {account()?.balance}</p>
-                        </div>
-                      ) : (
-                        <>
-                          {params.network === 'null' ? (
-                            <>
-                              <div>Please select network!</div>
-                            </>
-                          ) : (
-                            <>
-                              <div>Please select account!</div>
-                            </>
-                          )}
-                        </>
-                      )}
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-          </Col>
+                        )}
+                        <p>name : {account()?.name}</p>
+                        <p>address : {account()?.address}</p>
+                        <p>nonce : {account()?.nonce}</p>
+                        <p>balance : {account()?.balance}</p>
+                      </div>
+                    ) : (
+                      <>
+                        {params.network === 'null' ? (
+                          <>
+                            <div>Please select network!</div>
+                          </>
+                        ) : (
+                          <>
+                            <div>Please select account!</div>
+                          </>
+                        )}
+                      </>
+                    )}
+                  </div>
+                )}
+              </>
+            )}
+          </div>
         </Row>
       </Container>
     </>

@@ -408,7 +408,7 @@ const Header: Component = (): JSX.Element => {
 
   return (
     <>
-      <div>
+      <div class="tw-h-full">
         {/* header */}
         <header class="offscreen">golang is forever !</header>
         {/* metamask */}
@@ -458,8 +458,8 @@ const Header: Component = (): JSX.Element => {
           onError={propsHandleAmoyChange}
         />
 
-        <Container fluid>
-          <Row class="tw-items-center">
+        <Container fluid class="tw-h-full">
+          <Row class="tw-h-full tw-items-center">
             <Col lg={4} md={4} sm={4} xs={4} class="tw-flex tw-justify-start">
               <button onClick={handleImageClick} class="transparent tw-h-10">
                 <img src={HomeLogo} alt="Home" class="tw-h-full"></img>
@@ -600,11 +600,12 @@ const Header: Component = (): JSX.Element => {
                 <Nav.Item as="li">
                   <Nav.Link
                     eventKey="account"
-                    onClick={() =>
+                    onClick={() => {
                       handleAccountClick(
                         localStorage.getItem('address') as string,
-                      )
-                    }
+                      );
+                    }}
+                    class="tw-h-full tw-flex tw-items-center tw-justify-center"
                   >
                     <span class="tw-text-black">Account</span>
                   </Nav.Link>
