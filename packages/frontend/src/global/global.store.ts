@@ -4,6 +4,9 @@ import { createStore } from 'solid-js/store';
 export const [fromDexNavigate, setFromDexNavigate] = createStore({
   value: false,
 });
+export const [fromDexNavigate2, setFromDexNavigate2] = createStore({
+  value: false,
+});
 
 export enum HeaderNavigateType {
   'network' = 'network',
@@ -27,7 +30,14 @@ export const [fromPairNavigate, setFromPairNavigate] = createStore({
   value: false,
   // pair: '',
 });
+export const [fromPairNavigate2, setFromPairNavigate2] = createStore({
+  value: false,
+  // pair: '',
+});
 
 export const [fromAppNavigate, setFromAppNavigate] = createStore({
+  value: false,
+});
+export const [fromAppNavigate2, setFromAppNavigate2] = createStore({
   value: false,
 });

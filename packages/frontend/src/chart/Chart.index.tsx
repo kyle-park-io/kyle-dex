@@ -13,8 +13,8 @@ import {
   fromAppNavigate,
   setFromAppNavigate,
   HeaderNavigateType,
-  fromHeaderNavigate2,
-  setFromHeaderNavigate2,
+  fromHeaderNavigate,
+  setFromHeaderNavigate,
 } from '../global/global.store';
 import {
   getAllData,
@@ -230,10 +230,10 @@ export const ChartIndex: Component<ChartProps> = (props): JSX.Element => {
         setLoading(true);
         return;
       }
-      if (fromHeaderNavigate2.value) {
+      if (fromHeaderNavigate.value) {
         if (network === 'null') {
           setIsNetwork(false);
-          setFromHeaderNavigate2({ value: false, type: '' });
+          setFromHeaderNavigate({ value: false, type: '' });
           return;
         }
 
@@ -241,13 +241,13 @@ export const ChartIndex: Component<ChartProps> = (props): JSX.Element => {
         setLoading(false);
         switch (chart) {
           case 'all': {
-            if (fromHeaderNavigate2.type !== HeaderNavigateType.address) {
+            if (fromHeaderNavigate.type !== HeaderNavigateType.address) {
               await all();
             }
             break;
           }
           case 'one-pair': {
-            if (fromHeaderNavigate2.type !== HeaderNavigateType.address) {
+            if (fromHeaderNavigate.type !== HeaderNavigateType.address) {
               await onePair(pair);
             }
             break;
@@ -263,7 +263,7 @@ export const ChartIndex: Component<ChartProps> = (props): JSX.Element => {
             break;
           }
         }
-        setFromHeaderNavigate2({ value: false, type: '' });
+        setFromHeaderNavigate({ value: false, type: '' });
         setLoading(true);
         return;
       }

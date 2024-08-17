@@ -6,7 +6,10 @@ import { useParams } from '@solidjs/router';
 import { getPairList } from '../../axios/Dex.axios.pair';
 import { ListGroup, ListGroupItem, Button } from 'solid-bootstrap';
 import { globalState } from '../../../global/constants';
-import { setFromPairNavigate } from '../../../global/global.store';
+import {
+  setFromPairNavigate,
+  setFromPairNavigate2,
+} from '../../../global/global.store';
 import axios from 'axios';
 
 const [isNetwork, setIsNetwork] = createSignal(false);
@@ -27,9 +30,11 @@ export const PairList: Component<PairListProps> = (props): JSX.Element => {
     if (pairButtonId() === id) {
       setPairButtonId(-1);
       setFromPairNavigate({ value: true });
+      setFromPairNavigate2({ value: true });
     } else {
       setPairButtonId(id);
       setFromPairNavigate({ value: true });
+      setFromPairNavigate2({ value: true });
     }
   };
 

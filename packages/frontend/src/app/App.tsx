@@ -8,25 +8,32 @@ import {
   BridgeCard,
 } from '../components/card/Card';
 import { globalState } from '../global/constants';
-import { setFromAppNavigate } from '../global/global.store';
+import {
+  setFromAppNavigate,
+  setFromAppNavigate2,
+} from '../global/global.store';
 
 const App: Component = (): JSX.Element => {
   const navigate = useNavigate();
   const handleChartClick = (): void => {
     if ((localStorage.getItem('network') as string) === 'null') {
       setFromAppNavigate({ value: true });
+      setFromAppNavigate2({ value: true });
       navigate('/dex/chart');
     }
     if ((localStorage.getItem('network') as string) === 'hardhat') {
       setFromAppNavigate({ value: true });
+      setFromAppNavigate2({ value: true });
       navigate('/dex/chart/hardhat');
     }
     if ((localStorage.getItem('network') as string) === 'sepolia') {
       setFromAppNavigate({ value: true });
+      setFromAppNavigate2({ value: true });
       navigate('/dex/chart/sepolia');
     }
     if ((localStorage.getItem('network') as string) === 'amoy') {
       setFromAppNavigate({ value: true });
+      setFromAppNavigate2({ value: true });
       navigate('/dex/chart/amoy');
     }
   };

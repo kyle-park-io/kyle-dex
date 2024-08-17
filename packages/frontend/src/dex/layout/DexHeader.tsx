@@ -1,6 +1,9 @@
 import { type Component, type JSX } from 'solid-js';
 import { useNavigate, useLocation } from '@solidjs/router';
-import { setFromDexNavigate } from '../../global/global.store';
+import {
+  setFromDexNavigate,
+  setFromDexNavigate2,
+} from '../../global/global.store';
 import { Container } from 'solid-bootstrap';
 
 export const DexHeader: Component = (): JSX.Element => {
@@ -12,11 +15,13 @@ export const DexHeader: Component = (): JSX.Element => {
     if (network === 'null') {
       if (location.pathname !== '/dex/chart') {
         setFromDexNavigate({ value: true });
+        setFromDexNavigate2({ value: true });
         navigate(`/dex/chart`);
       }
     } else {
       if (location.pathname !== `/dex/chart/${network}`) {
         setFromDexNavigate({ value: true });
+        setFromDexNavigate2({ value: true });
         navigate(`/dex/chart/${network}`);
       }
     }
@@ -26,11 +31,13 @@ export const DexHeader: Component = (): JSX.Element => {
     if (network === 'null') {
       if (location.pathname !== '/dex/staking') {
         setFromDexNavigate({ value: true });
+        setFromDexNavigate2({ value: true });
         navigate(`/dex/staking`);
       }
     } else {
       if (location.pathname !== `/dex/staking/${network}`) {
         setFromDexNavigate({ value: true });
+        setFromDexNavigate2({ value: true });
         navigate(`/dex/staking/${network}`);
       }
     }
@@ -38,12 +45,14 @@ export const DexHeader: Component = (): JSX.Element => {
   const handleSwapClick = (): void => {
     if (location.pathname !== '/dex/swap') {
       setFromDexNavigate({ value: true });
+      setFromDexNavigate2({ value: true });
       navigate('/dex/swap');
     }
   };
   const handleBridgeClick = (): void => {
     if (location.pathname !== '/dex/bridge') {
       setFromDexNavigate({ value: true });
+      setFromDexNavigate2({ value: true });
       navigate('/dex/bridge');
     }
   };

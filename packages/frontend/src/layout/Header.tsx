@@ -99,6 +99,10 @@ const Header: Component = (): JSX.Element => {
         handleAccountClick('null');
       }
       if (location.pathname.startsWith('/dex/staking')) {
+        setFromHeaderNavigate({
+          value: true,
+          type: HeaderNavigateType.network,
+        });
         navigate('/dex/staking');
       }
       if (location.pathname.startsWith('/dex/chart')) {
@@ -126,7 +130,10 @@ const Header: Component = (): JSX.Element => {
           handleAccountClick(globalState.hardhat_admin_address);
         }
         if (location.pathname.startsWith('/dex/staking')) {
-          setFromHeaderNavigate({ value: true });
+          setFromHeaderNavigate({
+            value: true,
+            type: HeaderNavigateType.network,
+          });
           navigate('/dex/staking/hardhat');
         }
         if (location.pathname.startsWith('/dex/chart')) {
@@ -164,7 +171,10 @@ const Header: Component = (): JSX.Element => {
           }
         }
         if (location.pathname.startsWith('/dex/staking')) {
-          setFromHeaderNavigate({ value: true });
+          setFromHeaderNavigate({
+            value: true,
+            type: HeaderNavigateType.network,
+          });
           navigate('/dex/staking/sepolia');
         }
         if (location.pathname.startsWith('/dex/chart')) {
@@ -202,7 +212,10 @@ const Header: Component = (): JSX.Element => {
           }
         }
         if (location.pathname.startsWith('/dex/staking')) {
-          setFromHeaderNavigate({ value: true });
+          setFromHeaderNavigate({
+            value: true,
+            type: HeaderNavigateType.network,
+          });
           navigate('/dex/staking/amoy');
         }
         if (location.pathname.startsWith('/dex/chart')) {
@@ -232,7 +245,10 @@ const Header: Component = (): JSX.Element => {
         handleAccountClick(localStorage.getItem('address') as string);
       }
       if (location.pathname.startsWith('/dex/staking')) {
-        setFromHeaderNavigate({ value: true });
+        setFromHeaderNavigate({
+          value: true,
+          type: HeaderNavigateType.network,
+        });
         navigate('/dex/staking/hardhat');
       }
       if (location.pathname.startsWith('/dex/chart')) {
@@ -261,7 +277,10 @@ const Header: Component = (): JSX.Element => {
         handleSetMetamask();
       }
       if (location.pathname.startsWith('/dex/staking')) {
-        setFromHeaderNavigate({ value: true });
+        setFromHeaderNavigate({
+          value: true,
+          type: HeaderNavigateType.network,
+        });
         navigate('/dex/staking/sepolia');
       }
       if (location.pathname.startsWith('/dex/chart')) {
@@ -290,7 +309,10 @@ const Header: Component = (): JSX.Element => {
         handleSetMetamask();
       }
       if (location.pathname.startsWith('/dex/staking')) {
-        setFromHeaderNavigate({ value: true });
+        setFromHeaderNavigate({
+          value: true,
+          type: HeaderNavigateType.network,
+        });
         navigate('/dex/staking/amoy');
       }
       if (location.pathname.startsWith('/dex/chart')) {
@@ -306,7 +328,10 @@ const Header: Component = (): JSX.Element => {
       }
     } else {
       if (location.pathname.startsWith('/dex/staking')) {
-        setFromHeaderNavigate({ value: true });
+        setFromHeaderNavigate({
+          value: true,
+          type: HeaderNavigateType.network,
+        });
         navigate('/dex/staking');
       }
       if (location.pathname.startsWith('/dex/chart')) {

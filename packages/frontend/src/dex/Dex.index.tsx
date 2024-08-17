@@ -7,7 +7,7 @@ import { ChartList } from '../chart/components/Chart.list';
 import { PairList } from './components/pair/PairList';
 import { PairEventList } from './components/pair/PairEventList';
 import { PairEvent } from './components/pair/PairEvent';
-import { ClientPair } from './components/pair/ClientPair';
+import { ClientPairEvent } from './components/pair/ClientPairEvent';
 
 const [currentChart, setCurrentChart] = createSignal('all');
 const propsHandleCurrentChart = (chart: string): void => {
@@ -85,13 +85,13 @@ const DexChartIndex: Component = (): JSX.Element => {
             ></PairEvent>
           </Col>
           <Col md={2} class="tw-bg-red-300 tw-p-4">
-            <ClientPair
+            <ClientPairEvent
               currentPair={pair()}
               currentFocusedComponent={currentFocusedComponent()}
               handleCurrentFocusedComponent={propsHandleCurrentFocusedComponent}
               currentMyEvent={currentMyEvent()}
               handleCurrentMyEvent={propsHandleCurrentMyEvent}
-            ></ClientPair>
+            ></ClientPairEvent>
           </Col>
         </Row>
       </Container>

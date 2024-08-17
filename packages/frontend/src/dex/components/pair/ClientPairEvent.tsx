@@ -1,7 +1,6 @@
 import { type Component, type JSX } from 'solid-js';
 import { createSignal, createEffect, For } from 'solid-js';
 import { type ClientPairProps } from '../../interfaces/component.interfaces';
-import { useParams } from '@solidjs/router';
 import {
   getClientPairEvent,
   getClientPairsEvent,
@@ -9,8 +8,14 @@ import {
 import { ListGroup, ListGroupItem, CloseButton } from 'solid-bootstrap';
 import { globalState } from '../../../global/constants';
 import {
-  fromHeaderNavigate,
-  setFromHeaderNavigate,
+  fromPairNavigate2,
+  setFromPairNavigate2,
+  fromDexNavigate2,
+  setFromDexNavigate2,
+  fromAppNavigate2,
+  setFromAppNavigate2,
+  fromHeaderNavigate2,
+  setFromHeaderNavigate2,
 } from '../../../global/global.store';
 import axios from 'axios';
 
@@ -41,10 +46,10 @@ const [pairsBurnEventCount, setPairsBurnEventCount] = createSignal(0);
 const [pairsSwapEvents, setPairsSwapEvents] = createSignal<any>([]);
 const [pairsSwapEventCount, setPairsSwapEventCount] = createSignal(0);
 
-export const ClientPair: Component<ClientPairProps> = (props): JSX.Element => {
+export const ClientPairEvent: Component<ClientPairProps> = (
+  props,
+): JSX.Element => {
   const api = globalState.api_url;
-
-  const params = useParams();
 
   // toggle
   const [pairEventShow, setPairEventShow] = createSignal<boolean[]>([false]);
@@ -259,135 +264,16 @@ export const ClientPair: Component<ClientPairProps> = (props): JSX.Element => {
   };
 
   createEffect(() => {
-    const pair = props.currentPair;
-    if (fromHeaderNavigate.value) {
-      if (params.id === undefined) {
-        setIsNetwork(false);
-        setIsAccount(false);
-      } else {
-        setIsNetwork(true);
-        if (pair !== '') {
-          if ((localStorage.getItem('address') as string) !== 'null') {
-            void getPairEvents();
-            setIsAccount(true);
-          } else {
-            setIsAccount(false);
-          }
-        } else {
-          if ((localStorage.getItem('address') as string) !== 'null') {
-            void getPairsEvents();
-            setIsAccount(true);
-          } else {
-            setIsAccount(false);
-          }
-          setPairEvents([]);
-          setPairMintEvents([]);
-          setPairBurnEvents([]);
-          setPairSwapEvents([]);
-          setPairEventCount(0);
-          setPairMintEventCount(0);
-          setPairSwapEventCount(0);
-          setPairBurnEventCount(0);
-        }
-      }
-      setFromHeaderNavigate({ value: false });
-    } else {
-      setIsNetwork(true);
-      if (pair !== '') {
-        if ((localStorage.getItem('address') as string) !== 'null') {
-          void getPairEvents();
-          setIsAccount(true);
-        } else {
-          setIsAccount(false);
-        }
-      } else {
-        setPairEvents([]);
-        setPairMintEvents([]);
-        setPairBurnEvents([]);
-        setPairSwapEvents([]);
-        setPairEventCount(0);
-        setPairMintEventCount(0);
-        setPairSwapEventCount(0);
-        setPairBurnEventCount(0);
-      }
-    }
-  });
-  async function getPairEvents(): Promise<void> {
-    try {
-      const data = await getClientPairEvent(api, {
-        network: localStorage.getItem('network') as string,
-        userAddress: localStorage.getItem('address') as string,
-        pairAddress: props.currentPair,
-      });
-
-      const arr: any[] = [];
-      const mintArr: any[] = [];
-      const burnArr: any[] = [];
-      const swapArr: any[] = [];
-      let mintIndex = 0;
-      let burnIndex = 0;
-      let swapIndex = 0;
-      for (let i = 0; i < data.length; i++) {
-        arr.push({ tx: data[i].txHash, event: data[i].event });
-        arr[i].shortTx = data[i].txHash.slice(0, 10);
-        arr[i].data = JSON.stringify(data[i], undefined, 2);
-        if (data[i].event === 'Mint') {
-          mintArr.push(arr[i]);
-          mintIndex++;
-        }
-        if (data[i].event === 'Burn') {
-          burnArr.push(arr[i]);
-          burnIndex++;
-        }
-        if (data[i].event === 'Swap') {
-          swapArr.push(arr[i]);
-          swapIndex++;
-        }
-      }
-      setPairEvents(arr);
-      setPairMintEvents(mintArr);
-      setPairBurnEvents(burnArr);
-      setPairSwapEvents(swapArr);
-
-      setPairEventCount(data.length);
-      setPairMintEventCount(mintIndex);
-      setPairBurnEventCount(burnIndex);
-      setPairSwapEventCount(swapIndex);
-
-      // setEventExisted(true);
-    } catch (err) {
-      if (axios.isAxiosError(err)) {
-        if (err.response?.status === 404) {
-          setPairEvents([]);
-          setPairMintEvents([]);
-          setPairBurnEvents([]);
-          setPairSwapEvents([]);
-          setPairEventCount(0);
-          setPairMintEventCount(0);
-          setPairSwapEventCount(0);
-          setPairBurnEventCount(0);
-
-          // setEventExisted(false);
-        }
-      }
-    }
-  }
-
-  createEffect(() => {
     const fn = async () => {
       const network = localStorage.getItem('network') as string;
       const address = localStorage.getItem('address') as string;
+      const pair = props.currentPair;
 
-      if (fromHeaderNavigate.value) {
-        if (network === 'null') {
-          setIsNetwork(false);
-          setIsAccount(false);
-          setCurrentEvent('');
-          setFromHeaderNavigate({ value: false, type: '' });
+      if (fromPairNavigate2.value) {
+        if (pair === '') {
+          setFromPairNavigate2({ value: false });
           return;
         }
-
-        setIsNetwork(true);
         if (address === 'null') {
           setIsAccount(false);
 
@@ -399,17 +285,170 @@ export const ClientPair: Component<ClientPairProps> = (props): JSX.Element => {
           setPairsMintEventCount(0);
           setPairsSwapEventCount(0);
           setPairsBurnEventCount(0);
+          setPairEvents([]);
+          setPairMintEvents([]);
+          setPairBurnEvents([]);
+          setPairSwapEvents([]);
+          setPairEventCount(0);
+          setPairMintEventCount(0);
+          setPairSwapEventCount(0);
+          setPairBurnEventCount(0);
           setEventExisted(false);
           setCurrentEvent('');
 
-          setFromHeaderNavigate({ value: false, type: '' });
+          setFromPairNavigate2({ value: false });
+          return;
+        } else {
+          setIsAccount(true);
+          await getPairEvents();
+          setCurrentEvent('my-pair-all-event');
+
+          setFromPairNavigate2({ value: false });
+          return;
+        }
+      }
+      if (fromDexNavigate2.value) {
+        if (network === 'null') {
+          setIsNetwork(false);
+          setIsAccount(false);
+          setCurrentEvent('');
+          setFromDexNavigate2({ value: false });
           return;
         }
 
-        await getPairsEvents();
-        setIsAccount(true);
-        setCurrentEvent('my-all-event');
-        setFromHeaderNavigate({ value: false, type: '' });
+        if (address === 'null') {
+          setIsAccount(false);
+
+          setPairsEvents([]);
+          setPairsMintEvents([]);
+          setPairsBurnEvents([]);
+          setPairsSwapEvents([]);
+          setPairsEventCount(0);
+          setPairsMintEventCount(0);
+          setPairsSwapEventCount(0);
+          setPairsBurnEventCount(0);
+          setPairEvents([]);
+          setPairMintEvents([]);
+          setPairBurnEvents([]);
+          setPairSwapEvents([]);
+          setPairEventCount(0);
+          setPairMintEventCount(0);
+          setPairSwapEventCount(0);
+          setPairBurnEventCount(0);
+          setEventExisted(false);
+          setCurrentEvent('');
+
+          setFromDexNavigate2({ value: false });
+          return;
+        } else {
+          if (pair === '') {
+            await getPairsEvents();
+            setIsAccount(true);
+            setCurrentEvent('my-all-event');
+          } else {
+            await getPairEvents();
+            setIsAccount(true);
+            setCurrentEvent('my-pair-all-event');
+          }
+          setFromDexNavigate2({ value: false });
+          return;
+        }
+      }
+      if (fromAppNavigate2.value) {
+        if (network === 'null') {
+          setIsNetwork(false);
+          setIsAccount(false);
+          setCurrentEvent('');
+          setFromAppNavigate2({ value: false });
+          return;
+        }
+
+        if (address === 'null') {
+          setIsAccount(false);
+
+          setPairsEvents([]);
+          setPairsMintEvents([]);
+          setPairsBurnEvents([]);
+          setPairsSwapEvents([]);
+          setPairsEventCount(0);
+          setPairsMintEventCount(0);
+          setPairsSwapEventCount(0);
+          setPairsBurnEventCount(0);
+          setPairEvents([]);
+          setPairMintEvents([]);
+          setPairBurnEvents([]);
+          setPairSwapEvents([]);
+          setPairEventCount(0);
+          setPairMintEventCount(0);
+          setPairSwapEventCount(0);
+          setPairBurnEventCount(0);
+          setEventExisted(false);
+          setCurrentEvent('');
+
+          setFromAppNavigate2({ value: false });
+          return;
+        } else {
+          if (pair === '') {
+            await getPairsEvents();
+            setIsAccount(true);
+            setCurrentEvent('my-all-event');
+          } else {
+            await getPairEvents();
+            setIsAccount(true);
+            setCurrentEvent('my-pair-all-event');
+          }
+          setFromAppNavigate2({ value: false });
+          return;
+        }
+      }
+      if (fromHeaderNavigate2.value) {
+        if (network === 'null') {
+          setIsNetwork(false);
+          setIsAccount(false);
+          setCurrentEvent('');
+          setFromHeaderNavigate2({ value: false, type: '' });
+          return;
+        }
+
+        setIsNetwork(true);
+
+        if (address === 'null') {
+          setIsAccount(false);
+
+          setPairsEvents([]);
+          setPairsMintEvents([]);
+          setPairsBurnEvents([]);
+          setPairsSwapEvents([]);
+          setPairsEventCount(0);
+          setPairsMintEventCount(0);
+          setPairsSwapEventCount(0);
+          setPairsBurnEventCount(0);
+          setPairEvents([]);
+          setPairMintEvents([]);
+          setPairBurnEvents([]);
+          setPairSwapEvents([]);
+          setPairEventCount(0);
+          setPairMintEventCount(0);
+          setPairSwapEventCount(0);
+          setPairBurnEventCount(0);
+          setEventExisted(false);
+          setCurrentEvent('');
+
+          setFromHeaderNavigate2({ value: false, type: '' });
+          return;
+        } else {
+          if (pair === '') {
+            await getPairsEvents();
+            setIsAccount(true);
+            setCurrentEvent('my-all-event');
+          } else {
+            await getPairEvents();
+            setIsAccount(true);
+            setCurrentEvent('my-pair-all-event');
+          }
+          setFromHeaderNavigate2({ value: false, type: '' });
+          return;
+        }
       }
     };
     void fn();
@@ -469,6 +508,66 @@ export const ClientPair: Component<ClientPairProps> = (props): JSX.Element => {
           setPairsBurnEventCount(0);
 
           setEventExisted(false);
+        }
+      }
+    }
+  }
+  async function getPairEvents(): Promise<void> {
+    try {
+      const data = await getClientPairEvent(api, {
+        network: localStorage.getItem('network') as string,
+        userAddress: localStorage.getItem('address') as string,
+        pairAddress: props.currentPair,
+      });
+
+      const arr: any[] = [];
+      const mintArr: any[] = [];
+      const burnArr: any[] = [];
+      const swapArr: any[] = [];
+      let mintIndex = 0;
+      let burnIndex = 0;
+      let swapIndex = 0;
+      for (let i = 0; i < data.length; i++) {
+        arr.push({ tx: data[i].txHash, event: data[i].event });
+        arr[i].shortTx = data[i].txHash.slice(0, 10);
+        arr[i].data = JSON.stringify(data[i], undefined, 2);
+        if (data[i].event === 'Mint') {
+          mintArr.push(arr[i]);
+          mintIndex++;
+        }
+        if (data[i].event === 'Burn') {
+          burnArr.push(arr[i]);
+          burnIndex++;
+        }
+        if (data[i].event === 'Swap') {
+          swapArr.push(arr[i]);
+          swapIndex++;
+        }
+      }
+      setPairEvents(arr);
+      setPairMintEvents(mintArr);
+      setPairBurnEvents(burnArr);
+      setPairSwapEvents(swapArr);
+
+      setPairEventCount(data.length);
+      setPairMintEventCount(mintIndex);
+      setPairBurnEventCount(burnIndex);
+      setPairSwapEventCount(swapIndex);
+
+      // setEventExisted(true);
+    } catch (err) {
+      if (axios.isAxiosError(err)) {
+        if (err.response?.status === 404) {
+          setPairEvents([]);
+          setPairMintEvents([]);
+          setPairBurnEvents([]);
+          setPairSwapEvents([]);
+          setPairEventCount(0);
+          setPairMintEventCount(0);
+          setPairSwapEventCount(0);
+          setPairBurnEventCount(0);
+
+          // setEventExisted(false);
         }
       }
     }
