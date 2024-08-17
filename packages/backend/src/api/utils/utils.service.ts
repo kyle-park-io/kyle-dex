@@ -1,4 +1,9 @@
-import { Inject, Injectable, LoggerService } from '@nestjs/common';
+import {
+  Inject,
+  Injectable,
+  LoggerService,
+  NotFoundException,
+} from '@nestjs/common';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { CommonService } from '../../blockChain/common/common.service';
 import { AccountService } from '../../blockChain/account/interfaces/account.interface';
@@ -43,7 +48,7 @@ export class UtilsService {
             ? this.sepoliaRpcService.getContractAddress('Router')
             : this.amoyRpcService.getContractAddress('Router');
       if (contractAddress === undefined) {
-        throw new Error('contract is not existed');
+        throw new NotFoundException('router contract is not existed');
       }
 
       const args: ProcessContractDto = {
