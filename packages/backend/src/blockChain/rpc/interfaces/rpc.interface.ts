@@ -1,5 +1,5 @@
 import { type JsonRpcProvider, type Interface, type Contract } from 'ethers';
-import { ContractType, TokenContractType } from '../types/types';
+import { type ContractType, type TokenContractType } from '../types/types';
 
 export interface RpcService {
   getInitializationPromise(): Promise<void>;
@@ -39,7 +39,7 @@ export interface RpcService {
 
   getCurrentDeployedContractList(): ContractType[];
 
-  getTokenContractList(): TokenContractType[];
+  getTokenContractList(): TokenContractType[] | null;
 
   getContractEventList(name?: string, address?: string): string[] | undefined;
 

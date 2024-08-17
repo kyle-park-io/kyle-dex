@@ -116,7 +116,10 @@ export class HardhatRpcService implements RpcService, OnModuleInit {
     return this.currentDeployedContractList;
   }
 
-  getTokenContractList(): TokenContractType[] {
+  getTokenContractList(): TokenContractType[] | null {
+    if (this.tokenContractList.length === 0) {
+      return null;
+    }
     return this.tokenContractList;
   }
 

@@ -1,4 +1,9 @@
-import { Inject, Injectable, LoggerService } from '@nestjs/common';
+import {
+  Inject,
+  Injectable,
+  LoggerService,
+  NotFoundException,
+} from '@nestjs/common';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { CommonService } from '../../blockChain/common/common.service';
 import { AccountService } from '../../blockChain/account/interfaces/account.interface';
@@ -7,6 +12,7 @@ import { type BalanceOfDto } from './dto/token.request.dto';
 import { type ResponseBalanceOfDto } from './dto/token.response.dto';
 import { type ProcessContractDto } from '../../blockChain/common/dto/common.dto';
 import { NetworkType } from '../network/dto/network.request';
+import { type TokenContractType } from '../../blockChain/rpc/types/types';
 
 @Injectable()
 export class TokenService {
@@ -76,14 +82,22 @@ export class TokenService {
 
   async getTokenContractList(network: NetworkType): Promise<any> {
     try {
+      let list: TokenContractType[] | null = null;
       switch (network) {
         case NetworkType.hardhat:
-          return this.rpcService.getTokenContractList();
+          list = this.rpcService.getTokenContractList();
+          break;
         case NetworkType.sepolia:
-          return this.sepoliaRpcService.getTokenContractList();
+          list = this.sepoliaRpcService.getTokenContractList();
+          break;
         case NetworkType.amoy:
-          return this.amoyRpcService.getTokenContractList();
+          list = this.amoyRpcService.getTokenContractList();
+          break;
       }
+      if (list === null) {
+        throw new NotFoundException('token contract list not found');
+      }
+      return list;
     } catch (err) {
       this.logger.error('getTokenContractList error');
       throw err;
