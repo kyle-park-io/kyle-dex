@@ -8,16 +8,16 @@ export function startCronJobs() {
     try {
       const network = ['hardhat', 'sepolia', 'amoy'];
       for (const value of network) {
-        await axios.get(`${constants.api_url}/network/getNetwork`, {
-          params: { network: value },
-        });
-        // TODO: network
-        await axios.get(`${constants.api_url}/network/reconnectNetwork`, {
-          params: { network: value },
-        });
-        await axios.get(`${constants.api_url}/network/reconnectEventListener`, {
-          params: { network: value },
-        });
+        // await axios.get(`${constants.api_url}/network/getNetwork`, {
+        //   params: { network: value },
+        // });
+        // // TODO: network
+        // await axios.get(`${constants.api_url}/network/reconnectNetwork`, {
+        //   params: { network: value },
+        // });
+        // await axios.get(`${constants.api_url}/network/reconnectEventListener`, {
+        //   params: { network: value },
+        // });
       }
       console.log('Reconnect network success!', Date.now());
     } catch (err) {
