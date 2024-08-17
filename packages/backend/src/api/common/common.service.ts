@@ -6,6 +6,8 @@ import {
   type ProcessContractDto,
   type ProcessContractWithETHDto,
 } from '../../blockChain/common/dto/common.dto';
+import { isError } from 'ethers';
+import { CustomError } from '../../common/error/custom.error';
 
 @Injectable()
 export class CommonService {
@@ -29,21 +31,31 @@ export class CommonService {
     }
   }
 
-  async submit(dto: ProcessContractDto): Promise<void> {
+  async submit(dto: ProcessContractDto): Promise<any> {
     try {
-      await this.blockChainCommonService.submit(dto);
+      const result = await this.blockChainCommonService.submit(dto);
+      return result;
     } catch (err) {
-      this.logger.error(err);
-      throw err;
+      if (isError(err, 'CALL_EXCEPTION')) {
+        this.logger.error(err);
+        // throw err;
+        const errObj = new CustomError(err.code, err.reason, err.shortMessage);
+        throw errObj;
+      }
     }
   }
 
-  async submitWithETH(dto: ProcessContractWithETHDto): Promise<void> {
+  async submitWithETH(dto: ProcessContractWithETHDto): Promise<any> {
     try {
-      await this.blockChainCommonService.submitWithETH(dto);
+      const result = await this.blockChainCommonService.submitWithETH(dto);
+      return result;
     } catch (err) {
-      this.logger.error(err);
-      throw err;
+      if (isError(err, 'CALL_EXCEPTION')) {
+        this.logger.error(err);
+        // throw err;
+        const errObj = new CustomError(err.code, err.reason, err.shortMessage);
+        throw errObj;
+      }
     }
   }
 }

@@ -126,7 +126,7 @@ export class CommonService {
     }
   }
 
-  async submit(dto: ProcessContractDto): Promise<boolean> {
+  async submit(dto: ProcessContractDto): Promise<any> {
     try {
       const wallet: Wallet | undefined =
         this.hardhatAccountService.getWalletByAddress(dto.userAddress);
@@ -144,16 +144,15 @@ export class CommonService {
 
       const eFD = contract.interface.encodeFunctionData(dto.function, dto.args);
       const tx: TransactionRequest = { to: dto.contractAddress, data: eFD };
-      await wallet.sendTransaction(tx);
-
-      return true;
+      const result = await wallet.sendTransaction(tx);
+      return result.toJSON();
     } catch (err) {
       this.logger.error(err);
       throw err;
     }
   }
 
-  async submitWithETH(dto: ProcessContractWithETHDto): Promise<boolean> {
+  async submitWithETH(dto: ProcessContractWithETHDto): Promise<any> {
     try {
       const wallet: Wallet | undefined =
         this.hardhatAccountService.getWalletByAddress(dto.userAddress);
@@ -175,9 +174,8 @@ export class CommonService {
         data: eFD,
         value: dto.eth,
       };
-      await wallet.sendTransaction(tx);
-
-      return true;
+      const result = await wallet.sendTransaction(tx);
+      return result.toJSON();
     } catch (err) {
       this.logger.error(err);
       throw err;

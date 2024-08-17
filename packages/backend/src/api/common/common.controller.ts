@@ -120,10 +120,10 @@ export class CommonController {
   @ApiBody({ type: SubmitContractDto })
   @ApiCreatedResponse({
     description: 'Successfully submit transaction',
-    type: Boolean,
+    // type: Boolean,
   })
   @ApiInternalServerErrorResponse({ description: 'Internal server error' })
-  async submit(@Body() dto: SubmitContractDto): Promise<boolean> {
+  async submit(@Body() dto: SubmitContractDto): Promise<any> {
     try {
       // user
       let userAddress;
@@ -159,8 +159,9 @@ export class CommonController {
         function: dto.function,
         args: dto.args,
       };
-      await this.commonService.submit(args);
-      return true;
+
+      const result = await this.commonService.submit(args);
+      return result;
     } catch (err) {
       this.logger.error(err);
       throw err;
@@ -176,10 +177,10 @@ export class CommonController {
   @ApiBody({ type: SubmitContractWithETHDto })
   @ApiCreatedResponse({
     description: 'Successfully submit transaction',
-    type: Boolean,
+    // type: Boolean,
   })
   @ApiInternalServerErrorResponse({ description: 'Internal server error' })
-  async submitWithETH(@Body() dto: SubmitContractWithETHDto): Promise<boolean> {
+  async submitWithETH(@Body() dto: SubmitContractWithETHDto): Promise<any> {
     try {
       // user
       let userAddress;
@@ -216,8 +217,8 @@ export class CommonController {
         eth: parseEther(dto.eth).toString(),
       };
 
-      await this.commonService.submitWithETH(args);
-      return true;
+      const result = await this.commonService.submitWithETH(args);
+      return result;
     } catch (err) {
       this.logger.error(err);
       throw err;
