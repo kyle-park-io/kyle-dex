@@ -67,7 +67,7 @@ export class HardhatEventListenerService implements OnModuleInit {
         : this.rpcService.getContractEventList(contractName);
       if (event !== undefined) {
         for (const value of event) {
-          this.logger.log('event listener open : ', value);
+          this.logger.log(`${value} event listener open: `, address);
           await connectedContract.addListener(value, handleEvent);
         }
       }
@@ -96,8 +96,9 @@ export class HardhatEventListenerService implements OnModuleInit {
               `hardhat.${payload.log.address}.${txHash}.${hashed_log}`,
             ) !== undefined
           ) {
-            console.log(
+            self.logger.log(
               'already processed event: ',
+              log.name,
               payload.log.address,
               txHash,
               hashed_log,
@@ -114,17 +115,17 @@ export class HardhatEventListenerService implements OnModuleInit {
           );
 
           const eventNum = cacheService.get('hardhat.event.num');
-          console.log('number of loaded events: ', Number(eventNum) + 1);
+          self.logger.log('number of loaded events: ', Number(eventNum) + 1);
           cacheService.set('hardhat.event.num', String(Number(eventNum) + 1));
         } catch (err) {
-          console.error(err);
+          self.logger.error(err);
         }
       }
 
       // TODO : make auto reading system
       // const abi = await this.fsService.getAbi('Factory');
       // for (let i = 0; i < abi.length; i++) {
-      //   console.log(abi[i].type);
+      //   self.logger.log(abi[i].type);
       // }
     }
   }
@@ -152,7 +153,7 @@ export class HardhatEventListenerService implements OnModuleInit {
           : this.rpcService.getContractEventList(list.name);
       if (event !== undefined) {
         for (const value of event) {
-          this.logger.log('event listener open : ', value);
+          this.logger.log(`${value} event listener reopen: `, list.address);
           await connectedContract.addListener(value, handleEvent);
         }
       }
@@ -181,8 +182,9 @@ export class HardhatEventListenerService implements OnModuleInit {
               `hardhat.${payload.log.address}.${txHash}.${hashed_log}`,
             ) !== undefined
           ) {
-            console.log(
+            self.logger.log(
               'already processed event: ',
+              log.name,
               payload.log.address,
               txHash,
               hashed_log,
@@ -199,10 +201,10 @@ export class HardhatEventListenerService implements OnModuleInit {
           );
 
           const eventNum = cacheService.get('hardhat.event.num');
-          console.log('number of loaded events: ', Number(eventNum) + 1);
+          self.logger.log('number of loaded events: ', Number(eventNum) + 1);
           cacheService.set('hardhat.event.num', String(Number(eventNum) + 1));
         } catch (err) {
-          console.error(err);
+          self.logger.error(err);
         }
       }
     }
@@ -222,7 +224,7 @@ export class HardhatEventListenerService implements OnModuleInit {
       const event = this.rpcService.getContractEventList(undefined, address);
       if (event !== undefined) {
         for (const value of event) {
-          this.logger.log('event listener open : ', value);
+          this.logger.log(`${value} event listener open: `, address);
           await connectedContract.addListener(value, handleEvent);
         }
       }
@@ -251,8 +253,9 @@ export class HardhatEventListenerService implements OnModuleInit {
               `hardhat.${payload.log.address}.${txHash}.${log.signature}`,
             ) !== undefined
           ) {
-            console.log(
+            self.logger.log(
               'already processed event: ',
+              log.name,
               payload.log.address,
               txHash,
               hashed_log,
@@ -269,10 +272,10 @@ export class HardhatEventListenerService implements OnModuleInit {
           );
 
           const eventNum = cacheService.get('hardhat.event.num');
-          console.log('number of loaded events: ', Number(eventNum) + 1);
+          self.logger.log('number of loaded events: ', Number(eventNum) + 1);
           cacheService.set('hardhat.event.num', String(Number(eventNum) + 1));
         } catch (err) {
-          console.error(err);
+          self.logger.error(err);
         }
       }
     } catch (err) {
@@ -290,7 +293,7 @@ export class HardhatEventListenerService implements OnModuleInit {
   ): Promise<void> {
     try {
       const eventName = log.name;
-      this.logger.log('event received: ', eventName);
+      this.logger.log(`${eventName} event received: `);
       let name = this.rpcService.getContractName(contractAddress);
       if (name === undefined) {
         this.logger.error('wrong address');
