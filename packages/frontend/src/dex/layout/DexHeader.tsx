@@ -31,28 +31,32 @@ export const DexHeader: Component = (): JSX.Element => {
     if (network === 'null') {
       if (location.pathname !== '/dex/staking') {
         setFromDexNavigate({ value: true });
-        setFromDexNavigate2({ value: true });
         navigate(`/dex/staking`);
       }
     } else {
       if (location.pathname !== `/dex/staking/${network}`) {
         setFromDexNavigate({ value: true });
-        setFromDexNavigate2({ value: true });
         navigate(`/dex/staking/${network}`);
       }
     }
   };
   const handleSwapClick = (): void => {
-    if (location.pathname !== '/dex/swap') {
-      setFromDexNavigate({ value: true });
-      setFromDexNavigate2({ value: true });
-      navigate('/dex/swap');
+    const network = localStorage.getItem('network') as string;
+    if (network === 'null') {
+      if (location.pathname !== '/dex/swap') {
+        setFromDexNavigate({ value: true });
+        navigate(`/dex/swap`);
+      }
+    } else {
+      if (location.pathname !== `/dex/swap/${network}`) {
+        setFromDexNavigate({ value: true });
+        navigate(`/dex/swap/${network}`);
+      }
     }
   };
   const handleBridgeClick = (): void => {
     if (location.pathname !== '/dex/bridge') {
       setFromDexNavigate({ value: true });
-      setFromDexNavigate2({ value: true });
       navigate('/dex/bridge');
     }
   };

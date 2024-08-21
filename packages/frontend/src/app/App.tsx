@@ -56,7 +56,22 @@ const App: Component = (): JSX.Element => {
     }
   };
   const handleSwapClick = (): void => {
-    navigate('/dex/swap');
+    if ((localStorage.getItem('network') as string) === 'null') {
+      setFromAppNavigate({ value: true });
+      navigate('/dex/swap');
+    }
+    if ((localStorage.getItem('network') as string) === 'hardhat') {
+      setFromAppNavigate({ value: true });
+      navigate('/dex/swap/hardhat');
+    }
+    if ((localStorage.getItem('network') as string) === 'sepolia') {
+      setFromAppNavigate({ value: true });
+      navigate('/dex/swap/sepolia');
+    }
+    if ((localStorage.getItem('network') as string) === 'amoy') {
+      setFromAppNavigate({ value: true });
+      navigate('/dex/swap/amoy');
+    }
   };
   const handleBridgeClick = (): void => {
     navigate('/dex/bridge');

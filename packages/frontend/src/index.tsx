@@ -66,6 +66,7 @@ if (root != null) {
               <Route path="/dex/staking" component={DexStaking} />
               <Route path="/dex/staking/:id" component={DexStaking} />
               <Route path="/dex/swap" component={DexSwap} />
+              <Route path="/dex/swap/:id" component={DexSwap} />\
               <Route path="/dex/bridge" component={DexBridge} />
               {/* test component */}
               <Route path="/dex/test" component={Test} />
