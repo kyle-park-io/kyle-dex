@@ -42,3 +42,8 @@ export async function getPairEventAll(url: string, param: any): Promise<any> {
   const res = await axios.post(`${url}/chart/getPairEventAll`, param);
   return res.data;
 }
+
+export async function getReserve(url: string, param: any): Promise<any> {
+  const res = await axios.post(`${url}/pair/getReserve`, param);
+  return res.data;
+}

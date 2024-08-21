@@ -16,3 +16,8 @@ export async function estimateLiquidity(url: string, param: any): Promise<any> {
   const res = await axios.post(`${url}/pair/estimateLiquidity`, param);
   return res.data;
 }
+
+export async function estimateSwapRatio(url: string, param: any): Promise<any> {
+  const res = await axios.post(`${url}/pair/estimateSwapRatio`, param);
+  return res.data;
+}
