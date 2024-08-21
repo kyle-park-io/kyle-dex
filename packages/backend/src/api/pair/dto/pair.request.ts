@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsOptional } from 'class-validator';
+import { IsString, IsOptional, IsArray } from 'class-validator';
 import { IsAddress } from '../../../common/decorator/custom.decorator';
 
 export class GetReserveDto {
@@ -18,6 +18,24 @@ export class GetReserveDto {
     required: true,
   })
   readonly pairAddress!: string;
+}
+
+export class GetMyLiquidityDto {
+  @IsString()
+  @ApiProperty({
+    description: 'network name',
+    example: 'hardhat',
+    required: true,
+  })
+  readonly network!: string;
+
+  @IsAddress('check address type', { message: 'not address type' })
+  @ApiProperty({
+    description: 'user address',
+    example: '0x0000000000000000000000000000000000000000',
+    required: true,
+  })
+  readonly address!: string;
 }
 
 export class GetTokensDto {
@@ -90,4 +108,34 @@ export class EstimateLiquidityDto {
     required: false,
   })
   amountB?: string;
+}
+
+export class EstimateSwapRatioDto {
+  @IsString()
+  @ApiProperty({
+    description: 'network name',
+    example: 'hardhat',
+    required: true,
+  })
+  readonly network!: string;
+
+  @IsArray()
+  @ApiProperty({
+    description: 'tokens array',
+    examples: [
+      '0x6Ca2881e49b9F73C2A6814874463FDc3e2967EB9',
+      '0x6Ca2881e49b9F73C2A6814874463FDc3e2967EB9',
+      '0x6Ca2881e49b9F73C2A6814874463FDc3e2967EB9',
+    ],
+    required: true,
+  })
+  tokens!: string[];
+
+  @IsString()
+  @ApiProperty({
+    description: 'input token amount',
+    example: '100',
+    required: true,
+  })
+  inputAmount!: string;
 }

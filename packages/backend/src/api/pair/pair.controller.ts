@@ -19,8 +19,10 @@ import {
 // dto
 import {
   GetReserveDto,
+  GetMyLiquidityDto,
   GetTokensDto,
   EstimateLiquidityDto,
+  EstimateSwapRatioDto,
 } from './dto/pair.request';
 import {
   ResponseReserveDto,
@@ -48,6 +50,26 @@ export class PairController {
   async getReserve(@Body() dto: GetReserveDto): Promise<any> {
     try {
       return await this.pairService.getReserve(dto);
+    } catch (err) {
+      console.error(err);
+      throw err;
+    }
+  }
+
+  @Post('getMyLiquidity')
+  @Header('Content-Type', 'application/json')
+  @ApiOperation({
+    summary: 'getMyLiquidity',
+    description: 'getMyLiquidity',
+  })
+  @ApiCreatedResponse({
+    description: 'getMyLiquidity success',
+    // type: ResponseReserveDto,
+  })
+  @ApiInternalServerErrorResponse({ description: 'Internal server error' })
+  async getMyLiquidity(@Body() dto: GetMyLiquidityDto): Promise<any> {
+    try {
+      return await this.pairService.getMyLiquidity(dto);
     } catch (err) {
       console.error(err);
       throw err;
@@ -90,6 +112,28 @@ export class PairController {
   ): Promise<any> {
     try {
       return await this.pairService.estimateLiquidity(estimateLiquidityDto);
+    } catch (err) {
+      console.error(err);
+      throw err;
+    }
+  }
+
+  @Post('estimateSwapRatio')
+  @Header('Content-Type', 'application/json')
+  @ApiOperation({
+    summary: 'estimate swap ratio',
+    description: 'estimate swap ratio',
+  })
+  @ApiCreatedResponse({
+    description: 'estimate swap ratio success',
+    // type: ,
+  })
+  @ApiInternalServerErrorResponse({ description: 'Internal server error' })
+  async estimateSwapRatio(
+    @Body() estimateSwapRatioDto: EstimateSwapRatioDto,
+  ): Promise<any> {
+    try {
+      return await this.pairService.estimateSwapRatio(estimateSwapRatioDto);
     } catch (err) {
       console.error(err);
       throw err;
