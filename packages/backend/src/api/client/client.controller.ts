@@ -19,11 +19,13 @@ import {
   ApiInternalServerErrorResponse, // 500
 } from '@nestjs/swagger';
 // dto
-import { OnlyHardhatNetworkType } from '../network/dto/network.request';
 import { ClientDto } from './dto/client.request';
 import { ResponseClientDto } from './dto/client.response';
+import {
+  NetworkType,
+  OnlyHardhatNetworkType,
+} from '../network/dto/network.request';
 import { constants } from '../../constants/constants';
-import { NetworkType } from '../network/dto/network.request';
 
 @ApiTags('client')
 @Controller(`${constants.apiPrefix}/api/client`)

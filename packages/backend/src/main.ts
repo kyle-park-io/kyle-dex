@@ -80,7 +80,7 @@ async function bootstrap(): Promise<void> {
     await createGKEConfigDirectory();
 
     // cron
-    if (process.env['hardhat'] !== '0') {
+    if (process.env.hardhat !== '0') {
       startCronJobs();
     }
 

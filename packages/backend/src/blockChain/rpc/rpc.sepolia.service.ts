@@ -288,7 +288,7 @@ export class SepoliaRpcService implements RpcService, OnModuleInit {
 
   async initializeAsync(): Promise<void> {
     await this.contractService.getInitializationPromise();
-    if (process.env['sepolia'] !== '0') {
+    if (process.env.sepolia !== '0') {
       await this.initConnectNetwork();
       this.changeNetworkStatus(true);
     }

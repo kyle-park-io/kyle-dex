@@ -1,13 +1,16 @@
-export type ContractType = { name: string; address: string };
+export interface ContractType {
+  name: string;
+  address: string;
+}
 
-export type TokenContractType = {
+export interface TokenContractType {
   name: string;
   address: string;
   // deployer: string;
-};
+}
 
-export type PairContractType = {
+export interface PairContractType {
   name: string;
   address: string;
   // deployer: string;
-};
+}

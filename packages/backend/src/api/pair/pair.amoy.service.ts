@@ -259,7 +259,7 @@ export class AmoyPairService {
           `${dto.network}.pair.current.reserve.${pair.calcPair}`,
         );
         if (reserve === undefined || reserve === null) {
-          throw new Error('reserve is not existed');
+          throw new Error("pair's reserve is not existed");
         }
 
         const token0 = dto.tokens[i];
@@ -268,7 +268,7 @@ export class AmoyPairService {
         let reserve1 = '0';
 
         if (checkMap.get(token1) !== undefined) {
-          throw new Error('Duplicated token!');
+          throw new Error('duplicated token!');
         }
         checkMap.set(token1, true);
         const parsed = JSON.parse(reserve);
@@ -280,7 +280,7 @@ export class AmoyPairService {
           reserve1 = parsed.eventData.reserve0;
         }
         if (reserve0 === '0' || reserve1 === '0') {
-          throw new Error('reserve 0!');
+          throw new Error("pair's reserve is 0");
         }
         result[i].reserve0 = reserve0;
         result[i].reserve1 = reserve1;
@@ -289,12 +289,12 @@ export class AmoyPairService {
           (BigInt(resultAmount) * BigInt(reserve1)) / BigInt(reserve0),
         ).toString();
         if (resultAmount === '0') {
-          throw new Error('calc result 0!');
+          throw new Error('calculated result amount is 0!');
         }
         result[i].output = resultAmount;
 
         if (BigInt(reserve1) <= BigInt(resultAmount)) {
-          throw new Error('The constant product is broken!');
+          throw new Error('the constant product is broken!');
         }
       }
     } catch (err) {

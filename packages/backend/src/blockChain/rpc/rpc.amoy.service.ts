@@ -288,7 +288,7 @@ export class AmoyRpcService implements RpcService, OnModuleInit {
 
   async initializeAsync(): Promise<void> {
     await this.contractService.getInitializationPromise();
-    if (process.env['amoy'] !== '0') {
+    if (process.env.amoy !== '0') {
       await this.initConnectNetwork();
       this.changeNetworkStatus(true);
     }
