@@ -1,13 +1,9 @@
 import { Module } from '@nestjs/common';
-import { TransactionListenerModule } from './transaction-listener/transaction-listener.module';
 import { EventListenerModule } from './event-listener/event-listener.module';
-import { HardhatEventListenerService } from './event-listener/event-listener.hardhat.service';
+import { TransactionListenerModule } from './transaction-listener/transaction-listener.module';
 
 @Module({
   imports: [EventListenerModule, TransactionListenerModule],
-  providers: [
-    { provide: 'HardhatEventListener', useClass: HardhatEventListenerService },
-  ],
-  exports: ['HardhatEventListener'],
+  exports: [EventListenerModule, TransactionListenerModule],
 })
 export class ListenerModule {}

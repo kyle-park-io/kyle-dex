@@ -19,10 +19,11 @@ import {
   ApiInternalServerErrorResponse, // 500
 } from '@nestjs/swagger';
 // dto
-import { NetworkType2 } from '../network/dto/network.request';
+import { OnlyHardhatNetworkType } from '../network/dto/network.request';
 import { ClientDto } from './dto/client.request';
 import { ResponseClientDto } from './dto/client.response';
 import { constants } from '../../constants/constants';
+import { NetworkType } from '../network/dto/network.request';
 
 @ApiTags('client')
 @Controller(`${constants.apiPrefix}/api/client`)
@@ -41,7 +42,7 @@ export class ClientController {
   })
   @ApiQuery({
     name: 'network',
-    enum: NetworkType2,
+    enum: OnlyHardhatNetworkType,
   })
   @ApiOkResponse({
     description: 'getClientList success',
@@ -50,7 +51,7 @@ export class ClientController {
   @ApiInternalServerErrorResponse({
     description: 'Internal server error',
   })
-  getClientList(@Query('network') network: NetworkType2): any {
+  getClientList(@Query('network') network: OnlyHardhatNetworkType): any {
     try {
       return this.hardhatClientService.getClientList();
     } catch (err) {
@@ -74,13 +75,13 @@ export class ClientController {
   async getClient(@Body() dto: ClientDto): Promise<any> {
     try {
       switch (dto.network) {
-        case 'hardhat': {
+        case NetworkType.hardhat: {
           return await this.hardhatClientService.getClient(dto);
         }
-        case 'sepolia': {
+        case NetworkType.sepolia: {
           return await this.sepoliaClientService.getClient(dto);
         }
-        case 'amoy': {
+        case NetworkType.amoy: {
           return await this.amoyClientService.getClient(dto);
         }
         default:

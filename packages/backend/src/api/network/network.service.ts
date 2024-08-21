@@ -3,6 +3,8 @@ import { ConfigService } from '@nestjs/config';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { RpcService } from '../../blockChain/rpc/interfaces/rpc.interface';
 import { HardhatEventListenerService } from '../../blockChain/listener/event-listener/event-listener.hardhat.service';
+import { SepoliaEventListenerService } from '../../blockChain/listener/event-listener/event-listener.sepolia.service';
+import { AmoyEventListenerService } from '../../blockChain/listener/event-listener/event-listener.amoy.service';
 // dto
 import { NetworkType } from './dto/network.request';
 import { type JsonRpcProvider } from 'ethers';
@@ -24,6 +26,10 @@ export class NetworkService {
     private readonly amoyRpcService: RpcService,
     @Inject('HardhatEventListener')
     private readonly hardhatEventListenerService: HardhatEventListenerService,
+    @Inject('SepoliaEventListener')
+    private readonly sepoliaEventListenerService: SepoliaEventListenerService,
+    @Inject('AmoyEventListener')
+    private readonly amoyEventListenerService: AmoyEventListenerService,
   ) {}
 
   getNetwork(network: NetworkType): JsonRpcProvider {
@@ -71,10 +77,10 @@ export class NetworkService {
           await this.hardhatEventListenerService.reconnectRpc();
           break;
         case NetworkType.sepolia:
-          await this.hardhatEventListenerService.reconnectRpc();
+          await this.sepoliaEventListenerService.reconnectRpc();
           break;
         case NetworkType.amoy:
-          await this.hardhatEventListenerService.reconnectRpc();
+          await this.amoyEventListenerService.reconnectRpc();
           break;
         default:
           return 'wrong network';

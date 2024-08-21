@@ -27,7 +27,7 @@ import {
 // dto
 import { NetworkType } from './dto/network.request';
 import { constants } from '../../constants/constants';
-import { Provider, type Network } from 'ethers';
+import { type Provider, type Network } from 'ethers';
 
 @ApiTags('network')
 @Controller(`${constants.apiPrefix}/api/network`)

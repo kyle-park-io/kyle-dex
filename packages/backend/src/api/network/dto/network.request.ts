@@ -4,6 +4,6 @@ export enum NetworkType {
   amoy = 'amoy',
 }
 
-export enum NetworkType2 {
+export enum OnlyHardhatNetworkType {
   hardhat = 'hardhat',
 }
