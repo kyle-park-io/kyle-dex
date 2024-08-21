@@ -5,3 +5,9 @@ export type TokenContractType = {
   address: string;
   // deployer: string;
 };
+
+export type PairContractType = {
+  name: string;
+  address: string;
+  // deployer: string;
+};

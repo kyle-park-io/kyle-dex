@@ -11,7 +11,11 @@ import { type RpcService } from './interfaces/rpc.interface';
 import { ContractService } from '../contract/contract.service';
 import { FsService } from '../utils/fs.service';
 import { type ContractConfig } from '../contract/interfaces/contract.interface';
-import { type ContractType, type TokenContractType } from './types/types';
+import {
+  type ContractType,
+  type TokenContractType,
+  type PairContractType,
+} from './types/types';
 import { ethers, JsonRpcProvider, Interface, type Contract } from 'ethers';
 import { setTimeout } from 'timers/promises';
 
@@ -34,6 +38,7 @@ export class HardhatRpcService implements RpcService, OnModuleInit {
   // array
   private readonly currentDeployedContractList: ContractType[];
   private readonly tokenContractList: TokenContractType[];
+  private readonly pairContractList: PairContractType[];
 
   constructor(
     private readonly configService: ConfigService,
@@ -50,6 +55,7 @@ export class HardhatRpcService implements RpcService, OnModuleInit {
     this.contractEventListByAddressMap = new Map<string, string[]>();
     this.currentDeployedContractList = [];
     this.tokenContractList = [];
+    this.pairContractList = [];
 
     const http = this.configService.get<string>(
       'endpoints.localhost.hardhat.url.http',
@@ -121,6 +127,13 @@ export class HardhatRpcService implements RpcService, OnModuleInit {
       return null;
     }
     return this.tokenContractList;
+  }
+
+  getPairContractList(): PairContractType[] | null {
+    if (this.pairContractList.length === 0) {
+      return null;
+    }
+    return this.pairContractList;
   }
 
   getContractEventList(name?: string, address?: string): string[] | undefined {
@@ -244,6 +257,15 @@ export class HardhatRpcService implements RpcService, OnModuleInit {
       const interface2 = this.getContractInterfaceByName(name);
       if (interface2 === undefined) {
         throw new Error(`${name} contract is not existed`);
+      }
+
+      // pair
+      if (name.includes('Pair')) {
+        const pair: PairContractType = {
+          name,
+          address,
+        };
+        this.pairContractList.push(pair);
       }
 
       const contract = new ethers.Contract(address, interface2, this.provider);
