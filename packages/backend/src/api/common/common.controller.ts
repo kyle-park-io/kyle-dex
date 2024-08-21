@@ -214,7 +214,8 @@ export class CommonController {
         contractAddress,
         function: dto.function,
         args: dto.args,
-        eth: parseEther(dto.eth).toString(),
+        // eth: parseEther(dto.eth).toString(),
+        eth: dto.eth,
       };
 
       const result = await this.commonService.submitWithETH(args);

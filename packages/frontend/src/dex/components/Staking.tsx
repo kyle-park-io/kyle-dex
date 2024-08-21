@@ -1,9 +1,11 @@
 import { type Component, type JSX } from 'solid-js';
 import { createSignal, createEffect } from 'solid-js';
+import { useNavigate } from '@solidjs/router';
 import { Button, Spinner, CloseButton } from 'solid-bootstrap';
 import {
   fromDexNavigate,
   setFromDexNavigate,
+  setFromDexNavigate2,
   fromAppNavigate,
   setFromAppNavigate,
   HeaderNavigateType,
@@ -25,6 +27,7 @@ import {
 import { Container, Form, Row, Col } from 'solid-bootstrap';
 import { globalState } from '../../global/constants';
 import axios from 'axios';
+import { ethers } from 'ethers';
 // import { CustomError } from '../../common/error/custom.error';
 
 const notExisted = '현재 네트워크에 토큰이 존재하지 않습니다';
@@ -34,6 +37,7 @@ const [isAccount, setIsAccount] = createSignal(false);
 const [isError, setIsError] = createSignal(false);
 const [apiErr, setApiErr] = createSignal('');
 const [isResult, setIsResult] = createSignal(false);
+const [goChart, setGoChart] = createSignal(false);
 const [result, setResult] = createSignal('');
 
 const [pairs, setPairs] = createSignal<any[]>([]);
@@ -43,6 +47,7 @@ const [tokens, setTokens] = createSignal<any[]>([]);
 // const [items, setItems] = createSignal<Pair2[]>([]);
 
 export const Staking: Component = (): JSX.Element => {
+  const navigate = useNavigate();
   const api = globalState.api_url;
 
   // loading
@@ -309,17 +314,14 @@ export const Staking: Component = (): JSX.Element => {
     if (value === '') {
       setAMsg('Enter the value!');
       setABool(false);
-    } else if (/^[0-9]+$/.test(value)) {
-      if (value === '0') {
+    } else if (/^-?[0-9]+$/.test(value)) {
+      if (value === '0' || value.startsWith('-')) {
         setAMsg('Enter a value greater than 0!');
         setABool(false);
-      } else if (!value.startsWith('0')) {
+      } else {
         setAMsg("Let's calculate!");
         bool2 = true;
         setABool(true);
-      } else {
-        setAMsg('Invalid number format');
-        setABool(false);
       }
     } else {
       setAMsg('Invalid number format');
@@ -336,17 +338,14 @@ export const Staking: Component = (): JSX.Element => {
     if (value === '') {
       setBMsg('Enter the value!');
       setBBool(false);
-    } else if (/^[0-9]+$/.test(value)) {
-      if (value === '0') {
+    } else if (/^-?[0-9]+$/.test(value)) {
+      if (value === '0' || value.startsWith('-')) {
         setBMsg('Enter a value greater than 0!');
         setBBool(false);
-      } else if (!value.startsWith('0')) {
+      } else {
         setBMsg("Let's calculate!");
         bool2 = true;
         setBBool(true);
-      } else {
-        setBMsg('Invalid number format');
-        setBBool(false);
       }
     } else {
       setBMsg('Invalid number format');
@@ -380,10 +379,7 @@ export const Staking: Component = (): JSX.Element => {
     let amount1;
     let bool0 = false;
     let bool1 = false;
-    if (
-      selectedTokenA().toLocaleLowerCase() <
-      selectedTokenB().toLocaleLowerCase()
-    ) {
+    if (selectedTokenA().toLowerCase() < selectedTokenB().toLowerCase()) {
       token0 = selectedTokenA();
       token1 = selectedTokenB();
       amount0 = tokenALiquidity();
@@ -409,10 +405,7 @@ export const Staking: Component = (): JSX.Element => {
         amountB: amount1,
       });
 
-      if (
-        selectedTokenA().toLocaleLowerCase() <
-        selectedTokenB().toLocaleLowerCase()
-      ) {
+      if (selectedTokenA().toLowerCase() < selectedTokenB().toLowerCase()) {
         setTokenBCalculatedLiquidity(r.calc1.expected1);
         setBCalculatedLiquidity(r.calc1.liquidity);
         setTokenACalculatedLiquidity(r.calc0.expected0);
@@ -435,10 +428,7 @@ export const Staking: Component = (): JSX.Element => {
         amountA: amount0,
       });
 
-      if (
-        selectedTokenA().toLocaleLowerCase() <
-        selectedTokenB().toLocaleLowerCase()
-      ) {
+      if (selectedTokenA().toLowerCase() < selectedTokenB().toLowerCase()) {
         setTokenBCalculatedLiquidity(r.calc1.expected1);
         setBCalculatedLiquidity(r.calc1.liquidity);
         setTokenACalculatedLiquidity('');
@@ -461,10 +451,7 @@ export const Staking: Component = (): JSX.Element => {
         amountB: amount1,
       });
 
-      if (
-        selectedTokenA().toLocaleLowerCase() <
-        selectedTokenB().toLocaleLowerCase()
-      ) {
+      if (selectedTokenA().toLowerCase() < selectedTokenB().toLowerCase()) {
         setTokenACalculatedLiquidity(r.calc0.expected0);
         setACalculatedLiquidity(r.calc0.liquidity);
         setTokenBCalculatedLiquidity('');
@@ -519,17 +506,14 @@ export const Staking: Component = (): JSX.Element => {
     if (value === '') {
       setAMsgR('Enter the value!');
       setABoolR(false);
-    } else if (/^[0-9]+$/.test(value)) {
-      if (value === '0') {
+    } else if (/^-?[0-9]+$/.test(value)) {
+      if (value === '0' || value.startsWith('-')) {
         setAMsgR('Enter a value greater than 0!');
         setABoolR(false);
-      } else if (!value.startsWith('0')) {
+      } else {
         setAMsgR("Let's inject!");
         setTokenALiquidityR(value);
         setABoolR(true);
-      } else {
-        setAMsgR('Invalid number format');
-        setABoolR(false);
       }
     } else {
       setAMsgR('Invalid number format');
@@ -540,17 +524,14 @@ export const Staking: Component = (): JSX.Element => {
     if (value === '') {
       setBMsgR('Enter the value!');
       setBBoolR(false);
-    } else if (/^[0-9]+$/.test(value)) {
-      if (value === '0') {
+    } else if (/^-?[0-9]+$/.test(value)) {
+      if (value === '0' || value.startsWith('-')) {
         setBMsgR('Enter a value greater than 0!');
         setBBoolR(false);
-      } else if (!value.startsWith('0')) {
+      } else {
         setBMsgR("Let's inject!");
         setTokenBLiquidityR(value);
         setBBoolR(true);
-      } else {
-        setBMsgR('Invalid number format');
-        setBBoolR(false);
       }
     } else {
       setBMsgR('Invalid number format');
@@ -567,14 +548,25 @@ export const Staking: Component = (): JSX.Element => {
     }
   };
   const handleCancel = () => {
-    setLModal(false);
-    setIsResult(false);
-    setResult('');
+    if (isResult()) {
+      window.location.reload();
+    } else {
+      setLModal(false);
+      setIsResult(false);
+      setResult('');
+    }
+  };
+  const handleGoChart = () => {
+    const network = localStorage.getItem('network') as string;
+    setFromDexNavigate({ value: true });
+    setFromDexNavigate2({ value: true });
+    navigate(`/dex/chart/${network}`);
   };
   const handleSubmitR = async () => {
     try {
       setIsResult(false);
       setResult('');
+      setGoChart(false);
 
       // submit
       const network = localStorage.getItem('network') as string;
@@ -622,6 +614,7 @@ export const Staking: Component = (): JSX.Element => {
       }
       setIsResult(true);
       setResult('Transaction successfully completed!\nPlease check the chart');
+      setGoChart(true);
     } catch (err) {
       if (axios.isAxiosError(err)) {
         if (err.response?.status === 500) {
@@ -645,6 +638,11 @@ export const Staking: Component = (): JSX.Element => {
           setFromDexNavigate({ value: false });
           return;
         }
+        if (address === 'null') {
+          setIsAccount(false);
+        } else {
+          setIsAccount(true);
+        }
 
         setIsNetwork(true);
         setLoading(false);
@@ -660,6 +658,11 @@ export const Staking: Component = (): JSX.Element => {
           setIsNetwork(false);
           setFromAppNavigate({ value: false });
           return;
+        }
+        if (address === 'null') {
+          setIsAccount(false);
+        } else {
+          setIsAccount(true);
         }
 
         setIsNetwork(true);
@@ -797,7 +800,7 @@ export const Staking: Component = (): JSX.Element => {
 
         const res = await calcPair(api, {
           network: localStorage.getItem('network') as string,
-          userName: 'user1',
+          userName: 'admin',
           contractName: 'DexCalc',
           factory,
           tokenA: selectedTokenA(),
@@ -811,10 +814,7 @@ export const Staking: Component = (): JSX.Element => {
         network: localStorage.getItem('network') as string,
         pairAddress: pair,
       });
-      if (
-        selectedTokenA().toLocaleLowerCase() <
-        selectedTokenB().toLocaleLowerCase()
-      ) {
+      if (selectedTokenA().toLowerCase() < selectedTokenB().toLowerCase()) {
         setReserve(r.eventData);
       } else {
         setReserve({
@@ -831,6 +831,23 @@ export const Staking: Component = (): JSX.Element => {
           setReserveLoading(true);
         }
       }
+    }
+  };
+
+  const [eth, setEth] = createSignal('0');
+  const [wei, setWei] = createSignal('0');
+  const handleEth = (e) => {
+    setWei('0');
+    const value = e.target.value;
+    if (/^[0-9]+(\.[0-9]+)?$/.test(value)) {
+      setWei(ethers.parseEther(value).toString());
+    }
+  };
+  const handleWei = (e) => {
+    setEth('0');
+    const value = e.target.value;
+    if (/^[0-9]+$/.test(value)) {
+      setEth(ethers.formatEther(value).toString());
     }
   };
 
@@ -978,7 +995,6 @@ export const Staking: Component = (): JSX.Element => {
                         <Form.Group>
                           <Form.Label>Estimate Liquidity</Form.Label>
                           <br></br>
-
                           <Form.Label>token A</Form.Label>
                           <Form.Control
                             id="aLiquidity"
@@ -987,7 +1003,6 @@ export const Staking: Component = (): JSX.Element => {
                             placeholder="Please enter the liquidity to be injected"
                           ></Form.Control>
                           <p>{aMsg()}</p>
-
                           <Form.Label>token B</Form.Label>
                           <Form.Control
                             id="bLiquidity"
@@ -996,6 +1011,26 @@ export const Staking: Component = (): JSX.Element => {
                             placeholder="Please enter the liquidity to be injected"
                           ></Form.Control>
                           <p>{bMsg()}</p>
+
+                          <Form.Label>Conversion Tool</Form.Label>
+                          <div class="tw-flex tw-w-full">
+                            <div>
+                              <Form.Label>ETH</Form.Label>
+                              <Form.Control
+                                value={eth()}
+                                onInput={handleEth}
+                                placeholder="0"
+                              ></Form.Control>
+                            </div>
+                            <div>
+                              <Form.Label>WEI</Form.Label>
+                              <Form.Control
+                                value={wei()}
+                                onInput={handleWei}
+                                placeholder="0"
+                              ></Form.Control>
+                            </div>
+                          </div>
                         </Form.Group>
 
                         <>
@@ -1021,6 +1056,13 @@ export const Staking: Component = (): JSX.Element => {
                                     <>
                                       <p>result:</p>
                                       <p>{result()}</p>
+                                      {goChart() && (
+                                        <>
+                                          <Button onClick={handleGoChart}>
+                                            Go Chart
+                                          </Button>
+                                        </>
+                                      )}
                                     </>
                                   )}
                                 </pre>
