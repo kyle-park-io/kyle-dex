@@ -13,6 +13,7 @@ import { type ResponseBalanceOfDto } from './dto/token.response.dto';
 import { type ProcessContractDto } from '../../blockChain/common/dto/common.dto';
 import { NetworkType } from '../network/dto/network.request';
 import { type TokenContractType } from '../../blockChain/rpc/types/types';
+import { ZeroAddress } from 'ethers';
 
 @Injectable()
 export class TokenService {
@@ -23,35 +24,35 @@ export class TokenService {
     @Inject('HardhatAccount')
     private readonly accountService: AccountService,
     @Inject('HardhatRpc')
-    private readonly rpcService: RpcService,
+    private readonly hardhatRpcService: RpcService,
     @Inject('SepoliaRpc')
     private readonly sepoliaRpcService: RpcService,
     @Inject('AmoyRpc')
     private readonly amoyRpcService: RpcService,
   ) {}
 
-  // currently only hardhat network function
   async balanceOf(dto: BalanceOfDto): Promise<ResponseBalanceOfDto> {
     try {
-      // user
-      let userAddress;
-      if (dto.userAddress === undefined && dto.userName === undefined) {
-        throw new Error('chekc user params');
-      } else if (dto.userAddress !== undefined) {
-        userAddress = dto.userAddress;
-      } else if (dto.userName !== undefined) {
-        const wallet = this.accountService.getWalletByName(dto.userName);
-        if (wallet === undefined) {
-          throw new Error('user is not existed');
-        }
-        userAddress = wallet.address;
-      }
-      if (dto.userName !== undefined && dto.userAddress !== undefined) {
-        const address = this.accountService.getAddressByName(dto.userName);
-        if (dto.userAddress !== address) {
-          throw new Error('user name is unmatched by user address');
-        }
-      }
+      // // user
+      // let userAddress;
+      // if (dto.userAddress === undefined && dto.userName === undefined) {
+      //   throw new Error('chekc user params');
+      // } else if (dto.userAddress !== undefined) {
+      //   userAddress = dto.userAddress;
+      // } else if (dto.userName !== undefined) {
+      //   const wallet = this.accountService.getWalletByName(dto.userName);
+      //   if (wallet === undefined) {
+      //     throw new Error('user is not existed');
+      //   }
+      //   userAddress = wallet.address;
+      // }
+      // if (dto.userName !== undefined && dto.userAddress !== undefined) {
+      //   const address = this.accountService.getAddressByName(dto.userName);
+      //   if (dto.userAddress !== address) {
+      //     throw new Error('user name is unmatched by user address');
+      //   }
+      // }
+
       // contract
       let contractAddress;
       if (dto.contractAddress === undefined && dto.contractName === undefined) {
@@ -59,16 +60,37 @@ export class TokenService {
       } else if (dto.contractAddress !== undefined) {
         contractAddress = dto.contractAddress;
       } else if (dto.contractName !== undefined) {
-        const contract = this.rpcService.getContractAddress(dto.contractName);
+        let contract;
+        switch (dto.network) {
+          case NetworkType.hardhat: {
+            contract = this.hardhatRpcService.getContractByAddress(
+              dto.contractName,
+            );
+            break;
+          }
+          case NetworkType.sepolia: {
+            contract = this.sepoliaRpcService.getContractByAddress(
+              dto.contractName,
+            );
+            break;
+          }
+          case NetworkType.amoy: {
+            contract = this.amoyRpcService.getContractByAddress(
+              dto.contractName,
+            );
+            break;
+          }
+        }
         if (contract === undefined) {
-          throw new Error('contract is not existed');
+          throw new Error('contract is not exitsed');
         }
         contractAddress = contract;
       }
 
       const args: ProcessContractDto = {
         network: dto.network,
-        userAddress,
+        // userAddress,
+        userAddress: ZeroAddress,
         contractAddress,
         function: 'balanceOf',
         args: [dto.address],
@@ -85,7 +107,7 @@ export class TokenService {
       let list: TokenContractType[] | null = null;
       switch (network) {
         case NetworkType.hardhat:
-          list = this.rpcService.getTokenContractList();
+          list = this.hardhatRpcService.getTokenContractList();
           break;
         case NetworkType.sepolia:
           list = this.sepoliaRpcService.getTokenContractList();

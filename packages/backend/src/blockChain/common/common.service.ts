@@ -48,6 +48,7 @@ export class CommonService {
         return await this.queryWithContractInterface(dto);
       }
 
+      // The logic that is no longer used.
       const wallet: Wallet | undefined =
         this.hardhatAccountService.getWalletByAddress(dto.userAddress);
       if (wallet === undefined) {

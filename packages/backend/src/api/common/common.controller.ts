@@ -39,8 +39,15 @@ import {
   type ProcessContractDto,
   type ProcessContractWithETHDto,
 } from '../../blockChain/common/dto/common.dto';
-import { formatEther, formatUnits, parseEther, parseUnits } from 'ethers';
+import {
+  formatEther,
+  formatUnits,
+  parseEther,
+  parseUnits,
+  ZeroAddress,
+} from 'ethers';
 import { constants } from '../../constants/constants';
+import { NetworkType } from '../network/dto/network.request';
 
 @ApiTags('common')
 @Controller(`${constants.apiPrefix}/api/common`)
@@ -51,9 +58,13 @@ export class CommonController {
     private readonly logger: LoggerService,
     private readonly commonService: CommonService,
     @Inject('HardhatAccount')
-    private readonly accountService: AccountService,
+    private readonly hardhatAccountService: AccountService,
     @Inject('HardhatRpc')
-    private readonly rpcService: RpcService,
+    private readonly hardhatRpcService: RpcService,
+    @Inject('SepoliaRpc')
+    private readonly sepoliaRpcService: RpcService,
+    @Inject('AmoyRpc')
+    private readonly amoyRpcService: RpcService,
   ) {}
 
   @Post('query')
@@ -69,19 +80,20 @@ export class CommonController {
   @ApiInternalServerErrorResponse({ description: 'Internal server error' })
   async query(@Body() dto: QueryContractDto): Promise<any> {
     try {
-      // user
-      let userAddress;
-      if (dto.userAddress === undefined && dto.userName === undefined) {
-        throw new Error('check user params');
-      } else if (dto.userAddress !== undefined) {
-        userAddress = dto.userAddress;
-      } else if (dto.userName !== undefined) {
-        const wallet = this.accountService.getWalletByName(dto.userName);
-        if (wallet === undefined) {
-          throw new Error('user is not existed');
-        }
-        userAddress = wallet.address;
-      }
+      // // user
+      // let userAddress;
+      // if (dto.userAddress === undefined && dto.userName === undefined) {
+      //   throw new Error('check user params');
+      // } else if (dto.userAddress !== undefined) {
+      //   userAddress = dto.userAddress;
+      // } else if (dto.userName !== undefined) {
+      //   const wallet = this.hardhatAccountService.getWalletByName(dto.userName);
+      //   if (wallet === undefined) {
+      //     throw new Error('user is not existed');
+      //   }
+      //   userAddress = wallet.address;
+      // }
+      const userAddress = ZeroAddress;
       // contract
       let contractAddress;
       if (dto.contractAddress === undefined && dto.contractName === undefined) {
@@ -89,7 +101,27 @@ export class CommonController {
       } else if (dto.contractAddress !== undefined) {
         contractAddress = dto.contractAddress;
       } else if (dto.contractName !== undefined) {
-        const contract = this.rpcService.getContractAddress(dto.contractName);
+        let contract;
+        switch (dto.network) {
+          case NetworkType.hardhat: {
+            contract = this.hardhatRpcService.getContractByAddress(
+              dto.contractName,
+            );
+            break;
+          }
+          case NetworkType.sepolia: {
+            contract = this.sepoliaRpcService.getContractByAddress(
+              dto.contractName,
+            );
+            break;
+          }
+          case NetworkType.amoy: {
+            contract = this.amoyRpcService.getContractByAddress(
+              dto.contractName,
+            );
+            break;
+          }
+        }
         if (contract === undefined) {
           throw new Error('contract is not exitsed');
         }
@@ -132,7 +164,7 @@ export class CommonController {
       } else if (dto.userAddress !== undefined) {
         userAddress = dto.userAddress;
       } else if (dto.userName !== undefined) {
-        const wallet = this.accountService.getWalletByName(dto.userName);
+        const wallet = this.hardhatAccountService.getWalletByName(dto.userName);
         if (wallet === undefined) {
           throw new Error('user is not existed');
         }
@@ -145,7 +177,9 @@ export class CommonController {
       } else if (dto.contractAddress !== undefined) {
         contractAddress = dto.contractAddress;
       } else if (dto.contractName !== undefined) {
-        const contract = this.rpcService.getContractAddress(dto.contractName);
+        const contract = this.hardhatRpcService.getContractAddress(
+          dto.contractName,
+        );
         if (contract === undefined) {
           throw new Error('contract is not existed');
         }
@@ -189,7 +223,7 @@ export class CommonController {
       } else if (dto.userAddress !== undefined) {
         userAddress = dto.userAddress;
       } else if (dto.userName !== undefined) {
-        const wallet = this.accountService.getWalletByName(dto.userName);
+        const wallet = this.hardhatAccountService.getWalletByName(dto.userName);
         if (wallet === undefined) {
           throw new Error('user is not existed');
         }
@@ -202,7 +236,9 @@ export class CommonController {
       } else if (dto.contractAddress !== undefined) {
         contractAddress = dto.contractAddress;
       } else if (dto.contractName !== undefined) {
-        const contract = this.rpcService.getContractAddress(dto.contractName);
+        const contract = this.hardhatRpcService.getContractAddress(
+          dto.contractName,
+        );
         if (contract === undefined) {
           throw new Error('contract is not existed');
         }

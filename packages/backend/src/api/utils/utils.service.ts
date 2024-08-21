@@ -18,7 +18,7 @@ import {
   getCreate2Address,
   ZeroAddress,
 } from 'ethers';
-import { NetworkType } from '../network/dto/network.request';
+import { type NetworkType } from '../network/dto/network.request';
 
 @Injectable()
 export class UtilsService {
@@ -114,28 +114,29 @@ export class UtilsService {
 
   async calcPair(dto: CalcPairDto): Promise<string> {
     try {
-      // user
-      let userAddress;
-      if (dto.userAddress === undefined && dto.userName === undefined) {
-        // throw new Error('check user params');
-        userAddress = ZeroAddress;
-      } else if (dto.userAddress !== undefined) {
-        userAddress = dto.userAddress;
-      } else if (dto.userName !== undefined) {
-        const wallet = this.hardhatAccountService.getWalletByName(dto.userName);
-        if (wallet === undefined) {
-          throw new Error('user is not existed');
-        }
-        userAddress = wallet.address;
-      }
-      if (dto.userName !== undefined && dto.userAddress !== undefined) {
-        const address = this.hardhatAccountService.getAddressByName(
-          dto.userName,
-        );
-        if (dto.userAddress !== address) {
-          throw new Error('user name is unmatched by user address');
-        }
-      }
+      // // user
+      // let userAddress;
+      // if (dto.userAddress === undefined && dto.userName === undefined) {
+      //   // throw new Error('check user params');
+      //   userAddress = ZeroAddress;
+      // } else if (dto.userAddress !== undefined) {
+      //   userAddress = dto.userAddress;
+      // } else if (dto.userName !== undefined) {
+      //   const wallet = this.hardhatAccountService.getWalletByName(dto.userName);
+      //   if (wallet === undefined) {
+      //     throw new Error('user is not existed');
+      //   }
+      //   userAddress = wallet.address;
+      // }
+      // if (dto.userName !== undefined && dto.userAddress !== undefined) {
+      //   const address = this.hardhatAccountService.getAddressByName(
+      //     dto.userName,
+      //   );
+      //   if (dto.userAddress !== address) {
+      //     throw new Error('user name is unmatched by user address');
+      //   }
+      // }
+
       // contract
       const contractAddress: string | undefined =
         dto.network === 'hardhat'
@@ -149,7 +150,8 @@ export class UtilsService {
 
       const args: ProcessContractDto = {
         network: dto.network,
-        userAddress,
+        // userAddress,
+        userAddress: ZeroAddress,
         contractAddress,
         function: 'calcPair',
         args: [dto.factory, dto.tokenA, dto.tokenB],
