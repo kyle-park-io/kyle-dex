@@ -2,7 +2,6 @@ import {
   Inject,
   Injectable,
   LoggerService,
-  forwardRef,
   type OnModuleInit,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -33,7 +32,6 @@ export class AmoyEventListenerService implements OnModuleInit {
     @Inject(WINSTON_MODULE_NEST_PROVIDER)
     private readonly logger: LoggerService,
     // rpc
-    // @Inject(forwardRef(() => 'HardhatRpc'))
     @Inject('AmoyRpc')
     private readonly rpcService: RpcService,
     // extra
@@ -46,7 +44,6 @@ export class AmoyEventListenerService implements OnModuleInit {
   }
 
   async connectRpc(): Promise<void> {
-    const self = this;
     const contractList = this.rpcService.getContractList();
     for (const contractName of contractList) {
       if (contractName === 'Pair' || contractName === 'Token') continue;
@@ -54,11 +51,11 @@ export class AmoyEventListenerService implements OnModuleInit {
       const address = this.rpcService.getContractAddress(contractName);
       if (address === undefined) {
         continue;
-        // throw new Error('check');
+        // throw new Error('contract address is not existed');
       }
       const contract = this.rpcService.getContractByAddress(address);
       if (contract === undefined) {
-        throw new Error('check');
+        throw new Error('contract is not existed');
       }
 
       const provider = this.rpcService.getProvider();
@@ -69,70 +66,20 @@ export class AmoyEventListenerService implements OnModuleInit {
       if (event !== undefined) {
         for (const value of event) {
           this.logger.log(`${value} event listener open: `, address);
-          await connectedContract.addListener(value, handleEvent);
+          await connectedContract.addListener(value, (...event) => {
+            try {
+              this.handleEvent(connectedContract, event);
+            } catch (err) {
+              this.logger.error('Error handling event:', err);
+              throw err;
+            }
+          });
         }
       }
-
-      function handleEvent(...event): void {
-        try {
-          const payload: ContractEventPayload = event[event.length - 1];
-          const blockHash = payload.log.blockHash;
-          const blockNumber = payload.log.blockNumber;
-          const txHash = payload.log.transactionHash;
-          const topics = [...payload.log.topics];
-          const data = payload.log.data;
-
-          const log: LogDescription | null =
-            connectedContract.interface.parseLog({
-              topics,
-              data,
-            });
-          if (log === null) {
-            throw new Error('wrong matching event <-> data');
-          }
-          // check tx cache
-          const hashed_log = keccak256(toUtf8Bytes(log.signature));
-          if (
-            cacheService.get(
-              `hardhat.${payload.log.address}.${txHash}.${hashed_log}`,
-            ) !== undefined
-          ) {
-            self.logger.log(
-              'already processed event: ',
-              log.name,
-              payload.log.address,
-              txHash,
-              hashed_log,
-            );
-            return;
-          }
-
-          void self.processEvent(
-            payload.log.address,
-            blockHash,
-            blockNumber,
-            txHash,
-            log,
-          );
-
-          const eventNum = cacheService.get('hardhat.event.num');
-          self.logger.log('number of loaded events: ', Number(eventNum) + 1);
-          cacheService.set('hardhat.event.num', String(Number(eventNum) + 1));
-        } catch (err) {
-          self.logger.error(err);
-        }
-      }
-
-      // TODO : make auto reading system
-      // const abi = await this.fsService.getAbi('Factory');
-      // for (let i = 0; i < abi.length; i++) {
-      //   self.logger.log(abi[i].type);
-      // }
     }
   }
 
   async reconnectRpc(): Promise<void> {
-    const self = this;
     const contractList = this.rpcService.getCurrentDeployedContractList();
 
     for (const list of contractList) {
@@ -140,7 +87,7 @@ export class AmoyEventListenerService implements OnModuleInit {
         list.address,
       ) as Contract;
       if (connectedContract === undefined) {
-        throw new Error('check');
+        throw new Error('contract is not existed');
       }
 
       // remove
@@ -155,57 +102,14 @@ export class AmoyEventListenerService implements OnModuleInit {
       if (event !== undefined) {
         for (const value of event) {
           this.logger.log(`${value} event listener reopen: `, list.address);
-          await connectedContract.addListener(value, handleEvent);
-        }
-      }
-
-      function handleEvent(...event): void {
-        try {
-          const payload: ContractEventPayload = event[event.length - 1];
-          const blockHash = payload.log.blockHash;
-          const blockNumber = payload.log.blockNumber;
-          const txHash = payload.log.transactionHash;
-          const topics = [...payload.log.topics];
-          const data = payload.log.data;
-
-          const log: LogDescription | null =
-            connectedContract.interface.parseLog({
-              topics,
-              data,
-            });
-          if (log === null) {
-            throw new Error('wrong matching event <-> data');
-          }
-          // check tx cache
-          const hashed_log = keccak256(toUtf8Bytes(log.signature));
-          if (
-            cacheService.get(
-              `hardhat.${payload.log.address}.${txHash}.${hashed_log}`,
-            ) !== undefined
-          ) {
-            self.logger.log(
-              'already processed event: ',
-              log.name,
-              payload.log.address,
-              txHash,
-              hashed_log,
-            );
-            return;
-          }
-
-          void self.processEvent(
-            payload.log.address,
-            blockHash,
-            blockNumber,
-            txHash,
-            log,
-          );
-
-          const eventNum = cacheService.get('hardhat.event.num');
-          self.logger.log('number of loaded events: ', Number(eventNum) + 1);
-          cacheService.set('hardhat.event.num', String(Number(eventNum) + 1));
-        } catch (err) {
-          self.logger.error(err);
+          await connectedContract.addListener(value, (...event) => {
+            try {
+              this.handleEvent(connectedContract, event);
+            } catch (err) {
+              this.logger.error('Error handling event:', err);
+              throw err;
+            }
+          });
         }
       }
     }
@@ -213,12 +117,11 @@ export class AmoyEventListenerService implements OnModuleInit {
 
   async setEventListener(name: string, address: string): Promise<void> {
     try {
-      const self = this;
       this.rpcService.addNewContract(name, address);
 
       const contract = this.rpcService.getContractByAddress(address);
       if (contract === undefined) {
-        throw new Error('check');
+        throw new Error('contract is not existed');
       }
       const provider = this.rpcService.getProvider();
       const connectedContract = contract.connect(provider);
@@ -226,59 +129,66 @@ export class AmoyEventListenerService implements OnModuleInit {
       if (event !== undefined) {
         for (const value of event) {
           this.logger.log(`${value} event listener open: `, address);
-          await connectedContract.addListener(value, handleEvent);
+          await connectedContract.addListener(value, (...event) => {
+            try {
+              this.handleEvent(connectedContract, event);
+            } catch (err) {
+              this.logger.error('Error handling event:', err);
+              throw err;
+            }
+          });
         }
       }
+    } catch (err) {
+      this.logger.error(err);
+      throw err;
+    }
+  }
 
-      function handleEvent(...event): void {
-        try {
-          const payload: ContractEventPayload = event[event.length - 1];
-          const blockHash = payload.log.blockHash;
-          const blockNumber = payload.log.blockNumber;
-          const txHash = payload.log.transactionHash;
-          const topics = [...payload.log.topics];
-          const data = payload.log.data;
+  handleEvent(connectedContract, event): void {
+    try {
+      const payload: ContractEventPayload = event[event.length - 1];
+      const blockHash = payload.log.blockHash;
+      const blockNumber = payload.log.blockNumber;
+      const txHash = payload.log.transactionHash;
+      const topics = [...payload.log.topics];
+      const data = payload.log.data;
 
-          const log: LogDescription | null =
-            connectedContract.interface.parseLog({
-              topics,
-              data,
-            });
-          if (log === null) {
-            throw new Error('wrong matching event <-> data');
-          }
-          // check tx cache
-          const hashed_log = keccak256(toUtf8Bytes(log.signature));
-          if (
-            cacheService.get(
-              `hardhat.${payload.log.address}.${txHash}.${log.signature}`,
-            ) !== undefined
-          ) {
-            self.logger.log(
-              'already processed event: ',
-              log.name,
-              payload.log.address,
-              txHash,
-              hashed_log,
-            );
-            return;
-          }
-
-          void self.processEvent(
-            payload.log.address,
-            blockHash,
-            blockNumber,
-            txHash,
-            log,
-          );
-
-          const eventNum = cacheService.get('hardhat.event.num');
-          self.logger.log('number of loaded events: ', Number(eventNum) + 1);
-          cacheService.set('hardhat.event.num', String(Number(eventNum) + 1));
-        } catch (err) {
-          self.logger.error(err);
-        }
+      const log: LogDescription | null = connectedContract.interface.parseLog({
+        topics,
+        data,
+      });
+      if (log === null) {
+        throw new Error('wrong matching event <-> data');
       }
+      // check tx cache
+      const hashedLog = keccak256(toUtf8Bytes(log.signature));
+      if (
+        cacheService.get(
+          `hardhat.${payload.log.address}.${txHash}.${hashedLog}`,
+        ) !== undefined
+      ) {
+        this.logger.log(
+          'already processed event: ',
+          log.name,
+          payload.log.address,
+          txHash,
+          hashedLog,
+        );
+        return;
+      }
+
+      void this.processEvent(
+        payload.log.address,
+        blockHash,
+        blockNumber,
+        txHash,
+        log,
+      );
+
+      const eventNum = cacheService.get('hardhat.event.num');
+      this.logger.log('number of loaded events: ', Number(eventNum) + 1);
+      cacheService.set('hardhat.event.num', String(Number(eventNum) + 1));
     } catch (err) {
       this.logger.error(err);
       throw err;
@@ -839,8 +749,6 @@ export class AmoyEventListenerService implements OnModuleInit {
                 approvalObj,
               );
             }
-            default:
-              break;
           }
           break;
         }
@@ -849,10 +757,10 @@ export class AmoyEventListenerService implements OnModuleInit {
           break;
       }
 
-      const hashed_log = keccak256(toUtf8Bytes(log.signature));
+      const hashedLog = keccak256(toUtf8Bytes(log.signature));
       // set cache
       cacheService.set(
-        `hardhat.${contractAddress}.${txHash}.${hashed_log}`,
+        `hardhat.${contractAddress}.${txHash}.${hashedLog}`,
         timestamp,
       );
     } catch (err) {
