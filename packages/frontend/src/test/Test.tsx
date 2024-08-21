@@ -3,7 +3,7 @@ import { createSignal } from 'solid-js';
 
 const [test, setTest] = createSignal('');
 
-const handleTest = (e) => {
+const handleTest = (e): void => {
   console.log(e);
 };
 

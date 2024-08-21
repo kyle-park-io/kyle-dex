@@ -83,7 +83,7 @@ export const Swap: Component = (): JSX.Element => {
   const navigate = useNavigate();
 
   createEffect(() => {
-    const fn = async () => {
+    const fn = async (): Promise<void> => {
       const network = localStorage.getItem('network') as string;
       const address = localStorage.getItem('address') as string;
 
@@ -192,11 +192,11 @@ export const Swap: Component = (): JSX.Element => {
   let currentAbortController2 = new AbortController();
   const [inputs, setInputs] = createSignal([tokenDefault]);
   const [inputsMsg, setInputsMsg] = createSignal(['']);
-  const addInput = async () => {
+  const addInput = async (): Promise<void> => {
     setInputs([...inputs(), tokenDefault]);
     await handleInputAmountChange2();
   };
-  const removeInput = async () => {
+  const removeInput = async (): Promise<void> => {
     if (inputs().length > 1) {
       setInputs(inputs().slice(0, -1));
     }
@@ -209,12 +209,12 @@ export const Swap: Component = (): JSX.Element => {
 
     await handleInputAmountChange2();
   };
-  const handleInputAmountChange2 = async () => {
+  const handleInputAmountChange2 = async (): Promise<void> => {
     currentAbortController2.abort();
     currentAbortController2 = new AbortController();
     try {
       const result = await performSwapTask2(currentAbortController2.signal);
-      if (result) {
+      if (result as boolean) {
         await calculate();
       }
     } catch (err) {
@@ -227,8 +227,8 @@ export const Swap: Component = (): JSX.Element => {
       }
     }
   };
-  const performSwapTask2 = (signal) => {
-    return new Promise((resolve, reject) => {
+  const performSwapTask2 = async (signal): Promise<boolean> => {
+    return await new Promise((resolve, reject) => {
       const timeoutId = setTimeout(() => {
         checkArray();
         resolve(true);
@@ -242,7 +242,7 @@ export const Swap: Component = (): JSX.Element => {
     });
   };
 
-  const handleInputAmountChange = async (e) => {
+  const handleInputAmountChange = async (e): Promise<void> => {
     const value = e.target.value;
 
     currentAbortController.abort();
@@ -254,7 +254,7 @@ export const Swap: Component = (): JSX.Element => {
         value,
         currentAbortController.signal,
       );
-      if (result) {
+      if (result as boolean) {
         await calculate();
       }
     } catch (err) {
@@ -267,8 +267,8 @@ export const Swap: Component = (): JSX.Element => {
       }
     }
   };
-  const performSwapTask = (value: string, signal) => {
-    return new Promise((resolve, reject) => {
+  const performSwapTask = async (value: string, signal): Promise<boolean> => {
+    return await new Promise((resolve, reject) => {
       const timeoutId = setTimeout(() => {
         setValue(value);
         checkArray();
@@ -285,7 +285,7 @@ export const Swap: Component = (): JSX.Element => {
   const [inputAmount, setInputAmount] = createSignal('');
   const [msg, setMsg] = createSignal('Enter the value!');
   const [bool3, setBool] = createSignal(false);
-  const setValue = (value: string) => {
+  const setValue = (value: string): void => {
     let bool2 = false;
     if (value === '') {
       setMsg('Enter the value!');
@@ -310,7 +310,7 @@ export const Swap: Component = (): JSX.Element => {
     }
   };
   const [listBool, setListBool] = createSignal(false);
-  const checkArray = () => {
+  const checkArray = (): void => {
     setInputsMsg(['']);
     setListBool(true);
     if (inputs().length === 1) {
@@ -319,7 +319,7 @@ export const Swap: Component = (): JSX.Element => {
       return;
     }
     const checkMap = new Map<string, boolean>();
-    let arr: any = [];
+    const arr: any = [];
     for (let i = 0; i < inputs().length; i++) {
       if (inputs()[i] === tokenDefault) {
         setListBool(false);
@@ -338,7 +338,7 @@ export const Swap: Component = (): JSX.Element => {
   };
   const [estimateResult, setEstimateResult] = createSignal([]);
   const [estimateError, setEstimateError] = createSignal('');
-  const calculate = async () => {
+  const calculate = async (): Promise<void> => {
     console.log(bool3(), listBool());
     if (!bool3() || !listBool()) {
       return;
@@ -368,20 +368,20 @@ export const Swap: Component = (): JSX.Element => {
   const [inputsR, setInputsR] = createSignal([tokenDefault]);
   const [inputsMsgR, setInputsMsgR] = createSignal(['']);
   const [listBoolR, setListBoolR] = createSignal(false);
-  const addInputR = async () => {
+  const addInputR = (): void => {
     setInputsR([...inputsR(), tokenDefault]);
   };
-  const removeInputR = async () => {
+  const removeInputR = (): void => {
     if (inputsR().length > 1) {
       setInputsR(inputsR().slice(0, -1));
     }
   };
-  const handleSelectChangeR = async (e, index): Promise<void> => {
+  const handleSelectChangeR = (e, index): void => {
     const updatedValues = [...inputsR()];
     updatedValues[index] = e.target.value;
     setInputsR(updatedValues);
   };
-  const checkArrayR = () => {
+  const checkArrayR = (): void => {
     setInputsMsgR(['']);
     setListBoolR(true);
     if (inputsR().length === 1) {
@@ -390,7 +390,7 @@ export const Swap: Component = (): JSX.Element => {
       return;
     }
     const checkMap = new Map<string, boolean>();
-    let arr: any = [];
+    const arr: any = [];
     for (let i = 0; i < inputsR().length; i++) {
       if (inputsR()[i] === tokenDefault) {
         setListBoolR(false);
@@ -410,7 +410,7 @@ export const Swap: Component = (): JSX.Element => {
   const [inputAmountR, setInputAmountR] = createSignal('');
   const [msgR, setMsgR] = createSignal('Enter the value!');
   const [bool3R, setBoolR] = createSignal(false);
-  const setValueR = (value: string) => {
+  const setValueR = (value: string): void => {
     let bool2 = false;
     if (value === '') {
       setMsgR('Enter the value!');
@@ -434,13 +434,13 @@ export const Swap: Component = (): JSX.Element => {
       setInputAmountR('');
     }
   };
-  const handleInputAmountChangeR = (e) => {
+  const handleInputAmountChangeR = (e): void => {
     const value = e.target.value;
     setValueR(value);
   };
   const [lmodal, setLModal] = createSignal(false);
   const [resultMsg, setResultMsg] = createSignal('');
-  const handleSubmit = () => {
+  const handleSubmit = (): void => {
     checkArrayR();
     if (listBoolR() && bool3R()) {
       setResultMsg('');
@@ -452,7 +452,7 @@ export const Swap: Component = (): JSX.Element => {
   const [isResult, setIsResult] = createSignal(false);
   const [result, setResult] = createSignal('');
   const [goChart, setGoChart] = createSignal(false);
-  const handleCancel = () => {
+  const handleCancel = (): void => {
     if (isResult()) {
       window.location.reload();
     } else {
@@ -461,13 +461,13 @@ export const Swap: Component = (): JSX.Element => {
       setResult('');
     }
   };
-  const handleGoChart = () => {
+  const handleGoChart = (): void => {
     const network = localStorage.getItem('network') as string;
     setFromDexNavigate({ value: true });
     setFromDexNavigate2({ value: true });
     navigate(`/dex/chart/${network}`);
   };
-  const handleSubmitR = async () => {
+  const handleSubmitR = async (): Promise<void> => {
     try {
       setIsResult(false);
       setResult('');
@@ -514,14 +514,14 @@ export const Swap: Component = (): JSX.Element => {
 
   const [eth, setEth] = createSignal('0');
   const [wei, setWei] = createSignal('0');
-  const handleEth = (e) => {
+  const handleEth = (e): void => {
     setWei('0');
     const value = e.target.value;
     if (/^[0-9]+(\.[0-9]+)?$/.test(value)) {
       setWei(ethers.parseEther(value).toString());
     }
   };
-  const handleWei = (e) => {
+  const handleWei = (e): void => {
     setEth('0');
     const value = e.target.value;
     if (/^[0-9]+$/.test(value)) {
@@ -681,7 +681,7 @@ export const Swap: Component = (): JSX.Element => {
                                 <Button
                                   variant="secondary"
                                   onClick={() => {
-                                    void addInputR();
+                                    addInputR();
                                   }}
                                 >
                                   Add Token
@@ -689,7 +689,7 @@ export const Swap: Component = (): JSX.Element => {
                                 <Button
                                   variant="secondary"
                                   onClick={() => {
-                                    void removeInputR();
+                                    removeInputR();
                                   }}
                                 >
                                   Remove Token
@@ -699,7 +699,7 @@ export const Swap: Component = (): JSX.Element => {
                                     <>
                                       <Form.Select
                                         onChange={(e) => {
-                                          void handleSelectChangeR(e, index);
+                                          handleSelectChangeR(e, index);
                                         }}
                                         value={value}
                                       >
@@ -742,7 +742,11 @@ export const Swap: Component = (): JSX.Element => {
                                           </>
                                         ))}
                                         <p>inputAmount: {inputAmountR()}</p>
-                                        <Button onClick={handleSubmitR}>
+                                        <Button
+                                          onClick={() => {
+                                            void handleSubmitR();
+                                          }}
+                                        >
                                           Submit
                                         </Button>
                                         <Button onClick={handleCancel}>

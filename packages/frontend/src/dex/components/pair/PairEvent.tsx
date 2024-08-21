@@ -29,7 +29,7 @@ export const PairEvent: Component<PairEventProps> = (props): JSX.Element => {
 
   // toggle
   const [pairEventShow, setPairEventShow] = createSignal<boolean[]>([false]);
-  const toggle = (index: number) => {
+  const toggle = (index: number): void => {
     const arr: boolean[] = [];
     for (let i = 0; i < pairEventCount(); i++) {
       if (i === index) arr.push(!pairEventShow()[index]);
@@ -44,7 +44,7 @@ export const PairEvent: Component<PairEventProps> = (props): JSX.Element => {
       toggle2();
     }
   });
-  const toggle2 = () => {
+  const toggle2 = (): void => {
     const arr: boolean[] = [];
     for (let i = 0; i < pairEventCount(); i++) {
       arr.push(false);
@@ -54,7 +54,7 @@ export const PairEvent: Component<PairEventProps> = (props): JSX.Element => {
 
   // mint toggle
   const [mintEventShow, setMintEventShow] = createSignal<boolean[]>([false]);
-  const mintToggle = (index: number) => {
+  const mintToggle = (index: number): void => {
     const arr: boolean[] = [];
     for (let i = 0; i < pairMintEventCount(); i++) {
       if (i === index) arr.push(!mintEventShow()[index]);
@@ -69,7 +69,7 @@ export const PairEvent: Component<PairEventProps> = (props): JSX.Element => {
       mintToggle2();
     }
   });
-  const mintToggle2 = () => {
+  const mintToggle2 = (): void => {
     const arr: boolean[] = [];
     for (let i = 0; i < pairMintEventCount(); i++) {
       arr.push(false);
@@ -79,7 +79,7 @@ export const PairEvent: Component<PairEventProps> = (props): JSX.Element => {
 
   // burn toggle
   const [burnEventShow, setBurnEventShow] = createSignal<boolean[]>([false]);
-  const burnToggle = (index: number) => {
+  const burnToggle = (index: number): void => {
     const arr: boolean[] = [];
     for (let i = 0; i < pairBurnEventCount(); i++) {
       if (i === index) arr.push(!burnEventShow()[index]);
@@ -94,7 +94,7 @@ export const PairEvent: Component<PairEventProps> = (props): JSX.Element => {
       burnToggle2();
     }
   });
-  const burnToggle2 = () => {
+  const burnToggle2 = (): void => {
     const arr: boolean[] = [];
     for (let i = 0; i < pairBurnEventCount(); i++) {
       arr.push(false);
@@ -104,7 +104,7 @@ export const PairEvent: Component<PairEventProps> = (props): JSX.Element => {
 
   // swap toggle
   const [swapEventShow, setSwapEventShow] = createSignal<boolean[]>([false]);
-  const swapToggle = (index: number) => {
+  const swapToggle = (index: number): void => {
     const arr: boolean[] = [];
     for (let i = 0; i < pairSwapEventCount(); i++) {
       if (i === index) arr.push(!swapEventShow()[index]);
@@ -119,7 +119,7 @@ export const PairEvent: Component<PairEventProps> = (props): JSX.Element => {
       swapToggle2();
     }
   });
-  const swapToggle2 = () => {
+  const swapToggle2 = (): void => {
     const arr: boolean[] = [];
     for (let i = 0; i < pairSwapEventCount(); i++) {
       arr.push(false);

@@ -1,7 +1,15 @@
 import { type Component, type JSX } from 'solid-js';
 import { createSignal, createEffect } from 'solid-js';
 import { useNavigate } from '@solidjs/router';
-import { Button, Spinner, CloseButton } from 'solid-bootstrap';
+import {
+  Button,
+  Spinner,
+  CloseButton,
+  Container,
+  Form,
+  Row,
+  Col,
+} from 'solid-bootstrap';
 import {
   fromDexNavigate,
   setFromDexNavigate,
@@ -24,7 +32,6 @@ import {
   calcPair,
   estimateLiquidity,
 } from '../axios/Dex.axios.utils';
-import { Container, Form, Row, Col } from 'solid-bootstrap';
 import { globalState } from '../../global/constants';
 import axios from 'axios';
 import { ethers } from 'ethers';
@@ -66,7 +73,7 @@ export const Staking: Component = (): JSX.Element => {
   const [selectedTokenA, setSelectedTokenA] = createSignal('');
   const [selectedTokenB, setSelectedTokenB] = createSignal('');
   const [selectedPair, setSelectedPair] = createSignal('');
-  const handleTokenAChange = (e) => {
+  const handleTokenAChange = (e): void => {
     if (e.target.value === selectedTokenB()) {
       setSelectedTokenB(selectedTokenA());
       setSelectedTokenA(e.target.value);
@@ -89,7 +96,7 @@ export const Staking: Component = (): JSX.Element => {
     setBCalculatedLiquidity('');
     setResultLoading(false);
   };
-  const handleTokenBChange = (e) => {
+  const handleTokenBChange = (e): void => {
     if (e.target.value === selectedTokenA()) {
       setSelectedTokenA(selectedTokenB());
       setSelectedTokenB(e.target.value);
@@ -112,7 +119,7 @@ export const Staking: Component = (): JSX.Element => {
     setBCalculatedLiquidity('');
     setResultLoading(false);
   };
-  const handlePairChange = (e) => {
+  const handlePairChange = (e): void => {
     for (let i = 0; i < pairs().length; i++) {
       if (pairs()[i].pair === e.target.value) {
         setSelectedTokenA(pairs()[i].tokenA);
@@ -224,17 +231,17 @@ export const Staking: Component = (): JSX.Element => {
   const [bMsg, setBMsg] = createSignal('Enter the value!');
   const [bBool, setBBool] = createSignal(false);
 
-  let a_bool = true;
-  let b_bool = true;
+  let A_BOOL = true;
+  let B_BOOL = true;
   let currentAbortController = new AbortController();
   let currentAbortController2 = new AbortController();
-  const handleTokenALiquidityChange = async (e) => {
+  const handleTokenALiquidityChange = async (e): Promise<void> => {
     setResultLoading(false);
 
     const id = e.target.id;
     const value = e.target.value;
 
-    a_bool = false;
+    A_BOOL = false;
     currentAbortController.abort();
     currentAbortController = new AbortController();
     try {
@@ -243,8 +250,8 @@ export const Staking: Component = (): JSX.Element => {
         value,
         currentAbortController.signal,
       );
-      if (result) {
-        a_bool = true;
+      if (result as boolean) {
+        A_BOOL = true;
         await calculate();
       }
     } catch (err) {
@@ -257,13 +264,13 @@ export const Staking: Component = (): JSX.Element => {
       }
     }
   };
-  const handleTokenBLiquidityChange = async (e) => {
+  const handleTokenBLiquidityChange = async (e): Promise<void> => {
     setResultLoading(false);
 
     const id = e.target.id;
     const value = e.target.value;
 
-    b_bool = false;
+    B_BOOL = false;
     currentAbortController2.abort();
     currentAbortController2 = new AbortController();
     try {
@@ -272,8 +279,8 @@ export const Staking: Component = (): JSX.Element => {
         value,
         currentAbortController2.signal,
       );
-      if (result) {
-        b_bool = true;
+      if (result as boolean) {
+        B_BOOL = true;
         await calculate();
       }
     } catch (err) {
@@ -286,8 +293,12 @@ export const Staking: Component = (): JSX.Element => {
       }
     }
   };
-  const performLiquidityTask = (id: string, value: string, signal) => {
-    return new Promise((resolve, reject) => {
+  const performLiquidityTask = async (
+    id: string,
+    value: string,
+    signal,
+  ): Promise<boolean> => {
+    return await new Promise((resolve, reject) => {
       const timeoutId = setTimeout(() => {
         switch (id) {
           case 'aLiquidity': {
@@ -309,7 +320,7 @@ export const Staking: Component = (): JSX.Element => {
       });
     });
   };
-  const setAValue = (value: string) => {
+  const setAValue = (value: string): void => {
     let bool2 = false;
     if (value === '') {
       setAMsg('Enter the value!');
@@ -333,7 +344,7 @@ export const Staking: Component = (): JSX.Element => {
       // setTokenALiquidity('');
     }
   };
-  const setBValue = (value: string) => {
+  const setBValue = (value: string): void => {
     let bool2 = false;
     if (value === '') {
       setBMsg('Enter the value!');
@@ -365,8 +376,8 @@ export const Staking: Component = (): JSX.Element => {
     createSignal('');
   const [aCalculatedLiquidity, setACalculatedLiquidity] = createSignal('');
 
-  const calculate = async () => {
-    if (!a_bool || !b_bool) {
+  const calculate = async (): Promise<void> => {
+    if (!A_BOOL || !B_BOOL) {
       setResultLoading(true);
       return;
     }
@@ -483,7 +494,7 @@ export const Staking: Component = (): JSX.Element => {
   const [bBoolR, setBBoolR] = createSignal(false);
   const [resultMsg, setResultMsg] = createSignal('');
 
-  const handleTokenLiquidityRChange = async (e) => {
+  const handleTokenLiquidityRChange = (e): void => {
     setLModal(false);
     setIsResult(false);
     setResult('');
@@ -502,7 +513,7 @@ export const Staking: Component = (): JSX.Element => {
       }
     }
   };
-  const setAValueR = (value: string) => {
+  const setAValueR = (value: string): void => {
     if (value === '') {
       setAMsgR('Enter the value!');
       setABoolR(false);
@@ -520,7 +531,7 @@ export const Staking: Component = (): JSX.Element => {
       setABoolR(false);
     }
   };
-  const setBValueR = (value: string) => {
+  const setBValueR = (value: string): void => {
     if (value === '') {
       setBMsgR('Enter the value!');
       setBBoolR(false);
@@ -539,7 +550,7 @@ export const Staking: Component = (): JSX.Element => {
     }
   };
   const [lmodal, setLModal] = createSignal(false);
-  const handleSubmit = () => {
+  const handleSubmit = (): void => {
     if (aBoolR() && bBoolR()) {
       setResultMsg('');
       setLModal(true);
@@ -547,7 +558,7 @@ export const Staking: Component = (): JSX.Element => {
       setResultMsg('Check input!');
     }
   };
-  const handleCancel = () => {
+  const handleCancel = (): void => {
     if (isResult()) {
       window.location.reload();
     } else {
@@ -556,13 +567,13 @@ export const Staking: Component = (): JSX.Element => {
       setResult('');
     }
   };
-  const handleGoChart = () => {
+  const handleGoChart = (): void => {
     const network = localStorage.getItem('network') as string;
     setFromDexNavigate({ value: true });
     setFromDexNavigate2({ value: true });
     navigate(`/dex/chart/${network}`);
   };
-  const handleSubmitR = async () => {
+  const handleSubmitR = async (): Promise<void> => {
     try {
       setIsResult(false);
       setResult('');
@@ -628,7 +639,7 @@ export const Staking: Component = (): JSX.Element => {
 
   // init
   createEffect(() => {
-    const fn = async () => {
+    const fn = async (): Promise<void> => {
       const network = localStorage.getItem('network') as string;
       const address = localStorage.getItem('address') as string;
 
@@ -688,7 +699,6 @@ export const Staking: Component = (): JSX.Element => {
             setIsAccount(true);
           }
           setFromHeaderNavigate({ value: false, type: '' });
-          return;
         } else {
           if (address === 'null') {
             setIsAccount(false);
@@ -703,7 +713,6 @@ export const Staking: Component = (): JSX.Element => {
           setFromHeaderNavigate({ value: false, type: '' });
           setLoading(true);
           setCalcLoading(true);
-          return;
         }
       }
     };
@@ -836,14 +845,14 @@ export const Staking: Component = (): JSX.Element => {
 
   const [eth, setEth] = createSignal('0');
   const [wei, setWei] = createSignal('0');
-  const handleEth = (e) => {
+  const handleEth = (e): void => {
     setWei('0');
     const value = e.target.value;
     if (/^[0-9]+(\.[0-9]+)?$/.test(value)) {
       setWei(ethers.parseEther(value).toString());
     }
   };
-  const handleWei = (e) => {
+  const handleWei = (e): void => {
     setEth('0');
     const value = e.target.value;
     if (/^[0-9]+$/.test(value)) {
@@ -886,14 +895,18 @@ export const Staking: Component = (): JSX.Element => {
                             type="radio"
                             label="Select Tokens"
                             value="t"
-                            onChange={handleChangeT}
+                            onChange={(e) => {
+                              void handleChangeT(e);
+                            }}
                           />
                           <Form.Check
                             name="method"
                             type="radio"
                             label="Select Pair"
                             value="p"
-                            onChange={handleChangeP}
+                            onChange={(e) => {
+                              void handleChangeP(e);
+                            }}
                           />
                         </Form.Group>
                         <div>cf. WETH: {globalState.hardhat_weth_address}</div>
@@ -999,7 +1012,9 @@ export const Staking: Component = (): JSX.Element => {
                           <Form.Control
                             id="aLiquidity"
                             value={tokenALiquidity()}
-                            onInput={handleTokenALiquidityChange}
+                            onInput={(e) => {
+                              void handleTokenALiquidityChange(e);
+                            }}
                             placeholder="Please enter the liquidity to be injected"
                           ></Form.Control>
                           <p>{aMsg()}</p>
@@ -1007,7 +1022,9 @@ export const Staking: Component = (): JSX.Element => {
                           <Form.Control
                             id="bLiquidity"
                             value={tokenBLiquidity()}
-                            onInput={handleTokenBLiquidityChange}
+                            onInput={(e) => {
+                              void handleTokenBLiquidityChange(e);
+                            }}
                             placeholder="Please enter the liquidity to be injected"
                           ></Form.Control>
                           <p>{bMsg()}</p>
@@ -1047,7 +1064,11 @@ export const Staking: Component = (): JSX.Element => {
                                   <p>tokenB: {selectedTokenB()}</p>
                                   <p>amountA: {tokenALiquidityR()}</p>
                                   <p>amountB: {tokenBLiquidityR()}</p>
-                                  <Button onClick={handleSubmitR}>
+                                  <Button
+                                    onClick={() => {
+                                      void handleSubmitR();
+                                    }}
+                                  >
                                     Submit
                                   </Button>
                                   <Button onClick={handleCancel}>Cancel</Button>

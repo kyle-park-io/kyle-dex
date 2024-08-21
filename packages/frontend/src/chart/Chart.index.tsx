@@ -137,7 +137,7 @@ export const ChartIndex: Component<ChartProps> = (props): JSX.Element => {
   });
 
   createEffect(() => {
-    const fn = async () => {
+    const fn = async (): Promise<void> => {
       const network = localStorage.getItem('network') as string;
       const address = localStorage.getItem('address') as string;
       const chart = props.currentChart;

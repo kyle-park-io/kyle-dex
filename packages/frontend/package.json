@@ -25,6 +25,8 @@
     "clean-build": "yarn run clean && yarn run build",
     "clean-build-prod": "yarn run clean && yarn run build-prod",
     "dev": "vite",
+    "format": "prettier --write \"src/**/*.{ts,tsx}\" \"test/**/*.{ts,tsx}\"",
+    "lint": "eslint \"{src,apps,libs,test}/**/*.{ts,tsx}\" --fix",
     "preview": "vite preview",
     "test": "node ./__tests__/frontend.test.js"
   },

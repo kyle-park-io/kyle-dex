@@ -53,7 +53,7 @@ export const ClientPairEvent: Component<ClientPairProps> = (
 
   // toggle
   const [pairEventShow, setPairEventShow] = createSignal<boolean[]>([false]);
-  const pairToggle = (index: number) => {
+  const pairToggle = (index: number): void => {
     const arr: boolean[] = [];
     for (let i = 0; i < pairEventCount(); i++) {
       if (i === index) arr.push(!pairEventShow()[index]);
@@ -68,7 +68,7 @@ export const ClientPairEvent: Component<ClientPairProps> = (
       pairToggle2();
     }
   });
-  const pairToggle2 = () => {
+  const pairToggle2 = (): void => {
     const arr: boolean[] = [];
     for (let i = 0; i < pairEventCount(); i++) {
       arr.push(false);
@@ -80,7 +80,7 @@ export const ClientPairEvent: Component<ClientPairProps> = (
   const [pairMintEventShow, setPairMintEventShow] = createSignal<boolean[]>([
     false,
   ]);
-  const pairMintToggle = (index: number) => {
+  const pairMintToggle = (index: number): void => {
     const arr: boolean[] = [];
     for (let i = 0; i < pairMintEventCount(); i++) {
       if (i === index) arr.push(!pairMintEventShow()[index]);
@@ -95,7 +95,7 @@ export const ClientPairEvent: Component<ClientPairProps> = (
       pairMintToggle2();
     }
   });
-  const pairMintToggle2 = () => {
+  const pairMintToggle2 = (): void => {
     const arr: boolean[] = [];
     for (let i = 0; i < pairMintEventCount(); i++) {
       arr.push(false);
@@ -107,7 +107,7 @@ export const ClientPairEvent: Component<ClientPairProps> = (
   const [pairBurnEventShow, setPairBurnEventShow] = createSignal<boolean[]>([
     false,
   ]);
-  const pairBurnToggle = (index: number) => {
+  const pairBurnToggle = (index: number): void => {
     const arr: boolean[] = [];
     for (let i = 0; i < pairBurnEventCount(); i++) {
       if (i === index) arr.push(!pairBurnEventShow()[index]);
@@ -122,7 +122,7 @@ export const ClientPairEvent: Component<ClientPairProps> = (
       pairBurnToggle2();
     }
   });
-  const pairBurnToggle2 = () => {
+  const pairBurnToggle2 = (): void => {
     const arr: boolean[] = [];
     for (let i = 0; i < pairBurnEventCount(); i++) {
       arr.push(false);
@@ -134,7 +134,7 @@ export const ClientPairEvent: Component<ClientPairProps> = (
   const [pairSwapEventShow, setPairSwapEventShow] = createSignal<boolean[]>([
     false,
   ]);
-  const pairSwapToggle = (index: number) => {
+  const pairSwapToggle = (index: number): void => {
     const arr: boolean[] = [];
     for (let i = 0; i < pairSwapEventCount(); i++) {
       if (i === index) arr.push(!pairSwapEventShow()[index]);
@@ -149,7 +149,7 @@ export const ClientPairEvent: Component<ClientPairProps> = (
       pairSwapToggle2();
     }
   });
-  const pairSwapToggle2 = () => {
+  const pairSwapToggle2 = (): void => {
     const arr: boolean[] = [];
     for (let i = 0; i < pairSwapEventCount(); i++) {
       arr.push(false);
@@ -159,7 +159,7 @@ export const ClientPairEvent: Component<ClientPairProps> = (
 
   // toggle
   const [pairsEventShow, setPairsEventShow] = createSignal<boolean[]>([false]);
-  const pairsToggle = (index: number) => {
+  const pairsToggle = (index: number): void => {
     const arr: boolean[] = [];
     for (let i = 0; i < pairsEventCount(); i++) {
       if (i === index) arr.push(!pairsEventShow()[index]);
@@ -174,7 +174,7 @@ export const ClientPairEvent: Component<ClientPairProps> = (
       pairsToggle2();
     }
   });
-  const pairsToggle2 = () => {
+  const pairsToggle2 = (): void => {
     const arr: boolean[] = [];
     for (let i = 0; i < pairsEventCount(); i++) {
       arr.push(false);
@@ -186,7 +186,7 @@ export const ClientPairEvent: Component<ClientPairProps> = (
   const [pairsMintEventShow, setPairsMintEventShow] = createSignal<boolean[]>([
     false,
   ]);
-  const pairsMintToggle = (index: number) => {
+  const pairsMintToggle = (index: number): void => {
     const arr: boolean[] = [];
     for (let i = 0; i < pairsMintEventCount(); i++) {
       if (i === index) arr.push(!pairsMintEventShow()[index]);
@@ -201,7 +201,7 @@ export const ClientPairEvent: Component<ClientPairProps> = (
       pairsMintToggle2();
     }
   });
-  const pairsMintToggle2 = () => {
+  const pairsMintToggle2 = (): void => {
     const arr: boolean[] = [];
     for (let i = 0; i < pairsMintEventCount(); i++) {
       arr.push(false);
@@ -213,7 +213,7 @@ export const ClientPairEvent: Component<ClientPairProps> = (
   const [pairsBurnEventShow, setPairsBurnEventShow] = createSignal<boolean[]>([
     false,
   ]);
-  const pairsBurnToggle = (index: number) => {
+  const pairsBurnToggle = (index: number): void => {
     const arr: boolean[] = [];
     for (let i = 0; i < pairsBurnEventCount(); i++) {
       if (i === index) arr.push(!pairsBurnEventShow()[index]);
@@ -228,7 +228,7 @@ export const ClientPairEvent: Component<ClientPairProps> = (
       pairsBurnToggle2();
     }
   });
-  const pairsBurnToggle2 = () => {
+  const pairsBurnToggle2 = (): void => {
     const arr: boolean[] = [];
     for (let i = 0; i < pairsBurnEventCount(); i++) {
       arr.push(false);
@@ -240,7 +240,7 @@ export const ClientPairEvent: Component<ClientPairProps> = (
   const [pairsSwapEventShow, setPairsSwapEventShow] = createSignal<boolean[]>([
     false,
   ]);
-  const pairsSwapToggle = (index: number) => {
+  const pairsSwapToggle = (index: number): void => {
     const arr: boolean[] = [];
     for (let i = 0; i < pairsSwapEventCount(); i++) {
       if (i === index) arr.push(!pairsSwapEventShow()[index]);
@@ -255,7 +255,7 @@ export const ClientPairEvent: Component<ClientPairProps> = (
       pairsSwapToggle2();
     }
   });
-  const pairsSwapToggle2 = () => {
+  const pairsSwapToggle2 = (): void => {
     const arr: boolean[] = [];
     for (let i = 0; i < pairsSwapEventCount(); i++) {
       arr.push(false);
@@ -264,7 +264,7 @@ export const ClientPairEvent: Component<ClientPairProps> = (
   };
 
   createEffect(() => {
-    const fn = async () => {
+    const fn = async (): Promise<void> => {
       const network = localStorage.getItem('network') as string;
       const address = localStorage.getItem('address') as string;
       const pair = props.currentPair;
@@ -435,7 +435,6 @@ export const ClientPairEvent: Component<ClientPairProps> = (
           setCurrentEvent('');
 
           setFromHeaderNavigate2({ value: false, type: '' });
-          return;
         } else {
           if (pair === '') {
             await getPairsEvents();
@@ -447,7 +446,6 @@ export const ClientPairEvent: Component<ClientPairProps> = (
             setCurrentEvent('my-pair-all-event');
           }
           setFromHeaderNavigate2({ value: false, type: '' });
-          return;
         }
       }
     };

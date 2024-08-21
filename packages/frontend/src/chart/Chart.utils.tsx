@@ -1,4 +1,6 @@
-export const getRandomColor = () => {
+import { type JSX } from 'solid-js';
+
+export const getRandomColor = (): string => {
   const letters = '0123456789ABCDEF';
   let color = '#';
   for (let i = 0; i < 6; i++) {
@@ -56,7 +58,7 @@ export const addDecimalPoint = (
   }
 };
 
-export const fallback = () => {
+export const fallback = (): JSX.Element => {
   return (
     <div class="tw-w-full tw-h-full tw-flex tw-items-center tw-justify-center">
       <p>Chart is not available</p>

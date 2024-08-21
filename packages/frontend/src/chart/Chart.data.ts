@@ -316,7 +316,7 @@ export async function getMyAllData(
     });
 
     // balance data
-    const balanceMap: Map<string, string> = new Map();
+    const balanceMap = new Map<string, string>();
     for (let i = 1; i < data.length; i++) {
       if (data[i].event !== 'Transfer') continue;
 
@@ -343,7 +343,7 @@ export async function getMyAllData(
     const balance: any[] = [];
     const result: any[] = [];
     let i = 1;
-    for (let [key, value] of balanceMap) {
+    for (const [key, value] of balanceMap) {
       const pair_property = await getPairProperty(api, {
         network,
         pairAddress: key,

@@ -4,7 +4,7 @@ import { onCleanup, onMount } from 'solid-js';
 import './Resize.css';
 
 const Resize: Component = (): JSX.Element => {
-  const enforceMinSize = () => {
+  const enforceMinSize = (): void => {
     if (window.innerWidth < 800) {
       window.resizeTo(800, window.innerHeight);
     }
