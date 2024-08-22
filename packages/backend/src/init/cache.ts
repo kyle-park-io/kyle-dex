@@ -34,8 +34,8 @@ class CacheService {
 const cacheService = new CacheService(0);
 
 // init
-cacheService.set('hardhat.event.num', '0');
-cacheService.set('sepolia.event.num', '0');
-cacheService.set('amoy.event.num', '0');
+cacheService.set('network.hardhat.event.num', '0');
+cacheService.set('network.sepolia.event.num', '0');
+cacheService.set('network.amoy.event.num', '0');
 
 export default cacheService;

@@ -24,6 +24,7 @@ import cacheService from '../../../init/cache';
 @Injectable()
 export class HardhatEventListenerService implements OnModuleInit {
   private initPromise!: Promise<void>;
+  private readonly network = 'hardhat';
 
   constructor(
     // config
@@ -164,7 +165,7 @@ export class HardhatEventListenerService implements OnModuleInit {
       const hashedLog = keccak256(toUtf8Bytes(log.signature));
       if (
         cacheService.get(
-          `hardhat.${payload.log.address}.${txHash}.${hashedLog}`,
+          `network.${this.network}.${payload.log.address}.${txHash}.${hashedLog}`,
         ) !== undefined
       ) {
         this.logger.log(
@@ -185,9 +186,12 @@ export class HardhatEventListenerService implements OnModuleInit {
         log,
       );
 
-      const eventNum = cacheService.get('hardhat.event.num');
+      const eventNum = cacheService.get(`network.${this.network}.event.num`);
       this.logger.log('number of loaded events: ', Number(eventNum) + 1);
-      cacheService.set('hardhat.event.num', String(Number(eventNum) + 1));
+      cacheService.set(
+        `network.${this.network}.event.num`,
+        String(Number(eventNum) + 1),
+      );
     } catch (err) {
       this.logger.error(err);
       throw err;
@@ -283,42 +287,46 @@ export class HardhatEventListenerService implements OnModuleInit {
               }
               // TODO : check concurrency
               // set pair-map key
-              cacheService.set(`hardhat.pair.index.${pair}`, index);
+              cacheService.set(
+                `network.${this.network}.pair.${pair}.index`,
+                index,
+              );
 
               // pair property
-              cacheService.set(`hardhat.pair.property.${pair}`, {
-                token0,
-                token1,
-              });
+              cacheService.set(
+                `network.${this.network}.pair.${pair}.property`,
+                {
+                  token0,
+                  token1,
+                },
+              );
 
               reserveObj.pair = pair;
               reserveObj.event = eventName;
               const eventData2 = { reserve0: '0', reserve1: '0' };
               reserveObj.eventData = eventData2;
 
-              await this.fsService.writePairArrayToFile(
-                'hardhat',
-                'pairs.list',
-                pairObj,
-              );
-              await this.fsService.writePairReserveAllArrayToFile(
-                'hardhat',
-                `pair.reserve.all`,
+              // network.${}.pairs.list
+              await this.fsService.writePairListToFile(this.network, pairObj);
+              // network.${}.pairs.current.reserve
+              await this.fsService.writePairsCurrentReserveToFile(
+                this.network,
                 pair,
                 reserveObj,
               );
-              await this.fsService.writePairEventAllArrayToFile(
-                'hardhat',
-                'pair.event.all',
+              // network.${}.pair.${}.event.sync
+              await this.fsService.writePairSyncEventToFile(
+                this.network,
                 pair,
                 reserveObj,
               );
-              await this.fsService.writePairsReserveListArrayToFile(
-                'hardhat',
-                'pairs.reserve.list',
+              // network.${}.pair.${}.event.all
+              await this.fsService.writePairAllEventToFile(
+                this.network,
                 pair,
                 reserveObj,
               );
+
               // TODO: pair contract name
               await this.setEventListener('Pair', pair);
               // // sse
@@ -355,24 +363,25 @@ export class HardhatEventListenerService implements OnModuleInit {
                 }
               }
 
-              await this.fsService.writePairReserveAllArrayToFile(
-                'hardhat',
-                `pair.reserve.all`,
+              // network.${}.pairs.current.reserve
+              await this.fsService.writePairsCurrentReserveToFile(
+                this.network,
                 pair,
                 syncObj,
               );
-              await this.fsService.writePairEventAllArrayToFile(
-                'hardhat',
-                'pair.event.all',
+              // network.${}.pair.${}.event.sync
+              await this.fsService.writePairSyncEventToFile(
+                this.network,
                 pair,
                 syncObj,
               );
-              await this.fsService.writePairsReserveListArrayToFile(
-                'hardhat',
-                'pairs.reserve.list',
+              // network.${}.pair.${}.event.all
+              await this.fsService.writePairAllEventToFile(
+                this.network,
                 pair,
                 syncObj,
               );
+
               break;
             }
             case 'Mint': {
@@ -396,25 +405,26 @@ export class HardhatEventListenerService implements OnModuleInit {
                 }
               }
 
-              await this.fsService.writePairEventAllArrayToFile(
-                'hardhat',
-                'pair.event.all',
+              // network.${}.pair.${}.event.all
+              await this.fsService.writePairAllEventToFile(
+                this.network,
                 pair,
                 mintObj,
               );
-              await this.fsService.writeUserPairEventArrayToFile(
-                'hardhat',
-                'user.pair.event',
+              // network.${}.user.${}.pairs.event.all
+              await this.fsService.writeUserPairsAllEventToFile(
+                this.network,
+                user,
+                mintObj,
+              );
+              // network.${}.user.${}.pair.${}.event.all
+              await this.fsService.writeUserPairAllEventToFile(
+                this.network,
                 user,
                 pair,
                 mintObj,
               );
-              await this.fsService.writeUserPairsEventAllArrayToFile(
-                'hardhat',
-                'user.pair.event.all',
-                user,
-                mintObj,
-              );
+
               break;
             }
             case 'Burn': {
@@ -437,25 +447,27 @@ export class HardhatEventListenerService implements OnModuleInit {
                   burnObj.eventData = eventData;
                 }
               }
-              await this.fsService.writePairEventAllArrayToFile(
-                'hardhat',
-                'pair.event.all',
+
+              // network.${}.pair.${}.event.all
+              await this.fsService.writePairAllEventToFile(
+                this.network,
                 pair,
                 burnObj,
               );
-              await this.fsService.writeUserPairEventArrayToFile(
-                'hardhat',
-                'user.pair.event',
+              // network.${}.user.${}.pairs.event.all
+              await this.fsService.writeUserPairsAllEventToFile(
+                this.network,
+                user,
+                burnObj,
+              );
+              // network.${}.user.${}.pair.${}.event.all
+              await this.fsService.writeUserPairAllEventToFile(
+                this.network,
                 user,
                 pair,
                 burnObj,
               );
-              await this.fsService.writeUserPairsEventAllArrayToFile(
-                'hardhat',
-                'user.pair.event.all',
-                user,
-                burnObj,
-              );
+
               break;
             }
             case 'Swap': {
@@ -478,25 +490,27 @@ export class HardhatEventListenerService implements OnModuleInit {
                   swapObj.eventData = eventData;
                 }
               }
-              await this.fsService.writePairEventAllArrayToFile(
-                'hardhat',
-                'pair.event.all',
+
+              // network.${}.pair.${}.event.all
+              await this.fsService.writePairAllEventToFile(
+                this.network,
                 pair,
                 swapObj,
               );
-              await this.fsService.writeUserPairEventArrayToFile(
-                'hardhat',
-                'user.pair.event',
+              // network.${}.user.${}.pairs.event.all
+              await this.fsService.writeUserPairsAllEventToFile(
+                this.network,
+                user,
+                swapObj,
+              );
+              // network.${}.user.${}.pair.${}.event.all
+              await this.fsService.writeUserPairAllEventToFile(
+                this.network,
                 user,
                 pair,
                 swapObj,
               );
-              await this.fsService.writeUserPairsEventAllArrayToFile(
-                'hardhat',
-                'user.pair.event.all',
-                user,
-                swapObj,
-              );
+
               break;
             }
             case 'Transfer': {
@@ -536,25 +550,39 @@ export class HardhatEventListenerService implements OnModuleInit {
                 throw new Error('Transfer event error');
               }
 
-              await this.fsService.writePairEventAllArrayToFile(
-                'hardhat',
-                'pair.event.all',
+              // network.${}.pair.${}.event.all
+              await this.fsService.writePairAllEventToFile(
+                this.network,
                 pair,
                 transferObj,
               );
-              await this.fsService.writeUserPairEventArrayToFile(
-                'hardhat',
-                'user.pair.event',
+              // network.${}.user.${}.pairs.event.all
+              await this.fsService.writeUserPairsAllEventToFile(
+                this.network,
+                user,
+                transferObj,
+              );
+              // network.${}.user.${}.pair.${}.event.all
+              await this.fsService.writeUserPairAllEventToFile(
+                this.network,
                 user,
                 pair,
                 transferObj,
               );
-              await this.fsService.writeUserPairsEventAllArrayToFile(
-                'hardhat',
-                'user.pair.event.all',
-                user,
+              // network.${}.user.${}.pair.${}.event.transfer
+              await this.fsService.writeUserPairTransferEventToFile(
+                this.network,
+                tokenFrom,
+                pair,
                 transferObj,
               );
+              await this.fsService.writeUserPairTransferEventToFile(
+                this.network,
+                tokenTo,
+                pair,
+                transferObj,
+              );
+
               break;
             }
             case 'Approval': {
@@ -598,25 +626,26 @@ export class HardhatEventListenerService implements OnModuleInit {
                 throw new Error('Approval event error');
               }
 
-              await this.fsService.writePairEventAllArrayToFile(
-                'hardhat',
-                'pair.event.all',
+              // network.${}.pair.${}.event.all
+              await this.fsService.writePairAllEventToFile(
+                this.network,
                 pair,
                 approvalObj,
               );
-              await this.fsService.writeUserPairEventArrayToFile(
-                'hardhat',
-                'user.pair.event',
+              // network.${}.user.${}.pairs.event.all
+              await this.fsService.writeUserPairsAllEventToFile(
+                this.network,
+                user,
+                approvalObj,
+              );
+              // network.${}.user.${}.pair.${}.event.all
+              await this.fsService.writeUserPairAllEventToFile(
+                this.network,
                 user,
                 pair,
                 approvalObj,
               );
-              await this.fsService.writeUserPairsEventAllArrayToFile(
-                'hardhat',
-                'user.pair.event.all',
-                user,
-                approvalObj,
-              );
+
               break;
             }
             default:
@@ -666,25 +695,39 @@ export class HardhatEventListenerService implements OnModuleInit {
                 throw new Error('Transfer event error');
               }
 
-              await this.fsService.writeTokenEventAllArrayToFile(
-                'hardhat',
-                'token.event.all',
+              // network.${}.token.${}.event.all
+              await this.fsService.writeTokenAllEventToFile(
+                this.network,
                 token,
                 transferObj,
               );
-              await this.fsService.writeUserTokenEventArrayToFile(
-                'hardhat',
-                'user.token.event',
+              // network.${}.user.${}.tokens.event.all
+              await this.fsService.writeUserTokensAllEventToFile(
+                this.network,
+                user,
+                transferObj,
+              );
+              // network.${}.user.${}.token.${}.event.all
+              await this.fsService.writeUserTokenAllEventToFile(
+                this.network,
                 user,
                 token,
                 transferObj,
               );
-              await this.fsService.writeUserTokensEventAllArrayToFile(
-                'hardhat',
-                'user.token.event.all',
-                user,
+              // network.${}.user.${}.token.${}.event.transfer
+              await this.fsService.writeUserTokenTransferEventToFile(
+                this.network,
+                tokenFrom,
+                token,
                 transferObj,
               );
+              await this.fsService.writeUserTokenTransferEventToFile(
+                this.network,
+                tokenTo,
+                token,
+                transferObj,
+              );
+
               break;
             }
             case 'Approval': {
@@ -728,25 +771,27 @@ export class HardhatEventListenerService implements OnModuleInit {
                 throw new Error('Approval event error');
               }
 
-              await this.fsService.writeTokenEventAllArrayToFile(
-                'hardhat',
-                'token.event.all',
+              // network.${}.token.${}.event.all
+              await this.fsService.writeTokenAllEventToFile(
+                this.network,
                 token,
                 approvalObj,
               );
-              await this.fsService.writeUserTokenEventArrayToFile(
-                'hardhat',
-                'user.token.event',
+              // network.${}.user.${}.tokens.event.all
+              await this.fsService.writeUserTokensAllEventToFile(
+                this.network,
+                user,
+                approvalObj,
+              );
+              // network.${}.user.${}.token.${}.event.all
+              await this.fsService.writeUserTokenAllEventToFile(
+                this.network,
                 user,
                 token,
                 approvalObj,
               );
-              await this.fsService.writeUserTokensEventAllArrayToFile(
-                'hardhat',
-                'user.token.event.all',
-                user,
-                approvalObj,
-              );
+
+              break;
             }
           }
           break;
@@ -759,7 +804,7 @@ export class HardhatEventListenerService implements OnModuleInit {
       const hashedLog = keccak256(toUtf8Bytes(log.signature));
       // set cache
       cacheService.set(
-        `hardhat.${contractAddress}.${txHash}.${hashedLog}`,
+        `network.${this.network}.${contractAddress}.${txHash}.${hashedLog}`,
         timestamp,
       );
     } catch (err) {

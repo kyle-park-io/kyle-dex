@@ -82,8 +82,7 @@ export class HardhatPairService {
 
   async getTokens(dto: GetTokensDto): Promise<any> {
     try {
-      // const cache = cacheService.get('hardhat.pairs.list');
-      const cache = cacheService.get(`${dto.network}.pairs.list`);
+      const cache = cacheService.get(`network.${dto.network}.pairs.list`);
       if (typeof cache === 'string') {
         const pairList = JSON.parse(cache);
         for (let i = 0; i < pairList.length; i++) {
@@ -256,7 +255,7 @@ export class HardhatPairService {
         });
 
         const reserve: any = cacheService.get(
-          `${dto.network}.pair.current.reserve.${pair.calcPair}`,
+          `network.${dto.network}.pair.${pair.calcPair}.current.reserve`,
         );
         if (reserve === undefined || reserve === null) {
           throw new Error("pair's reserve is not existed");

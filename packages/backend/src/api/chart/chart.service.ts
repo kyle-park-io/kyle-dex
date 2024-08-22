@@ -13,7 +13,7 @@ import {
 @Injectable()
 export class ChartService {
   async getPairList(dto: GetPairListDto): Promise<any> {
-    const data = cacheService.get(`${dto.network}.pairs.list`);
+    const data = cacheService.get(`network.${dto.network}.pairs.list`);
     if (data === undefined) {
       throw new NotFoundException('pair list not found');
     }
@@ -22,7 +22,7 @@ export class ChartService {
 
   async getPairProperty(dto: GetPairDto): Promise<any> {
     const data = cacheService.get(
-      `${dto.network}.pair.property.${dto.pairAddress}`,
+      `network.${dto.network}.pair.${dto.pairAddress}.property`,
     );
     if (data === undefined) {
       throw new NotFoundException('pair not found');
@@ -31,7 +31,9 @@ export class ChartService {
   }
 
   async getPairsCurrentReserve(dto: GetPairsDto): Promise<any> {
-    const data = cacheService.get(`${dto.network}.pairs.current.reserve`);
+    const data = cacheService.get(
+      `network.${dto.network}.pairs.current.reserve`,
+    );
     if (data === undefined) {
       throw new NotFoundException('pairs reserve not found');
     }
@@ -40,7 +42,7 @@ export class ChartService {
 
   async getPairCurrentReserve(dto: GetPairDto): Promise<any> {
     const data = cacheService.get(
-      `${dto.network}.pair.current.reserve.${dto.pairAddress}`,
+      `network.${dto.network}.pair.${dto.pairAddress}.current.reserve`,
     );
     if (data === undefined) {
       throw new NotFoundException('pair reserve not found');
@@ -50,7 +52,7 @@ export class ChartService {
 
   async getPairReserveAll(dto: GetPairDto): Promise<any> {
     const data = cacheService.get(
-      `${dto.network}.pair.reserve.all.${dto.pairAddress}`,
+      `network.${dto.network}.pair.${dto.pairAddress}.event.sync`,
     );
     if (data === undefined) {
       throw new NotFoundException('pair not found');
@@ -61,7 +63,7 @@ export class ChartService {
   // pair event
   async getPairEventAll(dto: GetPairDto): Promise<any> {
     const data = cacheService.get(
-      `${dto.network}.pair.event.all.${dto.pairAddress}`,
+      `network.${dto.network}.pair.${dto.pairAddress}.event.all`,
     );
     if (data === undefined) {
       throw new NotFoundException('pair not found');
@@ -71,7 +73,7 @@ export class ChartService {
 
   async getClientPairsEvent(dto: GetClientEventAllDto): Promise<any> {
     const data = cacheService.get(
-      `${dto.network}.user.pair.event.all.${dto.userAddress}`,
+      `network.${dto.network}.user.${dto.userAddress}.pairs.event.all`,
     );
     if (data === undefined) {
       throw new NotFoundException('client not found');
@@ -81,7 +83,7 @@ export class ChartService {
 
   async getClientPairEvent(dto: GetClientPairEventDto): Promise<any> {
     const data = cacheService.get(
-      `${dto.network}.user.pair.event.${dto.userAddress}.${dto.pairAddress}`,
+      `network.${dto.network}.user.${dto.userAddress}.pair.${dto.pairAddress}.event.all`,
     );
     if (data === undefined) {
       throw new NotFoundException("client's pair not found");
@@ -92,7 +94,7 @@ export class ChartService {
   // token event
   async getTokenEventAll(dto: GetTokenDto): Promise<any> {
     const data = cacheService.get(
-      `${dto.network}.token.event.all.${dto.tokenAddress}`,
+      `network.${dto.network}.token.${dto.tokenAddress}.event.all`,
     );
     if (data === undefined) {
       throw new NotFoundException('token event not found');
@@ -102,7 +104,7 @@ export class ChartService {
 
   async getClientTokensEvent(dto: GetClientEventAllDto): Promise<any> {
     const data = cacheService.get(
-      `${dto.network}.user.token.event.all.${dto.userAddress}`,
+      `network.${dto.network}.user.${dto.userAddress}.tokens.event.all`,
     );
     if (data === undefined) {
       throw new NotFoundException("client's token event not found");
@@ -112,7 +114,7 @@ export class ChartService {
 
   async getClientTokenEvent(dto: GetClientTokenEventDto): Promise<any> {
     const data = cacheService.get(
-      `${dto.network}.user.token.event.${dto.userAddress}.${dto.tokenAddress}`,
+      `network.${dto.network}.user.${dto.userAddress}.token.${dto.tokenAddress}.event.all`,
     );
     if (data === undefined) {
       throw new NotFoundException("client's token event not found");
