@@ -481,4 +481,34 @@ export class FsService {
       );
     }
   };
+
+  // network.${}.user.${}.balancesOf
+  writeUserBalancesOfToFile = async (
+    network: string,
+    user: string,
+    index: number,
+    body: any,
+  ): Promise<void> => {
+    const path = `${network}/user/${user}`;
+    const name = `network.${network}.user.${user}.balancesOf`;
+    if (fs.existsSync(`${this.dataPath}/${path}/${name}.json`)) {
+      const data = await this.readArrayFromFile(path, name);
+      data[index] = body;
+      fs.writeFileSync(
+        `${this.dataPath}/${path}/${name}.json`,
+        JSON.stringify(data, null, 2),
+        'utf8',
+      );
+    } else {
+      fs.mkdirSync(`${this.dataPath}/${path}`, { recursive: true });
+
+      const data: any[] = [];
+      data.push(body);
+      fs.writeFileSync(
+        `${this.dataPath}/${path}/${name}.json`,
+        JSON.stringify(data, null, 2),
+        'utf8',
+      );
+    }
+  };
 }

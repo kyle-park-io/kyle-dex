@@ -18,6 +18,7 @@ import {
   type Block,
   keccak256,
   toUtf8Bytes,
+  ZeroAddress,
 } from 'ethers';
 import cacheService from '../../../init/cache';
 
@@ -583,6 +584,131 @@ export class HardhatEventListenerService implements OnModuleInit {
                 transferObj,
               );
 
+              // transfer cache
+              const toIndex = cacheService.get(
+                `network.${this.network}.user.${tokenTo}.balancesOf.${pair}.index`,
+              );
+              const toBalancesList = cacheService.get(
+                `network.${this.network}.user.${tokenTo}.balancesOf`,
+              );
+              if (toBalancesList === undefined) {
+                if (toIndex !== undefined) {
+                  throw new Error("There's a gap in the cache!");
+                }
+                this.logger.warn(
+                  `First inject:\nuser: ${tokenTo}, pair: ${pair}`,
+                );
+                const value = {
+                  type: 'pair',
+                  address: pair,
+                  balanceOf: tokenValue,
+                };
+                cacheService.set(
+                  `network.${this.network}.user.${tokenTo}.balancesOf.${pair}.index`,
+                  '0',
+                );
+                cacheService.set(
+                  `network.${this.network}.user.${tokenTo}.balancesOf`,
+                  JSON.stringify([value], undefined, 2),
+                );
+                await this.fsService.writeUserBalancesOfToFile(
+                  this.network,
+                  tokenTo,
+                  0,
+                  value,
+                );
+              } else {
+                if (typeof toBalancesList !== 'string') {
+                  throw new Error('Incorrect data type');
+                }
+                if (toIndex === undefined) {
+                  const balancesOf = JSON.parse(toBalancesList);
+                  this.logger.warn(
+                    `First inject:\nuser: ${tokenTo}, pair: ${pair}`,
+                  );
+                  const value = {
+                    type: 'pair',
+                    address: pair,
+                    balanceOf: tokenValue,
+                  };
+                  balancesOf.push(value);
+                  cacheService.set(
+                    `network.${this.network}.user.${tokenTo}.balancesOf.${pair}.index`,
+                    (balancesOf.length - 1).toString(),
+                  );
+                  cacheService.set(
+                    `network.${this.network}.user.${tokenTo}.balancesOf`,
+                    JSON.stringify(balancesOf, undefined, 2),
+                  );
+                  await this.fsService.writeUserBalancesOfToFile(
+                    this.network,
+                    tokenTo,
+                    balancesOf.length - 1,
+                    value,
+                  );
+                } else {
+                  const balancesOf = JSON.parse(toBalancesList);
+                  const beforeBalanceOf = balancesOf[Number(toIndex)].balanceOf;
+                  const afterBalanceOf = BigInt(
+                    BigInt(beforeBalanceOf) + BigInt(tokenValue),
+                  ).toString();
+                  balancesOf[Number(toIndex)].balanceOf = afterBalanceOf;
+                  cacheService.set(
+                    `network.${this.network}.user.${tokenTo}.balancesOf`,
+                    JSON.stringify(balancesOf, undefined, 2),
+                  );
+                  const value = {
+                    type: 'pair',
+                    address: pair,
+                    balanceOf: afterBalanceOf,
+                  };
+                  await this.fsService.writeUserBalancesOfToFile(
+                    this.network,
+                    tokenTo,
+                    Number(toIndex),
+                    value,
+                  );
+                }
+              }
+              if (tokenFrom === ZeroAddress) break;
+              const fromIndex = cacheService.get(
+                `network.${this.network}.user.${tokenFrom}.balancesOf.${pair}.index`,
+              );
+              const fromBalancesList = cacheService.get(
+                `network.${this.network}.user.${tokenFrom}.balancesOf`,
+              );
+              if (fromBalancesList === undefined) {
+                throw new Error("There's a gap in the cache!");
+              } else {
+                if (fromIndex === undefined) {
+                  throw new Error("There's a gap in the cache!");
+                }
+                if (typeof fromBalancesList !== 'string') {
+                  throw new Error('Incorrect data type');
+                }
+                const balancesOf = JSON.parse(fromBalancesList);
+                const beforeBalanceOf = balancesOf[Number(fromIndex)].balanceOf;
+                const afterBalanceOf = BigInt(
+                  BigInt(beforeBalanceOf) - BigInt(tokenValue),
+                ).toString();
+                balancesOf[Number(fromIndex)].balanceOf = afterBalanceOf;
+                cacheService.set(
+                  `network.${this.network}.user.${tokenFrom}.balancesOf`,
+                  JSON.stringify(balancesOf, undefined, 2),
+                );
+                const value = {
+                  type: 'pair',
+                  address: pair,
+                  balanceOf: afterBalanceOf,
+                };
+                await this.fsService.writeUserBalancesOfToFile(
+                  this.network,
+                  tokenFrom,
+                  Number(fromIndex),
+                  value,
+                );
+              }
+
               break;
             }
             case 'Approval': {
@@ -727,6 +853,131 @@ export class HardhatEventListenerService implements OnModuleInit {
                 token,
                 transferObj,
               );
+
+              // transfer cache
+              const toIndex = cacheService.get(
+                `network.${this.network}.user.${tokenTo}.balancesOf.${token}.index`,
+              );
+              const toBalancesList = cacheService.get(
+                `network.${this.network}.user.${tokenTo}.balancesOf`,
+              );
+              if (toBalancesList === undefined) {
+                if (toIndex !== undefined) {
+                  throw new Error("There's a gap in the cache!");
+                }
+                this.logger.warn(
+                  `First inject:\nuser: ${tokenTo}, token: ${token}`,
+                );
+                const value = {
+                  type: 'token',
+                  address: token,
+                  balanceOf: tokenValue,
+                };
+                cacheService.set(
+                  `network.${this.network}.user.${tokenTo}.balancesOf.${token}.index`,
+                  '0',
+                );
+                cacheService.set(
+                  `network.${this.network}.user.${tokenTo}.balancesOf`,
+                  JSON.stringify([value], undefined, 2),
+                );
+                await this.fsService.writeUserBalancesOfToFile(
+                  this.network,
+                  tokenTo,
+                  0,
+                  value,
+                );
+              } else {
+                if (typeof toBalancesList !== 'string') {
+                  throw new Error('Incorrect data type');
+                }
+                if (toIndex === undefined) {
+                  const balancesOf = JSON.parse(toBalancesList);
+                  this.logger.warn(
+                    `First inject:\nuser: ${tokenTo}, token: ${token}`,
+                  );
+                  const value = {
+                    type: 'token',
+                    address: token,
+                    balanceOf: tokenValue,
+                  };
+                  balancesOf.push(value);
+                  cacheService.set(
+                    `network.${this.network}.user.${tokenTo}.balancesOf.${token}.index`,
+                    (balancesOf.length - 1).toString(),
+                  );
+                  cacheService.set(
+                    `network.${this.network}.user.${tokenTo}.balancesOf`,
+                    JSON.stringify(balancesOf, undefined, 2),
+                  );
+                  await this.fsService.writeUserBalancesOfToFile(
+                    this.network,
+                    tokenTo,
+                    balancesOf.length - 1,
+                    value,
+                  );
+                } else {
+                  const balancesOf = JSON.parse(toBalancesList);
+                  const beforeBalanceOf = balancesOf[Number(toIndex)].balanceOf;
+                  const afterBalanceOf = BigInt(
+                    BigInt(beforeBalanceOf) + BigInt(tokenValue),
+                  ).toString();
+                  balancesOf[Number(toIndex)].balanceOf = afterBalanceOf;
+                  cacheService.set(
+                    `network.${this.network}.user.${tokenTo}.balancesOf`,
+                    JSON.stringify(balancesOf, undefined, 2),
+                  );
+                  const value = {
+                    type: 'token',
+                    address: token,
+                    balanceOf: afterBalanceOf,
+                  };
+                  await this.fsService.writeUserBalancesOfToFile(
+                    this.network,
+                    tokenTo,
+                    Number(toIndex),
+                    value,
+                  );
+                }
+              }
+              if (tokenFrom === ZeroAddress) break;
+              const fromIndex = cacheService.get(
+                `network.${this.network}.user.${tokenFrom}.balancesOf.${token}.index`,
+              );
+              const fromBalancesList = cacheService.get(
+                `network.${this.network}.user.${tokenFrom}.balancesOf`,
+              );
+              if (fromBalancesList === undefined) {
+                throw new Error("There's a gap in the cache!");
+              } else {
+                if (fromIndex === undefined) {
+                  throw new Error("There's a gap in the cache!");
+                }
+                if (typeof fromBalancesList !== 'string') {
+                  throw new Error('Incorrect data type');
+                }
+                const balancesOf = JSON.parse(fromBalancesList);
+                const beforeBalanceOf = balancesOf[Number(fromIndex)].balanceOf;
+                const afterBalanceOf = BigInt(
+                  BigInt(beforeBalanceOf) - BigInt(tokenValue),
+                ).toString();
+                balancesOf[Number(fromIndex)].balanceOf = afterBalanceOf;
+                cacheService.set(
+                  `network.${this.network}.user.${tokenFrom}.balancesOf`,
+                  JSON.stringify(balancesOf, undefined, 2),
+                );
+                const value = {
+                  type: 'token',
+                  address: token,
+                  balanceOf: afterBalanceOf,
+                };
+                await this.fsService.writeUserBalancesOfToFile(
+                  this.network,
+                  tokenFrom,
+                  Number(fromIndex),
+                  value,
+                );
+              }
 
               break;
             }
