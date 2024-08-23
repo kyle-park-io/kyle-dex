@@ -94,4 +94,36 @@ export class ClientController {
       throw err;
     }
   }
+
+  @Post('getClientBalanceOf')
+  @Header('Content-Type', 'application/json')
+  @ApiOperation({
+    summary: 'getClientBalanceOf',
+    description: 'getClientBalanceOf',
+  })
+  @ApiBody({ type: ClientDto })
+  @ApiCreatedResponse({
+    description: 'getClientBalanceOf success',
+  })
+  @ApiInternalServerErrorResponse({ description: 'Internal server error' })
+  getClientBalanceOf(@Body() dto: ClientDto): any {
+    try {
+      switch (dto.network) {
+        case NetworkType.hardhat: {
+          return this.hardhatClientService.getClientBalanceOf(dto);
+        }
+        case NetworkType.sepolia: {
+          return this.sepoliaClientService.getClientBalanceOf(dto);
+        }
+        case NetworkType.amoy: {
+          return this.amoyClientService.getClientBalanceOf(dto);
+        }
+        default:
+          break;
+      }
+    } catch (err) {
+      console.error(err);
+      throw err;
+    }
+  }
 }
