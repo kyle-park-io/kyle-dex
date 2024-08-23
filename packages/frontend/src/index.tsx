@@ -10,6 +10,7 @@ import Footer from './layout/Footer';
 
 // route
 import App from './app/App';
+import About from './about/About';
 import AccountIndex from './account/Account.index';
 import DexChartIndex from './dex/Dex.index';
 import DexStaking from './dex/Dex.staking';
@@ -57,6 +58,7 @@ if (root != null) {
           <div class="tw-bg-white tw-flex-grow tw-flex tw-flex-wrap">
             <Routes>
               <Route path="/dex" component={App} />
+              <Route path="/dex/about" component={About} />
               <Route
                 path="/dex/account/:network/:address"
                 component={AccountIndex}
