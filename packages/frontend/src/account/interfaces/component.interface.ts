@@ -5,3 +5,8 @@ export interface AccountInfo {
   balance: string;
   nonce: string;
 }
+
+export interface AccountBalanceOfProps {
+  show: boolean;
+  onHide: () => void;
+}

@@ -9,12 +9,14 @@ import {
   HeaderNavigateType,
   setFromHeaderNavigate2,
 } from '../global/global.store';
-
 // css
 import './Header.css';
 
 // metamask
 import MetamaskIndex from '../metamask/Metamask.index';
+
+// account
+import AccountBalanceOf from '../account/components/Account.balanceOf';
 
 import { globalState } from '../global/constants';
 
@@ -487,6 +489,19 @@ const Header: Component = (): JSX.Element => {
     void fetchData();
   });
 
+  const [show, setShow] = createSignal(false);
+  const handleOpen = (): void => {
+    setShow(true);
+  };
+  const handleClose = (): void => {
+    setShow(false);
+  };
+
+  const handleAboutClick = (): void => {
+    navigate('/dex/about');
+    // window.location.href = `${url}/about`;
+  };
+
   return (
     <>
       <div class="tw-h-full">
@@ -547,6 +562,9 @@ const Header: Component = (): JSX.Element => {
               </button>
               <button onClick={handleHomeClick} class="transparent">
                 <span>Go Basic Home</span>
+              </button>
+              <button onClick={handleAboutClick} class="transparent">
+                <span>About</span>
               </button>
             </Col>
             <Col lg={4} md={4} sm={4} xs={4} class="tw-flex tw-justify-center">
@@ -690,6 +708,19 @@ const Header: Component = (): JSX.Element => {
                   >
                     <span class="tw-text-black">Account</span>
                   </Nav.Link>
+                </Nav.Item>
+                <Nav.Item as="li">
+                  <Nav.Link
+                    eventKey="move"
+                    onClick={handleOpen}
+                    class="tw-h-full tw-flex tw-items-center tw-justify-center"
+                  >
+                    <span class="tw-text-black">Balance</span>
+                  </Nav.Link>
+                  <AccountBalanceOf
+                    show={show()}
+                    onHide={handleClose}
+                  ></AccountBalanceOf>
                 </Nav.Item>
               </Nav>
             </Col>

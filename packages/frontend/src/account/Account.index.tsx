@@ -2,7 +2,7 @@ import { type Component, type JSX } from 'solid-js';
 import { createSignal, createEffect } from 'solid-js';
 import { useParams } from '@solidjs/router';
 import { getClient } from './Account.axios';
-import { type AccountInfo } from './interfaces/account.interface';
+import { type AccountInfo } from './interfaces/component.interface';
 import { Spinner, Container, Row, Col } from 'solid-bootstrap';
 import { globalState } from '../global/constants';
 

@@ -9,3 +9,11 @@ export async function getClient(url: string, param: any): Promise<any> {
   const res = await axios.post(`${url}/client/getClient`, param);
   return res.data;
 }
+
+export async function getClientBalanceOf(
+  url: string,
+  param: any,
+): Promise<any> {
+  const res = await axios.post(`${url}/client/getClientBalanceOf`, param);
+  return res.data;
+}
