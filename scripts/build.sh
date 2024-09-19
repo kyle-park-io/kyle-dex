@@ -10,4 +10,4 @@ yarn run clean-build-prod
 cp -r -p dist ${SCRIPT_DIR}/../packages/backend/build
 
 # public files
-cp -r -p public/* /home/kyle/code/kyle-server/packages/ingress-proxy/public
+cp -r -p public/* /home/kyle/code/kyle-server/packages/ingress-reverse-proxy/public
