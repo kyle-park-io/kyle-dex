@@ -8,7 +8,7 @@ import Github from '/github-icon.png?url';
 const Footer: Component = (): JSX.Element => {
   const handleNotionClick = (): void => {
     window.open(
-      'https://www.notion.so/kyle-park/c92ee6d25f1f48fe8fa54ef5fa79790c',
+      'https://kyle-park.notion.site/HI-I-m-KYLE-c52ac7c7e75c41dd92792f9db8cee895#0cbc2dce44ad44cba1e679d7ca4519c6',
     );
   };
   const handleLinkedinClick = (): void => {
