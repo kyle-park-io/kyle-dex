@@ -1,26 +1,42 @@
 import { type Component, type JSX } from 'solid-js';
 import { createSignal, createEffect } from 'solid-js';
-import { fromDexNavigate, setFromDexNavigate } from '../../global/global.store';
+import {
+  fromDexNavigate,
+  setFromDexNavigate,
+  // setFromDexNavigate2,
+  fromAppNavigate,
+  setFromAppNavigate,
+  // HeaderNavigateType,
+  fromHeaderNavigate,
+  setFromHeaderNavigate,
+} from '../../global/global.store';
 import { Container } from 'solid-bootstrap';
 import { globalState } from '../../global/constants';
 
-const [isCalled, setIsCalled] = createSignal(false);
+const api = globalState.api_url;
+console.log(api);
+
+const [isError, setIsError] = createSignal(false);
+console.log(isError, setIsError);
 
 export const Bridge: Component = (): JSX.Element => {
-  const api = globalState.api_url;
-  console.log(api);
-
-  // init
   createEffect(() => {
-    if (!isCalled() || fromDexNavigate.value) {
-      void init();
-    }
+    const fn = async (): Promise<void> => {
+      if (fromDexNavigate.value) {
+        setFromDexNavigate({ value: false });
+        return;
+      }
+      if (fromAppNavigate.value) {
+        setFromAppNavigate({ value: false });
+        return;
+      }
+      if (fromHeaderNavigate.value) {
+        setFromHeaderNavigate({ value: false });
+        return;
+      }
+    };
+    void fn;
   });
-  const init = async (): Promise<void> => {
-    setIsCalled(true);
-
-    setFromDexNavigate({ value: false });
-  };
 
   return (
     <>

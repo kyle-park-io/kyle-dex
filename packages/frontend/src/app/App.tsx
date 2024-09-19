@@ -74,7 +74,18 @@ const App: Component = (): JSX.Element => {
     }
   };
   const handleBridgeClick = (): void => {
-    navigate('/dex/bridge');
+    if ((localStorage.getItem('network') as string) === 'null') {
+      navigate('/dex/bridge');
+    }
+    if ((localStorage.getItem('network') as string) === 'hardhat') {
+      navigate('/dex/bridge/hardhat');
+    }
+    if ((localStorage.getItem('network') as string) === 'sepolia') {
+      navigate('/dex/bridge/sepolia');
+    }
+    if ((localStorage.getItem('network') as string) === 'amoy') {
+      navigate('/dex/bridge/amoy');
+    }
   };
 
   return (

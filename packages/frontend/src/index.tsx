@@ -70,6 +70,7 @@ if (root != null) {
               <Route path="/dex/swap" component={DexSwap} />
               <Route path="/dex/swap/:id" component={DexSwap} />\
               <Route path="/dex/bridge" component={DexBridge} />
+              <Route path="/dex/bridge/:id" component={DexBridge} />
               {/* test component */}
               <Route path="/dex/test" component={Test} />
               <Route path="*" component={NotFoundPage} />

@@ -55,9 +55,17 @@ export const DexHeader: Component = (): JSX.Element => {
     }
   };
   const handleBridgeClick = (): void => {
-    if (location.pathname !== '/dex/bridge') {
-      setFromDexNavigate({ value: true });
-      navigate('/dex/bridge');
+    const network = localStorage.getItem('network') as string;
+    if (network === 'null') {
+      if (location.pathname !== '/dex/bridge') {
+        setFromDexNavigate({ value: true });
+        navigate('/dex/bridge');
+      }
+    } else {
+      if (location.pathname !== `/dex/bridge/${network}`) {
+        setFromDexNavigate({ value: true });
+        navigate(`/dex/bridge/${network}`);
+      }
     }
   };
 

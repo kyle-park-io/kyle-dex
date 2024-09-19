@@ -125,6 +125,13 @@ const Header: Component = (): JSX.Element => {
         });
         navigate('/dex/swap');
       }
+      if (location.pathname.startsWith('/dex/bridge')) {
+        setFromHeaderNavigate({
+          value: true,
+          type: HeaderNavigateType.network,
+        });
+        navigate('/dex/bridge');
+      }
     } else {
       if (networkKey === 'hardhat') {
         setIsLocal(true);
@@ -162,6 +169,13 @@ const Header: Component = (): JSX.Element => {
             type: HeaderNavigateType.network,
           });
           navigate('/dex/swap/hardhat');
+        }
+        if (location.pathname.startsWith('/dex/bridge')) {
+          setFromHeaderNavigate({
+            value: true,
+            type: HeaderNavigateType.network,
+          });
+          navigate('/dex/bridge/hardhat');
         }
       } else if (networkKey === 'sepolia') {
         setIsLocal(false);
@@ -211,6 +225,13 @@ const Header: Component = (): JSX.Element => {
           });
           navigate('/dex/swap/sepolia');
         }
+        if (location.pathname.startsWith('/dex/bridge')) {
+          setFromHeaderNavigate({
+            value: true,
+            type: HeaderNavigateType.network,
+          });
+          navigate('/dex/bridge/sepolia');
+        }
       } else {
         setIsLocal(false);
         setHardhatButtonColor('white');
@@ -259,6 +280,13 @@ const Header: Component = (): JSX.Element => {
           });
           navigate('/dex/swap/amoy');
         }
+        if (location.pathname.startsWith('/dex/bridge')) {
+          setFromHeaderNavigate({
+            value: true,
+            type: HeaderNavigateType.network,
+          });
+          navigate('/dex/bridge/amoy');
+        }
       }
     }
   };
@@ -299,6 +327,13 @@ const Header: Component = (): JSX.Element => {
         });
         navigate('/dex/swap/hardhat');
       }
+      if (location.pathname.startsWith('/dex/bridge')) {
+        setFromHeaderNavigate({
+          value: true,
+          type: HeaderNavigateType.network,
+        });
+        navigate('/dex/bridge/hardhat');
+      }
     } else if (networkKey === 'sepolia') {
       setIsLocal(false);
       setHardhatButtonColor('white');
@@ -337,6 +372,13 @@ const Header: Component = (): JSX.Element => {
           type: HeaderNavigateType.network,
         });
         navigate('/dex/swap/sepolia');
+        if (location.pathname.startsWith('/dex/bridge')) {
+          setFromHeaderNavigate({
+            value: true,
+            type: HeaderNavigateType.network,
+          });
+          navigate('/dex/bridge/sepolia');
+        }
       }
     } else if (networkKey === 'amoy') {
       setIsLocal(false);
@@ -377,6 +419,13 @@ const Header: Component = (): JSX.Element => {
         });
         navigate('/dex/swap/amoy');
       }
+      if (location.pathname.startsWith('/dex/bridge')) {
+        setFromHeaderNavigate({
+          value: true,
+          type: HeaderNavigateType.network,
+        });
+        navigate('/dex/bridge/amoy');
+      }
     } else {
       if (location.pathname.startsWith('/dex/chart')) {
         setFromHeaderNavigate({
@@ -402,6 +451,13 @@ const Header: Component = (): JSX.Element => {
           type: HeaderNavigateType.network,
         });
         navigate('/dex/swap');
+      }
+      if (location.pathname.startsWith('/dex/bridge')) {
+        setFromHeaderNavigate({
+          value: true,
+          type: HeaderNavigateType.network,
+        });
+        navigate('/dex/bridge');
       }
     }
   };
