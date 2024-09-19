@@ -1,6 +1,6 @@
 import { type Component, type JSX } from 'solid-js';
 import { createSignal, createEffect } from 'solid-js';
-import { useNavigate } from '@solidjs/router';
+// import { useNavigate } from '@solidjs/router';
 import {
   Container,
   Row,
@@ -14,7 +14,7 @@ import {
 import {
   fromDexNavigate,
   setFromDexNavigate,
-  setFromDexNavigate2,
+  // setFromDexNavigate2,
   fromAppNavigate,
   setFromAppNavigate,
   HeaderNavigateType,
@@ -80,7 +80,7 @@ const [swapTokenList2, setSwapTokenList2] = createSignal<any[]>([]);
 // };
 
 export const Swap: Component = (): JSX.Element => {
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   createEffect(() => {
     const fn = async (): Promise<void> => {
@@ -463,9 +463,10 @@ export const Swap: Component = (): JSX.Element => {
   };
   const handleGoChart = (): void => {
     const network = localStorage.getItem('network') as string;
-    setFromDexNavigate({ value: true });
-    setFromDexNavigate2({ value: true });
-    navigate(`/dex/chart/${network}`);
+    // setFromDexNavigate({ value: true });
+    // setFromDexNavigate2({ value: true });
+    // navigate(`/dex/chart/${network}`);
+    window.location.href = `${globalState.url}/dex/chart/${network}`;
   };
   const handleSubmitR = async (): Promise<void> => {
     try {
