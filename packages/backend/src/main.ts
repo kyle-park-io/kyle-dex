@@ -55,7 +55,9 @@ async function bootstrap(): Promise<void> {
       .addBearerAuth()
       .build();
     const document = SwaggerModule.createDocument(app, options);
-    SwaggerModule.setup('dex/api-docs', app, document);
+    SwaggerModule.setup('dex/api-docs', app, document, {
+      // customfavIcon: '/favicon.ico',
+    });
 
     // file check
     const fileArray = ['config-prod/prod.yaml', 'artifacts'];

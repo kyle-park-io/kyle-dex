@@ -2,7 +2,7 @@
 SCRIPT_DIR=$(dirname "$(readlink -f "$0")")
 
 cd ${SCRIPT_DIR}/../packages/backend
-rm -rf build
+rm -rf build dist
 
 cd ${SCRIPT_DIR}/../packages/frontend
 # yarn run build
