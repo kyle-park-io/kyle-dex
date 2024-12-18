@@ -557,6 +557,9 @@ const Header: Component = (): JSX.Element => {
     navigate('/dex/about');
     // window.location.href = `${url}/about`;
   };
+  const handleSwaggerClick = (): void => {
+    window.open(`${globalState.url}/dex/api-docs`);
+  };
 
   return (
     <>
@@ -621,6 +624,9 @@ const Header: Component = (): JSX.Element => {
               </button>
               <button onClick={handleAboutClick} class="transparent">
                 <span>About</span>
+              </button>
+              <button onClick={handleSwaggerClick} class="transparent">
+                <span>Swagger</span>
               </button>
             </Col>
             <Col lg={4} md={4} sm={4} xs={4} class="tw-flex tw-justify-center">
