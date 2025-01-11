@@ -1059,8 +1059,9 @@ export class HardhatEventListenerService implements OnModuleInit {
         timestamp,
       );
     } catch (err) {
+      // TODO: Design and implement an asynchronous event handler
       this.logger.error(err);
-      throw err;
+      // throw err;
     }
   }
 
