@@ -35,9 +35,14 @@ export class HardhatAccountService implements AccountService {
     this.nameByAddressMap = new Map<string, string>();
     this.addressBynameMap = new Map<string, string>();
     this.addressArray = [];
-    const accountList = this.configService.get<AccountConfig[]>('accounts');
+    const accountList = this.configService.get<AccountConfig[]>(
+      'accounts.network.hardhat',
+    );
     if (accountList !== undefined) {
       for (let i = 0; i < accountList.length; i++) {
+        if (accountList[i].privateKey === '') {
+          continue;
+        }
         try {
           this.createWallet(
             accountList[i].name,

@@ -91,6 +91,8 @@ network:
         eventList:
           - 'Transfer'
           - 'Approval'
+      - name: 'tokenEx'
+        address: '0xb98FD3Bb98451a9F88E784232Db27B626eEDd3d7'
       - name: 'tokenA'
         address:
       - name: 'tokenB'

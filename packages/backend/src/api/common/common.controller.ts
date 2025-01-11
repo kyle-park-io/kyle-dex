@@ -104,26 +104,24 @@ export class CommonController {
         let contract;
         switch (dto.network) {
           case NetworkType.hardhat: {
-            contract = this.hardhatRpcService.getContractByAddress(
+            contract = this.hardhatRpcService.getContractAddress(
               dto.contractName,
             );
             break;
           }
           case NetworkType.sepolia: {
-            contract = this.sepoliaRpcService.getContractByAddress(
+            contract = this.sepoliaRpcService.getContractAddress(
               dto.contractName,
             );
             break;
           }
           case NetworkType.amoy: {
-            contract = this.amoyRpcService.getContractByAddress(
-              dto.contractName,
-            );
+            contract = this.amoyRpcService.getContractAddress(dto.contractName);
             break;
           }
         }
         if (contract === undefined) {
-          throw new Error('contract is not exitsed');
+          throw new Error('contract is not existed');
         }
         contractAddress = contract;
       }
@@ -177,9 +175,25 @@ export class CommonController {
       } else if (dto.contractAddress !== undefined) {
         contractAddress = dto.contractAddress;
       } else if (dto.contractName !== undefined) {
-        const contract = this.hardhatRpcService.getContractAddress(
-          dto.contractName,
-        );
+        let contract;
+        switch (dto.network) {
+          case NetworkType.hardhat: {
+            contract = this.hardhatRpcService.getContractAddress(
+              dto.contractName,
+            );
+            break;
+          }
+          case NetworkType.sepolia: {
+            contract = this.sepoliaRpcService.getContractAddress(
+              dto.contractName,
+            );
+            break;
+          }
+          case NetworkType.amoy: {
+            contract = this.amoyRpcService.getContractAddress(dto.contractName);
+            break;
+          }
+        }
         if (contract === undefined) {
           throw new Error('contract is not existed');
         }
@@ -187,7 +201,7 @@ export class CommonController {
       }
 
       const args: ProcessContractDto = {
-        network: 'hardhat',
+        network: dto.network,
         userAddress,
         contractAddress,
         function: dto.function,
@@ -236,9 +250,25 @@ export class CommonController {
       } else if (dto.contractAddress !== undefined) {
         contractAddress = dto.contractAddress;
       } else if (dto.contractName !== undefined) {
-        const contract = this.hardhatRpcService.getContractAddress(
-          dto.contractName,
-        );
+        let contract;
+        switch (dto.network) {
+          case NetworkType.hardhat: {
+            contract = this.hardhatRpcService.getContractAddress(
+              dto.contractName,
+            );
+            break;
+          }
+          case NetworkType.sepolia: {
+            contract = this.sepoliaRpcService.getContractAddress(
+              dto.contractName,
+            );
+            break;
+          }
+          case NetworkType.amoy: {
+            contract = this.amoyRpcService.getContractAddress(dto.contractName);
+            break;
+          }
+        }
         if (contract === undefined) {
           throw new Error('contract is not existed');
         }
@@ -246,6 +276,7 @@ export class CommonController {
       }
 
       const args: ProcessContractWithETHDto = {
+        network: dto.network,
         userAddress,
         contractAddress,
         function: dto.function,

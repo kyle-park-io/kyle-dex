@@ -57,6 +57,14 @@ export class QueryContractDto {
 }
 
 export class SubmitContractDto {
+  @IsString()
+  @ApiProperty({
+    description: 'network name',
+    example: 'hardhat',
+    required: true,
+  })
+  readonly network!: string;
+
   @IsOptional()
   @IsString()
   @ApiProperty({
@@ -103,6 +111,14 @@ export class SubmitContractDto {
 }
 
 export class SubmitContractWithETHDto {
+  @IsString()
+  @ApiProperty({
+    description: 'network name',
+    example: 'hardhat',
+    required: true,
+  })
+  readonly network!: string;
+
   @IsOptional()
   @IsString()
   @ApiProperty({

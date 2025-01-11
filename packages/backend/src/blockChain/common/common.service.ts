@@ -26,6 +26,10 @@ export class CommonService {
     // extra
     @Inject('HardhatAccount')
     private readonly hardhatAccountService: AccountService,
+    @Inject('SepoliaAccount')
+    private readonly sepoliaAccountService: AccountService,
+    @Inject('AmoyAccount')
+    private readonly amoyAccountService: AccountService,
     @Inject('HardhatRpc')
     private readonly hardhatRpcService: RpcService,
     @Inject('SepoliaRpc')
@@ -129,14 +133,19 @@ export class CommonService {
 
   async submit(dto: ProcessContractDto): Promise<any> {
     try {
+      const accountService = `${dto.network}AccountService`;
+      const rpcService = `${dto.network}RpcService`;
+
       const wallet: Wallet | undefined =
-        this.hardhatAccountService.getWalletByAddress(dto.userAddress);
+        // this.hardhatAccountService.getWalletByAddress(dto.userAddress);
+        this[accountService].getWalletByAddress(dto.userAddress);
       if (wallet === undefined) {
         throw new Error(`wallet is not existed, address : ${dto.userAddress}`);
       }
 
       const contract: Contract | undefined =
-        this.hardhatRpcService.getContractByAddress(dto.contractAddress);
+        // this.hardhatRpcService.getContractByAddress(dto.contractAddress);
+        this[rpcService].getContractByAddress(dto.contractAddress);
       if (contract === undefined) {
         throw new Error(
           `contract is not existed, address : ${dto.contractAddress}`,
@@ -155,14 +164,19 @@ export class CommonService {
 
   async submitWithETH(dto: ProcessContractWithETHDto): Promise<any> {
     try {
+      const accountService = `${dto.network}AccountService`;
+      const rpcService = `${dto.network}RpcService`;
+
       const wallet: Wallet | undefined =
-        this.hardhatAccountService.getWalletByAddress(dto.userAddress);
+        // this.hardhatAccountService.getWalletByAddress(dto.userAddress);
+        this[accountService].getWalletByAddress(dto.userAddress);
       if (wallet === undefined) {
         throw new Error(`wallet is not existed, address : ${dto.userAddress}`);
       }
 
       const contract: Contract | undefined =
-        this.hardhatRpcService.getContractByAddress(dto.contractAddress);
+        // this.hardhatRpcService.getContractByAddress(dto.contractAddress);
+        this[rpcService].getContractByAddress(dto.contractAddress);
       if (contract === undefined) {
         throw new Error(
           `contract is not existed, address : ${dto.contractAddress}`,

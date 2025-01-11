@@ -63,26 +63,24 @@ export class TokenService {
         let contract;
         switch (dto.network) {
           case NetworkType.hardhat: {
-            contract = this.hardhatRpcService.getContractByAddress(
+            contract = this.hardhatRpcService.getContractAddress(
               dto.contractName,
             );
             break;
           }
           case NetworkType.sepolia: {
-            contract = this.sepoliaRpcService.getContractByAddress(
+            contract = this.sepoliaRpcService.getContractAddress(
               dto.contractName,
             );
             break;
           }
           case NetworkType.amoy: {
-            contract = this.amoyRpcService.getContractByAddress(
-              dto.contractName,
-            );
+            contract = this.amoyRpcService.getContractAddress(dto.contractName);
             break;
           }
         }
         if (contract === undefined) {
-          throw new Error('contract is not exitsed');
+          throw new Error('contract is not existed');
         }
         contractAddress = contract;
       }
