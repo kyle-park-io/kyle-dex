@@ -482,6 +482,7 @@ export const Swap: Component = (): JSX.Element => {
       if (inputsR()[0] === globalState.hardhat_weth_address) {
         console.log('with eth test A');
         const result = await submitWithETH(api, {
+          network,
           userAddress: address,
           contractAddress: router,
           function: 'swapExactETHForTokens',
@@ -492,6 +493,7 @@ export const Swap: Component = (): JSX.Element => {
       } else {
         console.log('basic test');
         const result = await submit(api, {
+          network,
           userAddress: address,
           contractAddress: router,
           function: 'swapExactTokensForTokens',

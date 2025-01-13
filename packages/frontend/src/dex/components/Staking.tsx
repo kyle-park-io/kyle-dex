@@ -588,6 +588,7 @@ export const Staking: Component = (): JSX.Element => {
       if (selectedTokenA() === globalState.hardhat_weth_address) {
         console.log('with eth test A');
         const result = await submitWithETH(api, {
+          network,
           userAddress: address,
           contractAddress: router,
           function: 'addLiquidityETH',
@@ -598,6 +599,7 @@ export const Staking: Component = (): JSX.Element => {
       } else if (selectedTokenB() === globalState.hardhat_weth_address) {
         console.log('with eth test B');
         const result = await submitWithETH(api, {
+          network,
           userAddress: address,
           contractAddress: router,
           function: 'addLiquidityETH',
@@ -608,6 +610,7 @@ export const Staking: Component = (): JSX.Element => {
       } else {
         console.log('basic test');
         const result = await submit(api, {
+          network,
           userAddress: address,
           contractAddress: router,
           function: 'addLiquidity',
