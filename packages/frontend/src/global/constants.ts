@@ -3,7 +3,10 @@ import { createStore } from 'solid-js/store';
 const isProd = process.env.NODE_ENV === 'production';
 
 const [globalState] = createStore({
-  url: isProd ? 'https://jungho.dev' : 'http://localhost:5173',
+  ingress_reverse_proxy_url: isProd
+    ? 'https://jungho.dev'
+    : 'http://localhost:8080',
+  url: isProd ? 'https://jungho.dev' : 'http://localhost:3004',
   api_url: 'https://jungho.dev/api-dex/api',
   isProd,
   isOpen: true,

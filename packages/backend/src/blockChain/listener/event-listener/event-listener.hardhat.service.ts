@@ -69,7 +69,7 @@ export class HardhatEventListenerService implements OnModuleInit {
           this.logger.log(`${value} event listener open: `, address);
           await connectedContract.addListener(value, (...event) => {
             try {
-              // this.handleEvent(connectedContract, event);
+              this.handleEvent(connectedContract, event);
             } catch (err) {
               this.logger.error('Error handling event:', err);
               throw err;
@@ -105,7 +105,7 @@ export class HardhatEventListenerService implements OnModuleInit {
           this.logger.log(`${value} event listener reopen: `, list.address);
           await connectedContract.addListener(value, (...event) => {
             try {
-              // this.handleEvent(connectedContract, event);
+              this.handleEvent(connectedContract, event);
             } catch (err) {
               this.logger.error('Error handling event:', err);
               throw err;

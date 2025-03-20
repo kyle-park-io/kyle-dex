@@ -2,6 +2,7 @@ import { type Component, type JSX } from 'solid-js';
 import { createSignal, createEffect, onMount, For } from 'solid-js';
 import { useNavigate, useLocation } from '@solidjs/router';
 import { Container, Row, Col, Nav } from 'solid-bootstrap';
+import axios from 'axios';
 import HomeLogo from '/home.svg?url';
 import { getClientList } from '../account/Account.axios';
 import {
@@ -22,6 +23,7 @@ import { globalState } from '../global/constants';
 
 const Header: Component = (): JSX.Element => {
   const apiUrl = globalState.api_url;
+  const ingressURL = globalState.ingress_reverse_proxy_url;
 
   const location = useLocation();
   // navigate
@@ -536,11 +538,16 @@ const Header: Component = (): JSX.Element => {
     }
   });
 
+  const [count, setCount] = createSignal(0);
   const [accountList, setAccountList] = createSignal([]);
   onMount(() => {
     async function fetchData(): Promise<void> {
       const res = await getClientList(apiUrl, { network: 'hardhat' });
       setAccountList(res);
+
+      const res2 = await axios.get(`${ingressURL}/redis-tcp/real`);
+      setCount(res2.data);
+      console.log('실시간 접속자 수 : ', count());
     }
     void fetchData();
   });
@@ -636,6 +643,13 @@ const Header: Component = (): JSX.Element => {
             </Col>
             <Col lg={4} md={4} sm={4} xs={4} class="tw-flex tw-justify-end">
               <Nav defaultActiveKey="#" as="ul" class="tw-flex-nowrap">
+                {/* <Nav.Item as="li">
+                  <Nav.Link eventKey="count" class="tw-cursor-default">
+                    <span class="tw-text-black">
+                      실시간 접속자 수: {count()}
+                    </span>
+                  </Nav.Link>
+                </Nav.Item> */}
                 <Nav.Item as="li">
                   <Nav.Link eventKey="connect">
                     {!isLocal() && !isMetamaskConnected() ? (

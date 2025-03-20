@@ -1,7 +1,7 @@
 import { Inject, Injectable, LoggerService } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
-import { MetaMaskSDK } from '@metamask/sdk';
+// import { MetaMaskSDK } from '@metamask/sdk';
 
 @Injectable()
 export class MetamaskService {
@@ -21,13 +21,13 @@ export class MetamaskService {
       throw new Error('config error');
     }
 
-    const MMSDK = new MetaMaskSDK({
-      infuraAPIKey: https,
-      dappMetadata: {
-        name: 'Kyle Dex App',
-        url: 'http://localhost:3000',
-      },
-    });
+    // const MMSDK = new MetaMaskSDK({
+    //   infuraAPIKey: https,
+    //   dappMetadata: {
+    //     name: 'Kyle Dex App',
+    //     url: 'http://localhost:3000',
+    //   },
+    // });
     // console.log(MMSDK);
   }
 }
