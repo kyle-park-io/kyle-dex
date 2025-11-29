@@ -287,7 +287,7 @@ export const PairEvent: Component<PairEventProps> = (props): JSX.Element => {
                               {pairMintEventCount() === 0 ? (
                                 <>
                                   <div class="tw-flex-grow tw-flex tw-items-center tw-justify-center">
-                                    Mint 이벤트가 없습니다
+                                    No Mint events found
                                   </div>
                                 </>
                               ) : (
@@ -345,7 +345,7 @@ export const PairEvent: Component<PairEventProps> = (props): JSX.Element => {
                                   {pairBurnEventCount() === 0 ? (
                                     <>
                                       <div class="tw-flex-grow tw-flex tw-items-center tw-justify-center">
-                                        Burn 이벤트가 없습니다
+                                        No Burn events found
                                       </div>
                                     </>
                                   ) : (
@@ -401,7 +401,7 @@ export const PairEvent: Component<PairEventProps> = (props): JSX.Element => {
                                   {pairSwapEventCount() === 0 ? (
                                     <>
                                       <div class="tw-flex-grow tw-flex tw-items-center tw-justify-center">
-                                        Swap 이벤트가 없습니다
+                                        No Swap events found
                                       </div>
                                     </>
                                   ) : (
@@ -462,7 +462,7 @@ export const PairEvent: Component<PairEventProps> = (props): JSX.Element => {
                 ) : (
                   <>
                     <div class="tw-flex-grow tw-flex tw-items-center tw-justify-center">
-                      해당 이벤트가 없습니다
+                      No events found
                       <br></br>
                       Pair: {props.currentPair.slice(0, 10)}...
                     </div>

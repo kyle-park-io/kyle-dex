@@ -1,5 +1,6 @@
 import { render } from 'solid-js/web';
 import { Router, Route, Routes } from '@solidjs/router';
+import { lazy } from 'solid-js';
 
 // global css
 import './css/global.css';
@@ -8,18 +9,18 @@ import './css/global.css';
 import Header from './layout/Header';
 import Footer from './layout/Footer';
 
-// route
-import App from './app/App';
-import About from './about/About';
-import AccountIndex from './account/Account.index';
-import DexChartIndex from './dex/Dex.index';
-import DexStaking from './dex/Dex.staking';
-import DexSwap from './dex/Dex.swap';
-import DexBridge from './dex/Dex.bridge';
-import NotFoundPage from './components/404/NotFoundPage';
+// route - lazy loaded for code splitting
+const App = lazy(() => import('./app/App'));
+const About = lazy(() => import('./about/About'));
+const AccountIndex = lazy(() => import('./account/Account.index'));
+const DexChartIndex = lazy(() => import('./dex/Dex.index'));
+const DexStaking = lazy(() => import('./dex/Dex.staking'));
+const DexSwap = lazy(() => import('./dex/Dex.swap'));
+const DexBridge = lazy(() => import('./dex/Dex.bridge'));
+const NotFoundPage = lazy(() => import('./components/404/NotFoundPage'));
 
-// test
-import Test from './test/Test';
+// test - lazy loaded
+const Test = lazy(() => import('./test/Test'));
 
 // utils
 import Resize from './utils/Resize';
@@ -49,13 +50,14 @@ const root = document.getElementById('root');
 if (root != null) {
   render(
     () => (
-      <div class="tw-flex tw-flex-col tw-min-h-screen">
+      <div class="tw-flex tw-flex-col tw-flex-1" style={{ "background-color": "var(--color-bg-primary)", "min-height": "100vh" }}>
         <Router>
-          {/* tw-overflow-auto */}
-          <div class="tw-bg-white tw-h-12">
+          {/* Header */}
+          <div class="tw-h-14 tw-border-b" style={{ "background-color": "var(--color-header-bg)", "border-color": "var(--color-border-primary)" }}>
             <Header></Header>
           </div>
-          <div class="tw-bg-white tw-flex-grow tw-flex tw-flex-wrap">
+          {/* Main Content */}
+          <div class="tw-flex-1 tw-flex tw-flex-col" style={{ "background-color": "var(--color-bg-primary)" }}>
             <Routes>
               <Route path="/dex" component={App} />
               <Route path="/dex/about" component={About} />
@@ -76,7 +78,8 @@ if (root != null) {
               <Route path="*" component={NotFoundPage} />
             </Routes>
           </div>
-          <div class="tw-bg-gray-400 tw-h-8">
+          {/* Footer */}
+          <div class="tw-h-12 tw-border-t" style={{ "background-color": "var(--color-footer-bg)", "border-color": "var(--color-border-primary)" }}>
             <Footer></Footer>
           </div>
         </Router>

@@ -2,13 +2,97 @@
 @tailwind components;
 @tailwind utilities;
 
-/* header */
+/* ========================================
+   KYLE DEX - Dark Theme Design System
+   Inspired by modern crypto exchanges
+   ======================================== */
+
+/* CSS Variables - Dark Theme Color Palette */
+:root {
+  /* Typography */
+  --font-primary:
+    'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
+
+  /* Primary Colors */
+  --color-bg-primary: #0b0e11;
+  --color-bg-secondary: #141820;
+  --color-bg-tertiary: #1e2329;
+  --color-bg-hover: #2b3139;
+
+  /* Accent Colors */
+  --color-accent-primary: #f0b90b;
+  --color-accent-secondary: #fcd535;
+  --color-accent-green: #0ecb81;
+  --color-accent-red: #f6465d;
+  --color-accent-blue: #1e90ff;
+
+  /* Text Colors */
+  --color-text-primary: #eaecef;
+  --color-text-secondary: #848e9c;
+  --color-text-tertiary: #5e6673;
+  --color-text-inverse: #0b0e11;
+
+  /* Border Colors */
+  --color-border-primary: #2b3139;
+  --color-border-secondary: #3c4451;
+
+  /* Header/Footer - slightly lighter for distinction */
+  --color-header-bg: #181a20;
+  --color-footer-bg: #181a20;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.5);
+
+  /* Transitions */
+  --transition-fast: 150ms ease;
+  --transition-normal: 250ms ease;
+}
+
+/* Base Styles */
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  overflow-y: scroll;
+  font-size: 16px;
+  font-family: var(--font-primary);
+  background-color: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  line-height: 1.5;
+  letter-spacing: -0.01em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: var(--color-bg-primary);
+}
+
+/* Header - Hidden for screen readers */
 .offscreen {
   position: absolute;
   left: -9999px;
 }
 
-/* transparent block */
+/* Transparent Button Style */
 .transparent,
 .transparent:hover,
 .transparent:focus,
@@ -21,43 +105,216 @@
   outline: none;
 }
 
-/* xs: 기본 스타일, 미디어 쿼리 없이 정의 */
-body {
-  overflow-y: scroll;
-  font-size: 16px;
+/* Links */
+a {
+  color: var(--color-accent-primary);
+  text-decoration: none;
+  transition: color var(--transition-fast);
 }
 
-/* sm: 576px 이상 */
-@media (min-width: 576px) {
-  body {
-    font-size: 16px;
+a:hover {
+  color: var(--color-accent-secondary);
+}
+
+/* Typography */
+h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+/* Default Button Style */
+button {
+  font-family: inherit;
+  font-size: 0.875rem;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  border: 1px solid transparent;
+  background-color: var(--color-bg-tertiary);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+button:hover {
+  background-color: var(--color-bg-hover);
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Primary Button */
+.btn-primary {
+  background-color: var(--color-accent-primary);
+  color: var(--color-text-inverse);
+  border: none;
+}
+
+.btn-primary:hover {
+  background-color: var(--color-accent-secondary);
+}
+
+/* Secondary Button */
+.btn-secondary {
+  background-color: transparent;
+  color: var(--color-accent-primary);
+  border: 1px solid var(--color-accent-primary);
+}
+
+.btn-secondary:hover {
+  background-color: rgba(240, 185, 11, 0.1);
+}
+
+/* Success/Buy Button */
+.btn-success {
+  background-color: var(--color-accent-green);
+  color: var(--color-text-inverse);
+}
+
+.btn-success:hover {
+  background-color: #0fb978;
+}
+
+/* Danger/Sell Button */
+.btn-danger {
+  background-color: var(--color-accent-red);
+  color: white;
+}
+
+.btn-danger:hover {
+  background-color: #e5364d;
+}
+
+/* Input Styles */
+input[type='text'],
+input[type='email'],
+input[type='password'],
+input[type='number'] {
+  background-color: var(--color-bg-tertiary);
+  border: 1px solid var(--color-border-primary);
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+  color: var(--color-text-primary);
+  font-size: 0.875rem;
+  transition: border-color var(--transition-fast);
+}
+
+input:focus {
+  outline: none;
+  border-color: var(--color-accent-primary);
+}
+
+input::placeholder {
+  color: var(--color-text-tertiary);
+}
+
+/* Card Styles */
+.card {
+  background-color: var(--color-bg-secondary);
+  border: 1px solid var(--color-border-primary);
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  transition: all var(--transition-normal);
+}
+
+.card:hover {
+  border-color: var(--color-border-secondary);
+  box-shadow: var(--shadow-md);
+}
+
+/* Utility Classes */
+@layer components {
+  .center-flex {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .text-accent {
+    color: var(--color-accent-primary);
+  }
+
+  .text-success {
+    color: var(--color-accent-green);
+  }
+
+  .text-danger {
+    color: var(--color-accent-red);
+  }
+
+  .bg-dark-primary {
+    background-color: var(--color-bg-primary);
+  }
+
+  .bg-dark-secondary {
+    background-color: var(--color-bg-secondary);
+  }
+
+  .bg-dark-tertiary {
+    background-color: var(--color-bg-tertiary);
+  }
+
+  /* Monospace font for numbers/prices */
+  .font-mono {
+    font-family: var(--font-mono);
+    font-feature-settings:
+      'tnum' on,
+      'lnum' on;
   }
 }
 
-/* md: 768px 이상 */
-@media (min-width: 768px) {
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-bg-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-border-secondary);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-tertiary);
+}
+
+/* Selection */
+::selection {
+  background-color: var(--color-accent-primary);
+  color: var(--color-text-inverse);
+}
+
+/* Responsive Typography */
+@media (max-width: 768px) {
   body {
-    /* font-size: 18px; */
+    font-size: 14px;
   }
 }
 
-/* lg: 992px 이상 */
-@media (min-width: 992px) {
+@media (max-width: 480px) {
   body {
-    /* font-size: 20px; */
-  }
-}
-
-/* xl: 1200px 이상 */
-@media (min-width: 1200px) {
-  body {
-    /* font-size: 22px; */
-  }
-}
-
-/* xxl: 1400px 이상 (Bootstrap 5) */
-@media (min-width: 1400px) {
-  body {
-    /* font-size: 24px; */
+    font-size: 12px;
   }
 }

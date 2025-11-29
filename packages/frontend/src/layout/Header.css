@@ -1,8 +1,403 @@
-.dropdown-content {
-  background-color: white;
-  color: #000000;
-  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
-  padding: 12px 16px;
-  z-index: 1;
+/* ========================================
+   Header - Modern Exchange Style
+   ======================================== */
+
+/* Header Container */
+.header-container {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.header-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1.5rem;
+}
+
+/* Left Section */
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex: 1;
+}
+
+/* Home Button */
+.header-home-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.header-home-btn:hover {
+  background-color: transparent;
+  opacity: 0.9;
+}
+
+.header-home-btn svg {
+  display: block;
+}
+
+/* Center Section */
+.header-center {
   position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* Navigation */
+.header-nav {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.header-nav-item {
+  background: transparent;
+  border: none;
+  padding: 0.5rem 1rem;
+  color: var(--color-text-primary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: 0.5rem;
+  transition: all var(--transition-fast);
+}
+
+.header-nav-item:hover {
+  color: var(--color-accent-primary);
+  background-color: transparent;
+}
+
+/* Right Section */
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+/* Dropdown */
+.header-dropdown {
+  position: relative;
+}
+
+/* Network Button */
+.header-network-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: var(--color-bg-tertiary);
+  border: 1px solid var(--color-border-primary);
+  padding: 0.5rem 0.875rem;
+  color: var(--color-text-primary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: 0.5rem;
+  transition: all var(--transition-fast);
+}
+
+.header-network-btn:hover {
+  background-color: var(--color-bg-hover);
+  border-color: var(--color-border-secondary);
+}
+
+.header-network-btn svg {
+  color: var(--color-text-secondary);
+}
+
+/* Account Button */
+.header-account-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: var(--color-bg-tertiary);
+  border: 1px solid var(--color-border-primary);
+  padding: 0.5rem 0.875rem;
+  color: var(--color-text-primary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: 0.5rem;
+  transition: all var(--transition-fast);
+}
+
+.header-account-btn:hover {
+  background-color: var(--color-bg-hover);
+  border-color: var(--color-border-secondary);
+}
+
+/* Dropdown Content */
+.dropdown-content {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  right: 0;
+  min-width: 160px;
+  background-color: var(--color-bg-secondary);
+  border: 1px solid var(--color-border-primary);
+  border-radius: 0.75rem;
+  padding: 0.5rem;
+  box-shadow: var(--shadow-lg);
+  z-index: 1000;
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  width: 100%;
+  padding: 0.625rem 0.75rem;
+  background: transparent;
+  border: none;
+  color: var(--color-text-primary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+  border-radius: 0.5rem;
+  transition: all var(--transition-fast);
+}
+
+.dropdown-item:hover {
+  background-color: var(--color-bg-hover);
+}
+
+.dropdown-item.active {
+  background-color: rgba(240, 185, 11, 0.15);
+  color: var(--color-accent-primary);
+}
+
+.dropdown-item-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* Connect Wallet Button */
+.header-connect-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: linear-gradient(135deg, var(--color-accent-primary) 0%, #d4a00a 100%);
+  border: none;
+  padding: 0.5rem 1rem;
+  color: var(--color-text-inverse);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 0.5rem;
+  transition: all var(--transition-fast);
+  box-shadow: 0 2px 8px rgba(240, 185, 11, 0.25);
+}
+
+.header-connect-btn:hover {
+  background: linear-gradient(135deg, var(--color-accent-secondary) 0%, var(--color-accent-primary) 100%);
+  box-shadow: 0 4px 12px rgba(240, 185, 11, 0.35);
+  transform: translateY(-1px);
+}
+
+.header-connect-btn svg {
+  color: var(--color-text-inverse);
+}
+
+/* Wallet Connected State */
+.header-wallet-connected {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.wallet-status {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  color: var(--color-accent-green);
+  font-size: 0.8125rem;
+  font-weight: 500;
+}
+
+.wallet-status-dot {
+  width: 8px;
+  height: 8px;
+  background-color: var(--color-accent-green);
+  border-radius: 50%;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.header-disconnect-btn {
+  background-color: transparent;
+  border: 1px solid var(--color-accent-red);
+  padding: 0.375rem 0.75rem;
+  color: var(--color-accent-red);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: 0.375rem;
+  transition: all var(--transition-fast);
+}
+
+.header-disconnect-btn:hover {
+  background-color: rgba(246, 70, 93, 0.1);
+}
+
+/* Icon Buttons */
+.header-icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background-color: var(--color-bg-tertiary);
+  border: 1px solid var(--color-border-primary);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  border-radius: 0.5rem;
+  transition: all var(--transition-fast);
+}
+
+.header-icon-btn:hover {
+  background-color: var(--color-bg-hover);
+  border-color: var(--color-border-secondary);
+  color: var(--color-text-primary);
+}
+
+/* Text Buttons with Icon */
+.header-text-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: transparent;
+  border: none;
+  padding: 0.5rem 0.75rem;
+  color: var(--color-text-primary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: 0.5rem;
+  transition: all var(--transition-fast);
+}
+
+.header-text-btn:hover {
+  background-color: transparent;
+  color: var(--color-accent-primary);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .header-inner {
+    padding: 0 1rem;
+  }
+
+  .header-left {
+    gap: 0.5rem;
+  }
+
+  .header-nav {
+    display: none;
+  }
+
+  .header-title {
+    font-size: 1rem;
+    letter-spacing: 0.1em;
+  }
+
+  .header-network-btn span,
+  .header-account-btn span {
+    display: none;
+  }
+
+  .header-connect-btn span {
+    display: none;
+  }
+
+  .header-connect-btn {
+    padding: 0.5rem;
+  }
+}
+
+/* Legacy classes for compatibility */
+.offscreen {
+  position: absolute;
+  left: -9999px;
+}
+
+.header-nav-link {
+  color: var(--color-text-secondary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.375rem;
+  transition: all var(--transition-fast);
+}
+
+.header-nav-link:hover {
+  color: var(--color-text-primary);
+  background-color: var(--color-bg-hover);
+}
+
+.header-title {
+  font-family: var(--font-mono);
+  font-size: 1.375rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+}
+
+.header-title:hover {
+  color: var(--color-text-primary);
+  background: transparent;
+}
+
+.btn-connect {
+  background-color: var(--color-accent-primary);
+  color: var(--color-text-inverse);
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  transition: all var(--transition-fast);
+}
+
+.btn-connect:hover {
+  background-color: var(--color-accent-secondary);
+  transform: translateY(-1px);
+}
+
+.status-connected {
+  color: var(--color-accent-green);
+  font-weight: 500;
+}
+
+.btn-disconnect {
+  background-color: transparent;
+  color: var(--color-accent-red);
+  border: 1px solid var(--color-accent-red);
+}
+
+.btn-disconnect:hover {
+  background-color: rgba(246, 70, 93, 0.1);
 }

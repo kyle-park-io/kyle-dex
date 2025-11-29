@@ -668,7 +668,7 @@ export const ClientPairEvent: Component<ClientPairProps> = (
                               {pairsMintEventCount() === 0 ? (
                                 <>
                                   <div class="tw-flex-grow tw-flex tw-items-center tw-justify-center">
-                                    Mint 이벤트가 없습니다
+                                    No Mint events found
                                   </div>
                                 </>
                               ) : (
@@ -730,7 +730,7 @@ export const ClientPairEvent: Component<ClientPairProps> = (
                                   {pairsBurnEventCount() === 0 ? (
                                     <>
                                       <div class="tw-flex-grow tw-flex tw-items-center tw-justify-center">
-                                        Burn 이벤트가 없습니다
+                                        No Burn events found
                                       </div>
                                     </>
                                   ) : (
@@ -792,7 +792,7 @@ export const ClientPairEvent: Component<ClientPairProps> = (
                                       {pairsSwapEventCount() === 0 ? (
                                         <>
                                           <div class="tw-flex-grow tw-flex tw-items-center tw-justify-center">
-                                            Swap 이벤트가 없습니다
+                                            No Swap events found
                                           </div>
                                         </>
                                       ) : (
@@ -865,7 +865,8 @@ export const ClientPairEvent: Component<ClientPairProps> = (
                                               ) : (
                                                 <>
                                                   <div class="tw-flex-grow tw-flex tw-items-center tw-justify-center">
-                                                    해당 Pair 이벤트가 없습니다
+                                                    No events found for this
+                                                    pair
                                                   </div>
                                                 </>
                                               )}
@@ -932,7 +933,7 @@ export const ClientPairEvent: Component<ClientPairProps> = (
                                               {pairMintEventCount() === 0 ? (
                                                 <>
                                                   <div class="tw-flex-grow tw-flex tw-items-center tw-justify-center">
-                                                    Mint 이벤트가 없습니다
+                                                    No Mint events found
                                                   </div>
                                                 </>
                                               ) : (
@@ -1005,7 +1006,7 @@ export const ClientPairEvent: Component<ClientPairProps> = (
                                                   0 ? (
                                                     <>
                                                       <div class="tw-flex-grow tw-flex tw-items-center tw-justify-center">
-                                                        Burn 이벤트가 없습니다
+                                                        No Burn events found
                                                       </div>
                                                     </>
                                                   ) : (
@@ -1077,7 +1078,7 @@ export const ClientPairEvent: Component<ClientPairProps> = (
                                                   0 ? (
                                                     <>
                                                       <div class="tw-flex-grow tw-flex tw-items-center tw-justify-center">
-                                                        Swap 이벤트가 없습니다
+                                                        No Swap events found
                                                       </div>
                                                     </>
                                                   ) : (
@@ -1161,7 +1162,7 @@ export const ClientPairEvent: Component<ClientPairProps> = (
                 ) : (
                   <>
                     <div class="tw-flex-grow tw-flex tw-items-center tw-justify-center">
-                      해당 이벤트가 없습니다
+                      No events found
                       <br></br>
                       Account: {localStorage.getItem('address')?.slice(0, 10)}
                       ...

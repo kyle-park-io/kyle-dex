@@ -1,6 +1,6 @@
 ## build stage
 # node version
-FROM node:16 AS builder
+FROM node:22 AS builder
 
 # set dir
 WORKDIR /usr/src/app
@@ -23,7 +23,7 @@ RUN npm run build
 
 ## prod stage
 # node version
-FROM node:16-slim
+FROM node:22-slim
 
 # install git
 RUN apt-get update && apt-get install -y git \

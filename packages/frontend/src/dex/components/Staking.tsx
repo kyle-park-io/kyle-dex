@@ -1,19 +1,8 @@
-import { type Component, type JSX } from 'solid-js';
+import { type Component, type JSX, For, Show } from 'solid-js';
 import { createSignal, createEffect } from 'solid-js';
-// import { useNavigate } from '@solidjs/router';
-import {
-  Button,
-  Spinner,
-  CloseButton,
-  Container,
-  Form,
-  Row,
-  Col,
-} from 'solid-bootstrap';
 import {
   fromDexNavigate,
   setFromDexNavigate,
-  // setFromDexNavigate2,
   fromAppNavigate,
   setFromAppNavigate,
   HeaderNavigateType,
@@ -35,9 +24,10 @@ import {
 import { globalState } from '../../global/constants';
 import axios from 'axios';
 import { ethers } from 'ethers';
-// import { CustomError } from '../../common/error/custom.error';
 
-const notExisted = '현재 네트워크에 토큰이 존재하지 않습니다';
+import './Staking.css';
+
+const notExisted = 'No tokens exist on this network';
 
 const [isNetwork, setIsNetwork] = createSignal(false);
 const [isAccount, setIsAccount] = createSignal(false);
@@ -50,11 +40,7 @@ const [result, setResult] = createSignal('');
 const [pairs, setPairs] = createSignal<any[]>([]);
 const [tokens, setTokens] = createSignal<any[]>([]);
 
-// const [items, setItems] = createSignal<Pair[]>([]);
-// const [items, setItems] = createSignal<Pair2[]>([]);
-
 export const Staking: Component = (): JSX.Element => {
-  // const navigate = useNavigate();
   const api = globalState.api_url;
 
   // loading
@@ -340,8 +326,6 @@ export const Staking: Component = (): JSX.Element => {
     }
     if (bool2) {
       setTokenALiquidity(value);
-    } else {
-      // setTokenALiquidity('');
     }
   };
   const setBValue = (value: string): void => {
@@ -364,8 +348,6 @@ export const Staking: Component = (): JSX.Element => {
     }
     if (bool2) {
       setTokenBLiquidity(value);
-    } else {
-      // setTokenBLiquidity('');
     }
   };
 
@@ -569,9 +551,6 @@ export const Staking: Component = (): JSX.Element => {
   };
   const handleGoChart = (): void => {
     const network = localStorage.getItem('network') as string;
-    // setFromDexNavigate({ value: true });
-    // setFromDexNavigate2({ value: true });
-    // navigate(`/dex/chart/${network}`);
     window.location.href = `${globalState.url}/dex/chart/${network}`;
   };
   const handleSubmitR = async (): Promise<void> => {
@@ -633,7 +612,6 @@ export const Staking: Component = (): JSX.Element => {
     } catch (err) {
       if (axios.isAxiosError(err)) {
         if (err.response?.status === 500) {
-          // if (err instanceof CustomError) {}
           setIsResult(true);
           setResult(err.response.data.message);
         }
@@ -864,325 +842,604 @@ export const Staking: Component = (): JSX.Element => {
     }
   };
 
+  const formatAddress = (address: string) => {
+    if (!address || address === notExisted) return address;
+    return `${address.slice(0, 8)}...${address.slice(-6)}`;
+  };
+
+  // Dropdown open states
+  const [dropdownAOpen, setDropdownAOpen] = createSignal(false);
+  const [dropdownBOpen, setDropdownBOpen] = createSignal(false);
+  const [dropdownPairOpen, setDropdownPairOpen] = createSignal(false);
+
+  const getTokenName = (address: string) => {
+    const tokenList = tokens();
+    if (!tokenList || tokenList.length === 0) return null;
+    const found = tokenList.find(t => t.address === address);
+    return found?.name || null;
+  };
+
+  const handleSelectA = (address: string) => {
+    handleTokenAChange({ target: { value: address } });
+    setDropdownAOpen(false);
+  };
+
+  const handleSelectB = (address: string) => {
+    handleTokenBChange({ target: { value: address } });
+    setDropdownBOpen(false);
+  };
+
+  const handleSelectPair = (address: string) => {
+    handlePairChange({ target: { value: address } });
+    setDropdownPairOpen(false);
+  };
+
   return (
-    <>
-      <Container fluid class="tw-flex-grow tw-p-4 tw-bg-gray-300">
+    <div class="staking-container">
+      {/* Header */}
+      <section class="staking-header">
+        <h1 class="staking-title">Add Liquidity</h1>
+        <p class="staking-subtitle">Provide liquidity to earn LP tokens and trading fees</p>
+      </section>
+
+      {/* Content */}
+      <div class="staking-content">
         {!isNetwork() ? (
-          <>
-            <div class="tw-flex tw-items-center tw-justify-center">
-              Select network please!
+          <div class="staking-empty-state">
+            <div class="empty-icon">
+              <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/>
+                <path d="M12 8v4M12 16h.01"/>
+              </svg>
             </div>
-          </>
+            <h3>No Network Selected</h3>
+            <p>Please select a network from the header to start adding liquidity.</p>
+          </div>
         ) : (
           <>
             {isError() ? (
-              <>
-                <div class="tw-flex tw-items-center tw-justify-center">
-                  {apiErr()}
+              <div class="staking-error">
+                <div class="error-icon">
+                  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <path d="M12 8v4M12 16h.01"/>
+                  </svg>
                 </div>
-              </>
+                <h3>Error</h3>
+                <p>{apiErr()}</p>
+              </div>
             ) : (
-              <>
-                <Row>
-                  <Col md={4}>
+              <div class="staking-grid">
+                {/* Token Selection Card */}
+                <div class="staking-card">
+                  <div class="card-header">
+                    <h3>Token Selection</h3>
+                  </div>
+                  <div class="card-body">
                     {!loading() ? (
-                      <div class="tw-h-full tw-flex tw-items-center tw-justify-center">
-                        <Spinner animation="border" variant="info" />
+                      <div class="loading-state">
+                        <div class="loading-spinner"></div>
+                        <span>Loading tokens...</span>
                       </div>
                     ) : (
                       <>
-                        <Form.Group>
-                          <Form.Label>Method</Form.Label>
-                          <Form.Check
-                            checked
-                            name="method"
-                            type="radio"
-                            label="Select Tokens"
-                            value="t"
-                            onChange={(e) => {
-                              void handleChangeT(e);
-                            }}
-                          />
-                          <Form.Check
-                            name="method"
-                            type="radio"
-                            label="Select Pair"
-                            value="p"
-                            onChange={(e) => {
-                              void handleChangeP(e);
-                            }}
-                          />
-                        </Form.Group>
-                        <div>cf. WETH: {globalState.hardhat_weth_address}</div>
-                        <br></br>
-                        <Form.Group>
-                          {method() === 't' ? (
-                            <>
-                              <Form.Label>token A</Form.Label>
-                              <Form.Select
-                                aria-label="Select token A"
-                                onChange={handleTokenAChange}
-                                value={selectedTokenA()}
+                        {/* Method Selection */}
+                        <div class="method-selection">
+                          <label class="method-label">Selection Method</label>
+                          <div class="method-options">
+                            <label class="method-option">
+                              <input
+                                type="radio"
+                                name="method"
+                                value="t"
+                                checked={method() === 't'}
+                                onChange={(e) => void handleChangeT(e)}
+                              />
+                              <span class="method-text">Select Tokens</span>
+                            </label>
+                            <label class="method-option">
+                              <input
+                                type="radio"
+                                name="method"
+                                value="p"
+                                checked={method() === 'p'}
+                                onChange={(e) => void handleChangeP(e)}
+                              />
+                              <span class="method-text">Select Pair</span>
+                            </label>
+                          </div>
+                        </div>
+
+                        {/* WETH Info */}
+                        <div class="weth-info">
+                          <span class="weth-label">WETH Address:</span>
+                          <code class="weth-address" title={globalState.hardhat_weth_address}>
+                            {formatAddress(globalState.hardhat_weth_address)}
+                          </code>
+                        </div>
+
+                        {/* Token/Pair Selection */}
+                        {method() === 't' ? (
+                          <div class="token-selects">
+                            {/* Token A Dropdown */}
+                            <div class="select-group">
+                              <label>Token A</label>
+                              <div class="custom-dropdown">
+                                <button 
+                                  class="dropdown-trigger" 
+                                  onClick={() => setDropdownAOpen(!dropdownAOpen())}
+                                  type="button"
+                                >
+                                  <span class="dropdown-value">
+                                    {getTokenName(selectedTokenA()) 
+                                      ? `${getTokenName(selectedTokenA())} - ${formatAddress(selectedTokenA())}` 
+                                      : formatAddress(selectedTokenA())}
+                                  </span>
+                                  <svg 
+                                    class={`dropdown-arrow ${dropdownAOpen() ? 'open' : ''}`} 
+                                    width="16" height="16" viewBox="0 0 24 24" 
+                                    fill="none" stroke="currentColor" stroke-width="2"
+                                  >
+                                    <path d="M6 9l6 6 6-6"/>
+                                  </svg>
+                                </button>
+                                <Show when={dropdownAOpen()}>
+                                  <div class="dropdown-backdrop" onClick={() => setDropdownAOpen(false)}></div>
+                                  <div class="dropdown-menu">
+                                    <For each={tokens()}>
+                                      {(option) => (
+                                        <button
+                                          class={`dropdown-item ${option.address === selectedTokenA() ? 'selected' : ''}`}
+                                          onClick={() => handleSelectA(option.address)}
+                                          type="button"
+                                        >
+                                          <div class="dropdown-item-content">
+                                            <div class="token-icon">
+                                              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <circle cx="12" cy="12" r="10"/>
+                                                <path d="M12 6v12M9 9l3-3 3 3M9 15l3 3 3-3"/>
+                                              </svg>
+                                            </div>
+                                            <div class="dropdown-item-info">
+                                              <Show when={option.name}>
+                                                <span class="token-name">{option.name}</span>
+                                              </Show>
+                                              <span class="token-address" title={option.address}>
+                                                {formatAddress(option.address)}
+                                              </span>
+                                            </div>
+                                          </div>
+                                          <Show when={option.address === selectedTokenA()}>
+                                            <svg class="check-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                              <path d="M20 6L9 17l-5-5"/>
+                                            </svg>
+                                          </Show>
+                                        </button>
+                                      )}
+                                    </For>
+                                  </div>
+                                </Show>
+                              </div>
+                            </div>
+                            {/* Token B Dropdown */}
+                            <div class="select-group">
+                              <label>Token B</label>
+                              <div class="custom-dropdown">
+                                <button 
+                                  class="dropdown-trigger" 
+                                  onClick={() => setDropdownBOpen(!dropdownBOpen())}
+                                  type="button"
+                                >
+                                  <span class="dropdown-value">
+                                    {getTokenName(selectedTokenB()) 
+                                      ? `${getTokenName(selectedTokenB())} - ${formatAddress(selectedTokenB())}` 
+                                      : formatAddress(selectedTokenB())}
+                                  </span>
+                                  <svg 
+                                    class={`dropdown-arrow ${dropdownBOpen() ? 'open' : ''}`} 
+                                    width="16" height="16" viewBox="0 0 24 24" 
+                                    fill="none" stroke="currentColor" stroke-width="2"
+                                  >
+                                    <path d="M6 9l6 6 6-6"/>
+                                  </svg>
+                                </button>
+                                <Show when={dropdownBOpen()}>
+                                  <div class="dropdown-backdrop" onClick={() => setDropdownBOpen(false)}></div>
+                                  <div class="dropdown-menu">
+                                    <For each={tokens()}>
+                                      {(option) => (
+                                        <button
+                                          class={`dropdown-item ${option.address === selectedTokenB() ? 'selected' : ''}`}
+                                          onClick={() => handleSelectB(option.address)}
+                                          type="button"
+                                        >
+                                          <div class="dropdown-item-content">
+                                            <div class="token-icon">
+                                              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <circle cx="12" cy="12" r="10"/>
+                                                <path d="M12 6v12M9 9l3-3 3 3M9 15l3 3 3-3"/>
+                                              </svg>
+                                            </div>
+                                            <div class="dropdown-item-info">
+                                              <Show when={option.name}>
+                                                <span class="token-name">{option.name}</span>
+                                              </Show>
+                                              <span class="token-address" title={option.address}>
+                                                {formatAddress(option.address)}
+                                              </span>
+                                            </div>
+                                          </div>
+                                          <Show when={option.address === selectedTokenB()}>
+                                            <svg class="check-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                              <path d="M20 6L9 17l-5-5"/>
+                                            </svg>
+                                          </Show>
+                                        </button>
+                                      )}
+                                    </For>
+                                  </div>
+                                </Show>
+                              </div>
+                            </div>
+                          </div>
+                        ) : (
+                          /* Pair Dropdown */
+                          <div class="select-group">
+                            <label>Select Pair</label>
+                            <div class="custom-dropdown">
+                              <button 
+                                class="dropdown-trigger" 
+                                onClick={() => setDropdownPairOpen(!dropdownPairOpen())}
+                                type="button"
                               >
-                                {tokens().map((token) => (
-                                  <option value={token.address}>
-                                    {token.address}
-                                  </option>
-                                ))}
-                              </Form.Select>
-                              <Form.Label>token B</Form.Label>
-                              <Form.Select
-                                aria-label="Select token B"
-                                onChange={handleTokenBChange}
-                                value={selectedTokenB()}
-                              >
-                                {tokens()
-                                  // .filter((token) => token.address !== selectedTokenA())
-                                  .map((token) => (
-                                    <option value={token.address}>
-                                      {token.address}
-                                    </option>
-                                  ))}
-                              </Form.Select>
-                            </>
-                          ) : (
-                            <>
-                              <Form.Label>Pair</Form.Label>
-                              <Form.Select
-                                aria-label="Select Pair"
-                                onChange={handlePairChange}
-                                value={selectedPair()}
-                              >
-                                {pairs().map((pair) => (
-                                  <option value={pair.pair}>{pair.pair}</option>
-                                ))}
-                              </Form.Select>
-                            </>
-                          )}
-                        </Form.Group>
+                                <span class="dropdown-value">{formatAddress(selectedPair())}</span>
+                                <svg 
+                                  class={`dropdown-arrow ${dropdownPairOpen() ? 'open' : ''}`} 
+                                  width="16" height="16" viewBox="0 0 24 24" 
+                                  fill="none" stroke="currentColor" stroke-width="2"
+                                >
+                                  <path d="M6 9l6 6 6-6"/>
+                                </svg>
+                              </button>
+                              <Show when={dropdownPairOpen()}>
+                                <div class="dropdown-backdrop" onClick={() => setDropdownPairOpen(false)}></div>
+                                <div class="dropdown-menu">
+                                  <For each={pairs()}>
+                                    {(pair) => (
+                                      <button
+                                        class={`dropdown-item ${pair.pair === selectedPair() ? 'selected' : ''}`}
+                                        onClick={() => handleSelectPair(pair.pair)}
+                                        type="button"
+                                      >
+                                        <div class="dropdown-item-content">
+                                          <div class="token-icon">
+                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                              <circle cx="12" cy="12" r="10"/>
+                                              <path d="M8 12h8M12 8v8"/>
+                                            </svg>
+                                          </div>
+                                          <div class="dropdown-item-info">
+                                            <span class="token-address" title={pair.pair}>
+                                              {formatAddress(pair.pair)}
+                                            </span>
+                                          </div>
+                                        </div>
+                                        <Show when={pair.pair === selectedPair()}>
+                                          <svg class="check-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M20 6L9 17l-5-5"/>
+                                          </svg>
+                                        </Show>
+                                      </button>
+                                    )}
+                                  </For>
+                                </div>
+                              </Show>
+                            </div>
+                          </div>
+                        )}
                       </>
                     )}
-                  </Col>
-                  <Col md={4}>
+                  </div>
+                </div>
+
+                {/* Pool Info Card */}
+                <div class="staking-card">
+                  <div class="card-header">
+                    <h3>Pool Information</h3>
+                  </div>
+                  <div class="card-body">
                     {!reserveLoading() ? (
-                      <div class="tw-h-full tw-flex tw-items-center tw-justify-center">
-                        <Spinner animation="border" variant="info" />
+                      <div class="loading-state">
+                        <div class="loading-spinner"></div>
+                        <span>Loading pool data...</span>
                       </div>
                     ) : (
                       <>
                         {isReserve() ? (
-                          <>
-                            <ul class="list-unstyled">
-                              <li>pair: {selectedPair()}</li>
-                              <li>
-                                {selectedTokenA() ===
-                                globalState.hardhat_weth_address ? (
-                                  <>tokenA: {selectedTokenA()} (WETH)</>
-                                ) : (
-                                  <>tokenA: {selectedTokenA()}</>
+                          <div class="pool-info">
+                            <div class="pool-item">
+                              <span class="pool-label">Pair Address</span>
+                              <code class="pool-value" title={selectedPair()}>
+                                {formatAddress(selectedPair())}
+                              </code>
+                            </div>
+                            <div class="pool-item">
+                              <span class="pool-label">Token A</span>
+                              <code class="pool-value" title={selectedTokenA()}>
+                                {formatAddress(selectedTokenA())}
+                                {selectedTokenA() === globalState.hardhat_weth_address && (
+                                  <span class="token-badge">WETH</span>
                                 )}
-                              </li>
-                              <li>
-                                {selectedTokenB() ===
-                                globalState.hardhat_weth_address ? (
-                                  <>tokenB: {selectedTokenB()} (WETH)</>
-                                ) : (
-                                  <>tokenB: {selectedTokenB()}</>
+                              </code>
+                            </div>
+                            <div class="pool-item">
+                              <span class="pool-label">Token B</span>
+                              <code class="pool-value" title={selectedTokenB()}>
+                                {formatAddress(selectedTokenB())}
+                                {selectedTokenB() === globalState.hardhat_weth_address && (
+                                  <span class="token-badge">WETH</span>
                                 )}
-                              </li>
-                              <li>reserveA: {reserve().reserve0}</li>
-                              <li>reserveB: {reserve().reserve1}</li>
-                            </ul>
-                          </>
+                              </code>
+                            </div>
+                            <div class="reserves-grid">
+                              <div class="reserve-item">
+                                <span class="reserve-label">Reserve A</span>
+                                <span class="reserve-value">{reserve().reserve0}</span>
+                              </div>
+                              <div class="reserve-item">
+                                <span class="reserve-label">Reserve B</span>
+                                <span class="reserve-value">{reserve().reserve1}</span>
+                              </div>
+                            </div>
+                          </div>
                         ) : (
-                          <div class="tw-h-full tw-flex tw-items-center tw-justify-center">
-                            Check Pair
+                          <div class="no-pool">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                              <circle cx="12" cy="12" r="10"/>
+                              <path d="M12 8v4M12 16h.01"/>
+                            </svg>
+                            <span>No pool found for this pair</span>
                           </div>
                         )}
                       </>
                     )}
-                  </Col>
-                  <Col md={4}>
+                  </div>
+                </div>
+
+                {/* Estimate Liquidity Card */}
+                <div class="staking-card">
+                  <div class="card-header">
+                    <h3>Estimate Liquidity</h3>
+                  </div>
+                  <div class="card-body">
                     {!calcLoading() ? (
-                      <div class="tw-h-full tw-flex tw-items-center tw-justify-center">
-                        <Spinner animation="border" variant="info" />
+                      <div class="loading-state">
+                        <div class="loading-spinner"></div>
+                        <span>Loading...</span>
                       </div>
                     ) : (
                       <>
-                        <Form.Group>
-                          <Form.Label>Estimate Liquidity</Form.Label>
-                          <br></br>
-                          <Form.Label>token A</Form.Label>
-                          <Form.Control
+                        <div class="input-group">
+                          <label>Token A Amount</label>
+                          <input
                             id="aLiquidity"
+                            type="text"
+                            class="staking-input"
                             value={tokenALiquidity()}
-                            onInput={(e) => {
-                              void handleTokenALiquidityChange(e);
-                            }}
-                            placeholder="Please enter the liquidity to be injected"
-                          ></Form.Control>
-                          <p>{aMsg()}</p>
-                          <Form.Label>token B</Form.Label>
-                          <Form.Control
+                            onInput={(e) => void handleTokenALiquidityChange(e)}
+                            placeholder="Enter amount in wei"
+                          />
+                          <span class="input-hint">{aMsg()}</span>
+                        </div>
+                        <div class="input-group">
+                          <label>Token B Amount</label>
+                          <input
                             id="bLiquidity"
+                            type="text"
+                            class="staking-input"
                             value={tokenBLiquidity()}
-                            onInput={(e) => {
-                              void handleTokenBLiquidityChange(e);
-                            }}
-                            placeholder="Please enter the liquidity to be injected"
-                          ></Form.Control>
-                          <p>{bMsg()}</p>
+                            onInput={(e) => void handleTokenBLiquidityChange(e)}
+                            placeholder="Enter amount in wei"
+                          />
+                          <span class="input-hint">{bMsg()}</span>
+                        </div>
 
-                          <Form.Label>Conversion Tool</Form.Label>
-                          <div class="tw-flex tw-w-full">
-                            <div>
-                              <Form.Label>ETH</Form.Label>
-                              <Form.Control
+                        {/* Conversion Tool */}
+                        <div class="conversion-tool">
+                          <label class="conversion-label">Unit Converter</label>
+                          <div class="conversion-inputs">
+                            <div class="conversion-input">
+                              <span class="unit-label">ETH</span>
+                              <input
+                                type="text"
+                                class="staking-input"
                                 value={eth()}
                                 onInput={handleEth}
                                 placeholder="0"
-                              ></Form.Control>
+                              />
                             </div>
-                            <div>
-                              <Form.Label>WEI</Form.Label>
-                              <Form.Control
+                            <div class="conversion-arrow">
+                              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M8 7l-5 5 5 5M16 7l5 5-5 5"/>
+                              </svg>
+                            </div>
+                            <div class="conversion-input">
+                              <span class="unit-label">WEI</span>
+                              <input
+                                type="text"
+                                class="staking-input"
                                 value={wei()}
                                 onInput={handleWei}
                                 placeholder="0"
-                              ></Form.Control>
+                              />
                             </div>
                           </div>
-                        </Form.Group>
-
-                        <>
-                          {lmodal() && (
-                            <>
-                              <div class="tw-fixed tw-top-1/2 tw-left-1/2 tw-transform tw--translate-x-1/2 tw--translate-y-1/2 tw-z-50">
-                                <CloseButton
-                                  onClick={handleCancel}
-                                ></CloseButton>
-                                <pre class="tw-bg-white tw-whitespace-pre-wrap">
-                                  <p>!Please check one more</p>
-                                  <p>pair: {selectedPair()}</p>
-                                  <p>tokenA: {selectedTokenA()}</p>
-                                  <p>tokenB: {selectedTokenB()}</p>
-                                  <p>amountA: {tokenALiquidityR()}</p>
-                                  <p>amountB: {tokenBLiquidityR()}</p>
-                                  <Button
-                                    onClick={() => {
-                                      void handleSubmitR();
-                                    }}
-                                  >
-                                    Submit
-                                  </Button>
-                                  <Button onClick={handleCancel}>Cancel</Button>
-
-                                  {isResult() && (
-                                    <>
-                                      <p>result:</p>
-                                      <p>{result()}</p>
-                                      {goChart() && (
-                                        <>
-                                          <Button onClick={handleGoChart}>
-                                            Go Chart
-                                          </Button>
-                                        </>
-                                      )}
-                                    </>
-                                  )}
-                                </pre>
-                              </div>
-                            </>
-                          )}
-                        </>
+                        </div>
                       </>
                     )}
-                  </Col>
-                  <Col md={4}>
-                    <>
-                      {!isAccount() ? (
-                        <div class="tw-w-full tw-h-full tw-flex tw-items-center tw-justify-center">
-                          Select account please!
-                        </div>
-                      ) : (
-                        <>
-                          <Form.Group>
-                            <Form.Label>Add Liquidity</Form.Label>
-                            <br></br>
+                  </div>
+                </div>
 
-                            <Form.Label>token A</Form.Label>
-                            <Form.Control
-                              id="aLiquidityR"
-                              value={tokenALiquidityR()}
-                              onInput={handleTokenLiquidityRChange}
-                              placeholder="Please enter the liquidity to be injected"
-                            ></Form.Control>
-                            <p>{aMsgR()}</p>
-
-                            <Form.Label>token B</Form.Label>
-                            <Form.Control
-                              id="bLiquidityR"
-                              value={tokenBLiquidityR()}
-                              onInput={handleTokenLiquidityRChange}
-                              placeholder="Please enter the liquidity to be injected"
-                            ></Form.Control>
-                            <p>{bMsgR()}</p>
-                          </Form.Group>
-
-                          <Button onClick={handleSubmit}>Submit</Button>
-                          <p>{resultMsg()}</p>
-                        </>
-                      )}
-                    </>
-                  </Col>
-                  <Col md={8}>
+                {/* Calculation Results Card */}
+                <div class="staking-card">
+                  <div class="card-header">
+                    <h3>Calculation Results</h3>
+                  </div>
+                  <div class="card-body">
                     {!resultLoading() ? (
-                      <>
-                        {isCalculating() ? (
-                          <>
-                            <div class="tw-h-full tw-flex tw-items-center tw-justify-center">
-                              <Spinner animation="border" variant="info" />
-                              계산 중
-                            </div>
-                          </>
-                        ) : (
-                          <>
-                            <div class="tw-h-full tw-flex tw-items-center tw-justify-center">
-                              <Spinner animation="border" variant="info" />
-                              계산 대기 중
-                            </div>
-                          </>
-                        )}
-                      </>
+                      <div class="loading-state">
+                        <div class="loading-spinner"></div>
+                        <span>{isCalculating() ? 'Calculating...' : 'Waiting for input...'}</span>
+                      </div>
                     ) : (
-                      <div class="tw-h-full tw-w-full tw-flex">
-                        <div class="tw-flex1">
-                          tokenA를 {tokenALiquidity()}만큼 투입시키고 싶다면
-                          <br />
-                          tokenB는 최소 {tokenBCalculatedLiquidity()}만큼이
-                          필요하고
-                          <br />
-                          이에 따른 유동성 보상은 {bCalculatedLiquidity()}{' '}
-                          입니다
+                      <div class="results-vertical">
+                        <div class="result-card">
+                          <h4>If you inject Token A: {tokenALiquidity() || '0'}</h4>
+                          <div class="result-item">
+                            <span class="result-label">Required Token B</span>
+                            <span class="result-value">{tokenBCalculatedLiquidity() || '-'}</span>
+                          </div>
+                          <div class="result-item highlight">
+                            <span class="result-label">LP Reward</span>
+                            <span class="result-value">{bCalculatedLiquidity() || '-'}</span>
+                          </div>
                         </div>
-                        <div class="tw-flex1">
-                          tokenB를 {tokenBLiquidity()}만큼 투입시키고 싶다면
-                          <br />
-                          tokenA는 최소 {tokenACalculatedLiquidity()}만큼이
-                          필요하고
-                          <br />
-                          이에 따른 유동성 보상은 {aCalculatedLiquidity()}{' '}
-                          입니다
+                        <div class="result-card">
+                          <h4>If you inject Token B: {tokenBLiquidity() || '0'}</h4>
+                          <div class="result-item">
+                            <span class="result-label">Required Token A</span>
+                            <span class="result-value">{tokenACalculatedLiquidity() || '-'}</span>
+                          </div>
+                          <div class="result-item highlight">
+                            <span class="result-label">LP Reward</span>
+                            <span class="result-value">{aCalculatedLiquidity() || '-'}</span>
+                          </div>
                         </div>
                       </div>
                     )}
-                  </Col>
-                </Row>
-              </>
+                  </div>
+                </div>
+
+                {/* Add Liquidity Card */}
+                <div class="staking-card full-width">
+                  <div class="card-header">
+                    <h3>Add Liquidity</h3>
+                  </div>
+                  <div class="card-body">
+                    {!isAccount() ? (
+                      <div class="no-account">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                          <circle cx="12" cy="7" r="4"/>
+                        </svg>
+                        <span>Please select an account to add liquidity</span>
+                      </div>
+                    ) : (
+                      <div class="add-liquidity-form">
+                        <div class="add-liquidity-inputs">
+                          <div class="input-group">
+                            <label>Token A Amount</label>
+                            <input
+                              id="aLiquidityR"
+                              type="text"
+                              class="staking-input"
+                              value={tokenALiquidityR()}
+                              onInput={handleTokenLiquidityRChange}
+                              placeholder="Enter amount to inject"
+                            />
+                            <span class="input-hint">{aMsgR()}</span>
+                          </div>
+                          <div class="input-group">
+                            <label>Token B Amount</label>
+                            <input
+                              id="bLiquidityR"
+                              type="text"
+                              class="staking-input"
+                              value={tokenBLiquidityR()}
+                              onInput={handleTokenLiquidityRChange}
+                              placeholder="Enter amount to inject"
+                            />
+                            <span class="input-hint">{bMsgR()}</span>
+                          </div>
+                        </div>
+                        <div class="add-liquidity-action">
+                          <button class="submit-btn" onClick={handleSubmit}>
+                            Add Liquidity
+                          </button>
+                          {resultMsg() && <p class="result-msg error">{resultMsg()}</p>}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
             )}
           </>
         )}
-      </Container>
-    </>
+      </div>
+
+      {/* Confirmation Modal */}
+      {lmodal() && (
+        <div class="modal-overlay">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h3>Confirm Transaction</h3>
+              <button class="modal-close" onClick={handleCancel}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M18 6L6 18M6 6l12 12"/>
+                </svg>
+              </button>
+            </div>
+            <div class="modal-body">
+              <div class="confirm-item">
+                <span class="confirm-label">Pair</span>
+                <code class="confirm-value" title={selectedPair()}>{formatAddress(selectedPair())}</code>
+              </div>
+              <div class="confirm-item">
+                <span class="confirm-label">Token A</span>
+                <code class="confirm-value" title={selectedTokenA()}>{formatAddress(selectedTokenA())}</code>
+              </div>
+              <div class="confirm-item">
+                <span class="confirm-label">Token B</span>
+                <code class="confirm-value" title={selectedTokenB()}>{formatAddress(selectedTokenB())}</code>
+              </div>
+              <div class="confirm-item">
+                <span class="confirm-label">Amount A</span>
+                <span class="confirm-value amount">{tokenALiquidityR()}</span>
+              </div>
+              <div class="confirm-item">
+                <span class="confirm-label">Amount B</span>
+                <span class="confirm-value amount">{tokenBLiquidityR()}</span>
+              </div>
+
+              {isResult() && (
+                <div class={`transaction-result ${goChart() ? 'success' : 'error'}`}>
+                  <p>{result()}</p>
+                </div>
+              )}
+            </div>
+            <div class="modal-footer">
+              {!isResult() ? (
+                <>
+                  <button class="modal-btn cancel" onClick={handleCancel}>Cancel</button>
+                  <button class="modal-btn confirm" onClick={() => void handleSubmitR()}>
+                    Confirm
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button class="modal-btn cancel" onClick={handleCancel}>Close</button>
+                  {goChart() && (
+                    <button class="modal-btn confirm" onClick={handleGoChart}>
+                      View Chart
+                    </button>
+                  )}
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
   );
 };

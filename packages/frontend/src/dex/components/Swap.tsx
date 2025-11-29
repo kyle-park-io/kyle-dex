@@ -1,20 +1,8 @@
-import { type Component, type JSX } from 'solid-js';
+import { type Component, type JSX, For, Show } from 'solid-js';
 import { createSignal, createEffect } from 'solid-js';
-// import { useNavigate } from '@solidjs/router';
-import {
-  Container,
-  Row,
-  Col,
-  Form,
-  Button,
-  Table,
-  Spinner,
-  CloseButton,
-} from 'solid-bootstrap';
 import {
   fromDexNavigate,
   setFromDexNavigate,
-  // setFromDexNavigate2,
   fromAppNavigate,
   setFromAppNavigate,
   HeaderNavigateType,
@@ -29,16 +17,14 @@ import {
 import { globalState } from '../../global/constants';
 import { estimateSwapRatio } from '../axios/Dex.axios.utils';
 import { submit, submitWithETH } from '../axios/Dex.axios.submit';
-// import {
-//   calcPairFromFactory,
-//   getSpecifiedPairsReserve,
-// } from '../services/pair.service';
 import axios from 'axios';
 import { ethers } from 'ethers';
 
+import './Swap.css';
+
 const api = globalState.api_url;
 
-const tokenDefault = '토큰을 선택하세요';
+const tokenDefault = 'Select Token';
 
 // loading
 const [tokenListLoading, setTokenListLoading] = createSignal(false);
@@ -49,39 +35,11 @@ const [isNetwork, setIsNetwork] = createSignal(false);
 const [isAccount, setIsAccount] = createSignal(false);
 const [isError, setIsError] = createSignal(false);
 const [apiErr, setApiErr] = createSignal('');
-// const [isResult, setIsResult] = createSignal(false);
-// const [result, setResult] = createSignal('');
 
 const [swapTokenList, setSwapTokenList] = createSignal<any[]>([]);
 const [swapTokenList2, setSwapTokenList2] = createSignal<any[]>([]);
-// const [swapPairList, setSwapPairList] = createSignal<any[]>([]);
-// const [swapReserveList, setSwapReserveList] = createSignal<any[]>([]);
-
-// const makePairList = async (tokens: any[]): Promise<any> => {
-//   try {
-//     const arr: string[] = [];
-//     for (let i = 0; i < tokens.length - 1; i++) {
-//       const pair = await calcPairFromFactory(tokens[i], tokens[i + 1]);
-//       arr.push(pair);
-//     }
-//     console.log(arr);
-//     setSwapPairList(arr);
-//   } catch (err) {}
-// };
-
-// const makeReserveList = async (pairs: any[]): Promise<any> => {
-//   try {
-//     const arr: string[] = [];
-//     const result = await getSpecifiedPairsReserve(pairs);
-//     console.log(arr);
-//     console.log(result);
-//     // setSwapReserveList(arr);
-//   } catch (err) {}
-// };
 
 export const Swap: Component = (): JSX.Element => {
-  // const navigate = useNavigate();
-
   createEffect(() => {
     const fn = async (): Promise<void> => {
       const network = localStorage.getItem('network') as string;
@@ -156,6 +114,7 @@ export const Swap: Component = (): JSX.Element => {
     };
     void fn();
   });
+
   const init = async (): Promise<void> => {
     setCalculationLoading(true);
     setIsError(false);
@@ -173,14 +132,10 @@ export const Swap: Component = (): JSX.Element => {
         ...t,
         { name: 'WETH', address: w },
       ]);
-
-      // await makePairList(swapTokenList());
-      // await makeReserveList(swapPairList());
     } catch (err) {
       if (axios.isAxiosError(err)) {
         if (err.response?.status === 404) {
           setSwapTokenList([]);
-
           setIsError(true);
           setApiErr(err.response.data.message);
         }
@@ -192,23 +147,26 @@ export const Swap: Component = (): JSX.Element => {
   let currentAbortController2 = new AbortController();
   const [inputs, setInputs] = createSignal([tokenDefault]);
   const [inputsMsg, setInputsMsg] = createSignal(['']);
+  
   const addInput = async (): Promise<void> => {
     setInputs([...inputs(), tokenDefault]);
     await handleInputAmountChange2();
   };
+  
   const removeInput = async (): Promise<void> => {
     if (inputs().length > 1) {
       setInputs(inputs().slice(0, -1));
     }
     await handleInputAmountChange2();
   };
+  
   const handleSelectChange = async (e, index): Promise<void> => {
     const updatedValues = [...inputs()];
     updatedValues[index] = e.target.value;
     setInputs(updatedValues);
-
     await handleInputAmountChange2();
   };
+  
   const handleInputAmountChange2 = async (): Promise<void> => {
     currentAbortController2.abort();
     currentAbortController2 = new AbortController();
@@ -227,14 +185,13 @@ export const Swap: Component = (): JSX.Element => {
       }
     }
   };
+  
   const performSwapTask2 = async (signal): Promise<boolean> => {
     return await new Promise((resolve, reject) => {
       const timeoutId = setTimeout(() => {
         checkArray();
         resolve(true);
       }, 2000);
-
-      // cancel
       signal.addEventListener('abort', () => {
         clearTimeout(timeoutId);
         reject(new DOMException('Aborted', 'AbortError'));
@@ -244,16 +201,10 @@ export const Swap: Component = (): JSX.Element => {
 
   const handleInputAmountChange = async (e): Promise<void> => {
     const value = e.target.value;
-
     currentAbortController.abort();
     currentAbortController = new AbortController();
     try {
-      console.log(e.target.value);
-
-      const result = await performSwapTask(
-        value,
-        currentAbortController.signal,
-      );
+      const result = await performSwapTask(value, currentAbortController.signal);
       if (result as boolean) {
         await calculate();
       }
@@ -267,6 +218,7 @@ export const Swap: Component = (): JSX.Element => {
       }
     }
   };
+  
   const performSwapTask = async (value: string, signal): Promise<boolean> => {
     return await new Promise((resolve, reject) => {
       const timeoutId = setTimeout(() => {
@@ -274,17 +226,17 @@ export const Swap: Component = (): JSX.Element => {
         checkArray();
         resolve(true);
       }, 2000);
-
-      // cancel
       signal.addEventListener('abort', () => {
         clearTimeout(timeoutId);
         reject(new DOMException('Aborted', 'AbortError'));
       });
     });
   };
+  
   const [inputAmount, setInputAmount] = createSignal('');
   const [msg, setMsg] = createSignal('Enter the value!');
   const [bool3, setBool] = createSignal(false);
+  
   const setValue = (value: string): void => {
     let bool2 = false;
     if (value === '') {
@@ -309,13 +261,15 @@ export const Swap: Component = (): JSX.Element => {
       setInputAmount('');
     }
   };
+  
   const [listBool, setListBool] = createSignal(false);
+  
   const checkArray = (): void => {
     setInputsMsg(['']);
     setListBool(true);
     if (inputs().length === 1) {
       setListBool(false);
-      setInputsMsg(['토큰을 두 개 이상 선택하세요']);
+      setInputsMsg(['Select at least two tokens']);
       return;
     }
     const checkMap = new Map<string, boolean>();
@@ -323,12 +277,12 @@ export const Swap: Component = (): JSX.Element => {
     for (let i = 0; i < inputs().length; i++) {
       if (inputs()[i] === tokenDefault) {
         setListBool(false);
-        arr.push('토큰을 모두 선택하세요');
+        arr.push('Please select all tokens');
         continue;
       }
       if (checkMap.get(inputs()[i]) !== undefined) {
         setListBool(false);
-        arr.push('토큰이 스왑 과정에서 중복 호출될 수 없습니다');
+        arr.push('Token cannot be duplicated in swap path');
         continue;
       }
       arr.push('');
@@ -336,14 +290,14 @@ export const Swap: Component = (): JSX.Element => {
     }
     setInputsMsg(arr);
   };
+  
   const [estimateResult, setEstimateResult] = createSignal([]);
   const [estimateError, setEstimateError] = createSignal('');
+  
   const calculate = async (): Promise<void> => {
-    console.log(bool3(), listBool());
     if (!bool3() || !listBool()) {
       return;
     }
-
     setIsCalculated(false);
     const result = await estimateSwapRatio(api, {
       network: localStorage.getItem('network') as string,
@@ -351,9 +305,6 @@ export const Swap: Component = (): JSX.Element => {
       inputAmount: inputAmount(),
     });
     if (result.error !== null) {
-      if (axios.isAxiosError(result.error)) {
-        console.log('here');
-      }
       setEstimateResult(result.result);
       setEstimateError(result.error.message);
     } else {
@@ -362,31 +313,35 @@ export const Swap: Component = (): JSX.Element => {
     }
     setCalculationLoading(false);
     setIsCalculated(true);
-    console.log(estimateResult());
   };
 
+  // Swap execution
   const [inputsR, setInputsR] = createSignal([tokenDefault]);
   const [inputsMsgR, setInputsMsgR] = createSignal(['']);
   const [listBoolR, setListBoolR] = createSignal(false);
+  
   const addInputR = (): void => {
     setInputsR([...inputsR(), tokenDefault]);
   };
+  
   const removeInputR = (): void => {
     if (inputsR().length > 1) {
       setInputsR(inputsR().slice(0, -1));
     }
   };
+  
   const handleSelectChangeR = (e, index): void => {
     const updatedValues = [...inputsR()];
     updatedValues[index] = e.target.value;
     setInputsR(updatedValues);
   };
+  
   const checkArrayR = (): void => {
     setInputsMsgR(['']);
     setListBoolR(true);
     if (inputsR().length === 1) {
       setListBoolR(false);
-      setInputsMsgR(['토큰을 두 개 이상 선택하세요']);
+      setInputsMsgR(['Select at least two tokens']);
       return;
     }
     const checkMap = new Map<string, boolean>();
@@ -394,12 +349,12 @@ export const Swap: Component = (): JSX.Element => {
     for (let i = 0; i < inputsR().length; i++) {
       if (inputsR()[i] === tokenDefault) {
         setListBoolR(false);
-        arr.push('토큰을 모두 선택하세요');
+        arr.push('Please select all tokens');
         continue;
       }
       if (checkMap.get(inputsR()[i]) !== undefined) {
         setListBoolR(false);
-        arr.push('토큰이 스왑 과정에서 중복 호출될 수 없습니다');
+        arr.push('Token cannot be duplicated in swap path');
         continue;
       }
       arr.push('');
@@ -407,9 +362,11 @@ export const Swap: Component = (): JSX.Element => {
     }
     setInputsMsgR(arr);
   };
+  
   const [inputAmountR, setInputAmountR] = createSignal('');
   const [msgR, setMsgR] = createSignal('Enter the value!');
   const [bool3R, setBoolR] = createSignal(false);
+  
   const setValueR = (value: string): void => {
     let bool2 = false;
     if (value === '') {
@@ -434,12 +391,15 @@ export const Swap: Component = (): JSX.Element => {
       setInputAmountR('');
     }
   };
+  
   const handleInputAmountChangeR = (e): void => {
     const value = e.target.value;
     setValueR(value);
   };
+  
   const [lmodal, setLModal] = createSignal(false);
   const [resultMsg, setResultMsg] = createSignal('');
+  
   const handleSubmit = (): void => {
     checkArrayR();
     if (listBoolR() && bool3R()) {
@@ -449,9 +409,11 @@ export const Swap: Component = (): JSX.Element => {
       setResultMsg('Check input!');
     }
   };
+  
   const [isResult, setIsResult] = createSignal(false);
   const [result, setResult] = createSignal('');
   const [goChart, setGoChart] = createSignal(false);
+  
   const handleCancel = (): void => {
     if (isResult()) {
       window.location.reload();
@@ -461,13 +423,12 @@ export const Swap: Component = (): JSX.Element => {
       setResult('');
     }
   };
+  
   const handleGoChart = (): void => {
     const network = localStorage.getItem('network') as string;
-    // setFromDexNavigate({ value: true });
-    // setFromDexNavigate2({ value: true });
-    // navigate(`/dex/chart/${network}`);
     window.location.href = `${globalState.url}/dex/chart/${network}`;
   };
+  
   const handleSubmitR = async (): Promise<void> => {
     try {
       setIsResult(false);
@@ -478,9 +439,7 @@ export const Swap: Component = (): JSX.Element => {
       const address = localStorage.getItem('address') as string;
       const router = await getRouter(api, { network });
 
-      console.log(inputsR());
       if (inputsR()[0] === globalState.hardhat_weth_address) {
-        console.log('with eth test A');
         const result = await submitWithETH(api, {
           network,
           userAddress: address,
@@ -491,7 +450,6 @@ export const Swap: Component = (): JSX.Element => {
         });
         console.log(result);
       } else {
-        console.log('basic test');
         const result = await submit(api, {
           network,
           userAddress: address,
@@ -517,6 +475,7 @@ export const Swap: Component = (): JSX.Element => {
 
   const [eth, setEth] = createSignal('0');
   const [wei, setWei] = createSignal('0');
+  
   const handleEth = (e): void => {
     setWei('0');
     const value = e.target.value;
@@ -524,6 +483,7 @@ export const Swap: Component = (): JSX.Element => {
       setWei(ethers.parseEther(value).toString());
     }
   };
+  
   const handleWei = (e): void => {
     setEth('0');
     const value = e.target.value;
@@ -532,322 +492,407 @@ export const Swap: Component = (): JSX.Element => {
     }
   };
 
+  const formatAddress = (address: string) => {
+    if (!address || address === tokenDefault) return address;
+    return `${address.slice(0, 8)}...${address.slice(-6)}`;
+  };
+
   return (
-    <>
-      <Container fluid class="tw-flex-grow tw-p-4 tw-bg-gray-300">
-        {!isNetwork() ? (
-          <>
-            <div class="tw-flex tw-items-center tw-justify-center">
-              Select network please!
+    <div class="swap-container">
+      {/* Header */}
+      <section class="swap-header">
+        <h1 class="swap-title">Swap Tokens</h1>
+        <p class="swap-subtitle">Exchange tokens instantly using AMM</p>
+      </section>
+
+      {/* Content */}
+      <div class="swap-content">
+        <Show when={!isNetwork()}>
+          <div class="swap-empty-state">
+            <div class="empty-icon">
+              <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/>
+                <path d="M12 8v4M12 16h.01"/>
+              </svg>
             </div>
-          </>
-        ) : (
-          <>
-            {isError() ? (
-              <>
-                <div class="tw-flex tw-items-center tw-justify-center">
-                  {apiErr()}
-                </div>
-              </>
-            ) : (
-              <>
-                <Row>
-                  <Col md={4}>
-                    {!tokenListLoading() ? (
-                      <>
-                        <div class="tw-h-full tw-flex tw-items-center tw-justify-center">
-                          <Spinner animation="border" variant="info" />
-                        </div>
-                      </>
-                    ) : (
-                      <>
-                        <Form.Label>Token List</Form.Label>
-                        <p>cf. WETH: {globalState.hardhat_weth_address}</p>
-                        <Form.Select>
-                          {swapTokenList().map((token) => (
-                            <option value={token.address}>
-                              {token.address}
-                            </option>
-                          ))}
-                        </Form.Select>
-                      </>
-                    )}
-                  </Col>
-                  <Col md={4}>
-                    {!tokenListLoading() ? (
-                      <>
-                        <div class="tw-h-full tw-flex tw-items-center tw-justify-center">
-                          <Spinner animation="border" variant="info" />
-                        </div>
-                      </>
-                    ) : (
-                      <>
-                        <Button
-                          variant="secondary"
-                          onClick={() => {
-                            void addInput();
-                          }}
-                        >
-                          Add Token
-                        </Button>
-                        <Button
-                          variant="secondary"
-                          onClick={() => {
-                            void removeInput();
-                          }}
-                        >
-                          Remove Token
-                        </Button>
-                        <div>
-                          {inputs().map((value, index) => (
-                            <>
-                              <Form.Select
-                                onChange={(e) => {
-                                  void handleSelectChange(e, index);
-                                }}
-                                value={value}
-                              >
-                                {swapTokenList2().map((token) => (
-                                  <option value={token.address}>
-                                    {token.address}
-                                  </option>
-                                ))}
-                              </Form.Select>
-                              <p>{inputsMsg()[index]}</p>
-                            </>
-                          ))}
-                        </div>
-                      </>
-                    )}
-                  </Col>
-                  <Col md={4}>
-                    {!tokenListLoading() ? (
-                      <>
-                        <div class="tw-h-full tw-flex tw-items-center tw-justify-center">
-                          <Spinner animation="border" variant="info" />
-                        </div>
-                      </>
-                    ) : (
-                      <>
-                        <Form.Label>Estimate Swap Ratio</Form.Label>
-                        <br></br>
-                        <Form.Label>input amount</Form.Label>
-                        <Form.Control
-                          onInput={(e) => {
-                            void handleInputAmountChange(e);
-                          }}
-                          placeholder="Please enter the amount to be swapped"
-                        ></Form.Control>
-                        <p>{msg()}</p>
+            <h3>No Network Selected</h3>
+            <p>Please select a network from the header to start swapping.</p>
+          </div>
+        </Show>
 
-                        <Form.Label>Conversion Tool</Form.Label>
-                        <div class="tw-flex tw-w-full">
-                          <div>
-                            <Form.Label>ETH</Form.Label>
-                            <Form.Control
-                              value={eth()}
-                              onInput={handleEth}
-                              placeholder="0"
-                            ></Form.Control>
-                          </div>
-                          <div>
-                            <Form.Label>WEI</Form.Label>
-                            <Form.Control
-                              value={wei()}
-                              onInput={handleWei}
-                              placeholder="0"
-                            ></Form.Control>
-                          </div>
-                        </div>
-                      </>
-                    )}
-                  </Col>
-                  <Col md={4}>
-                    <>
-                      {!isAccount() ? (
-                        <div class="tw-w-full tw-h-full tw-flex tw-items-center tw-justify-center">
-                          Select account please!
-                        </div>
-                      ) : (
-                        <>
-                          {!tokenListLoading() ? (
-                            <>
-                              <div class="tw-h-full tw-flex tw-items-center tw-justify-center">
-                                <Spinner animation="border" variant="info" />
-                              </div>
-                            </>
-                          ) : (
-                            <>
-                              <Form.Group>
-                                <Form.Label>Swap Token</Form.Label>
-                                <br></br>
-                                <Button
-                                  variant="secondary"
-                                  onClick={() => {
-                                    addInputR();
-                                  }}
-                                >
-                                  Add Token
-                                </Button>
-                                <Button
-                                  variant="secondary"
-                                  onClick={() => {
-                                    removeInputR();
-                                  }}
-                                >
-                                  Remove Token
-                                </Button>
-                                <div>
-                                  {inputsR().map((value, index) => (
-                                    <>
-                                      <Form.Select
-                                        onChange={(e) => {
-                                          handleSelectChangeR(e, index);
-                                        }}
-                                        value={value}
-                                      >
-                                        {swapTokenList2().map((token) => (
-                                          <option value={token.address}>
-                                            {token.address}
-                                          </option>
-                                        ))}
-                                      </Form.Select>
-                                      <p>{inputsMsgR()[index]}</p>
-                                    </>
-                                  ))}
-                                </div>
-                                <Form.Label>input amount</Form.Label>
-                                <Form.Control
-                                  onInput={(e) => {
-                                    handleInputAmountChangeR(e);
-                                  }}
-                                  placeholder="Please enter the amount to be swapped"
-                                ></Form.Control>
-                                <p>{msgR()}</p>
-                                <Button onClick={handleSubmit}>Submit</Button>
-                                <p>{resultMsg()}</p>
-                              </Form.Group>
-                              <>
-                                {lmodal() && (
-                                  <>
-                                    <div class="tw-fixed tw-top-1/2 tw-left-1/2 tw-transform tw--translate-x-1/2 tw--translate-y-1/2 tw-z-50">
-                                      <CloseButton
-                                        onClick={handleCancel}
-                                      ></CloseButton>
-                                      <pre class="tw-bg-white tw-whitespace-pre-wrap">
-                                        <p>!Please check one more</p>
-                                        <p>swap list</p>
-                                        {inputsR().map((value, index) => (
-                                          <>
-                                            <p>
-                                              token{index} : {value}
-                                            </p>
-                                          </>
-                                        ))}
-                                        <p>inputAmount: {inputAmountR()}</p>
-                                        <Button
-                                          onClick={() => {
-                                            void handleSubmitR();
-                                          }}
-                                        >
-                                          Submit
-                                        </Button>
-                                        <Button onClick={handleCancel}>
-                                          Cancel
-                                        </Button>
+        <Show when={isNetwork() && isError()}>
+          <div class="swap-error">
+            <div class="error-icon">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <path d="M12 8v4M12 16h.01"/>
+              </svg>
+            </div>
+            <h3>Error</h3>
+            <p>{apiErr()}</p>
+          </div>
+        </Show>
 
-                                        {isResult() && (
-                                          <>
-                                            <p>result:</p>
-                                            <p>{result()}</p>
-                                            {goChart() && (
-                                              <>
-                                                <Button onClick={handleGoChart}>
-                                                  Go Chart
-                                                </Button>
-                                              </>
-                                            )}
-                                          </>
-                                        )}
-                                      </pre>
-                                    </div>
-                                  </>
-                                )}
-                              </>
-                            </>
-                          )}
-                        </>
+        <Show when={isNetwork() && !isError()}>
+          <div class="swap-grid">
+            {/* Token List Card */}
+            <div class="swap-card">
+              <div class="card-header">
+                <h3>Available Tokens</h3>
+              </div>
+              <div class="card-body">
+                <Show when={!tokenListLoading()}>
+                  <div class="loading-state">
+                    <div class="loading-spinner"></div>
+                    <span>Loading tokens...</span>
+                  </div>
+                </Show>
+                <Show when={tokenListLoading()}>
+                  <div class="weth-info">
+                    <span class="weth-label">WETH:</span>
+                    <code class="weth-address" title={globalState.hardhat_weth_address}>
+                      {formatAddress(globalState.hardhat_weth_address)}
+                    </code>
+                  </div>
+                  <div class="token-list">
+                    <For each={swapTokenList()}>
+                      {(token) => (
+                        <div class="token-list-item">
+                          <div class="token-icon-small">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                              <circle cx="12" cy="12" r="10"/>
+                            </svg>
+                          </div>
+                          <span class="token-name-small">{token.name || 'Token'}</span>
+                          <code class="token-address-small" title={token.address}>
+                            {formatAddress(token.address)}
+                          </code>
+                        </div>
                       )}
-                    </>
-                  </Col>
-                  <Col md={8}>
-                    {calculationLoading() ? (
-                      <>
-                        <div class="tw-h-full tw-flex tw-items-center tw-justify-center">
-                          <Spinner animation="border" variant="info" />
-                          계산 대기 중
+                    </For>
+                  </div>
+                </Show>
+              </div>
+            </div>
+
+            {/* Swap Path Card */}
+            <div class="swap-card">
+              <div class="card-header">
+                <h3>Estimate Swap Path</h3>
+                <div class="card-actions">
+                  <button class="action-btn" onClick={() => void addInput()}>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M12 5v14M5 12h14"/>
+                    </svg>
+                    Add
+                  </button>
+                  <button class="action-btn" onClick={() => void removeInput()}>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M5 12h14"/>
+                    </svg>
+                    Remove
+                  </button>
+                </div>
+              </div>
+              <div class="card-body">
+                <Show when={!tokenListLoading()}>
+                  <div class="loading-state">
+                    <div class="loading-spinner"></div>
+                    <span>Loading...</span>
+                  </div>
+                </Show>
+                <Show when={tokenListLoading()}>
+                  <div class="swap-path">
+                    <For each={inputs()}>
+                      {(value, index) => (
+                        <div class="path-item">
+                          <div class="path-number">{index() + 1}</div>
+                          <select
+                            class="swap-select"
+                            onChange={(e) => void handleSelectChange(e, index())}
+                            value={value}
+                          >
+                            <For each={swapTokenList2()}>
+                              {(token) => (
+                                <option value={token.address}>
+                                  {token.name ? `${token.name} - ` : ''}{formatAddress(token.address)}
+                                </option>
+                              )}
+                            </For>
+                          </select>
+                          <Show when={inputsMsg()[index()]}>
+                            <span class="path-error">{inputsMsg()[index()]}</span>
+                          </Show>
                         </div>
-                      </>
-                    ) : (
-                      <>
-                        {!isCalculated() ? (
-                          <>
-                            <div class="tw-h-full tw-flex tw-items-center tw-justify-center">
-                              <Spinner animation="border" variant="info" />
-                              계산 중
+                      )}
+                    </For>
+                  </div>
+                </Show>
+              </div>
+            </div>
+
+            {/* Estimate Card */}
+            <div class="swap-card">
+              <div class="card-header">
+                <h3>Estimate Amount</h3>
+              </div>
+              <div class="card-body">
+                <Show when={!tokenListLoading()}>
+                  <div class="loading-state">
+                    <div class="loading-spinner"></div>
+                    <span>Loading...</span>
+                  </div>
+                </Show>
+                <Show when={tokenListLoading()}>
+                  <div class="input-group">
+                    <label>Input Amount (wei)</label>
+                    <input
+                      type="text"
+                      class="swap-input"
+                      onInput={(e) => void handleInputAmountChange(e)}
+                      placeholder="Enter amount to swap"
+                    />
+                    <span class="input-hint">{msg()}</span>
+                  </div>
+
+                  <div class="conversion-tool">
+                    <label class="conversion-label">Unit Converter</label>
+                    <div class="conversion-inputs">
+                      <div class="conversion-input">
+                        <span class="unit-label">ETH</span>
+                        <input
+                          type="text"
+                          class="swap-input"
+                          value={eth()}
+                          onInput={handleEth}
+                          placeholder="0"
+                        />
+                      </div>
+                      <div class="conversion-arrow">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <path d="M8 7l-5 5 5 5M16 7l5 5-5 5"/>
+                        </svg>
+                      </div>
+                      <div class="conversion-input">
+                        <span class="unit-label">WEI</span>
+                        <input
+                          type="text"
+                          class="swap-input"
+                          value={wei()}
+                          onInput={handleWei}
+                          placeholder="0"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </Show>
+              </div>
+            </div>
+
+            {/* Results Card */}
+            <div class="swap-card">
+              <div class="card-header">
+                <h3>Calculation Results</h3>
+              </div>
+              <div class="card-body">
+                <Show when={calculationLoading()}>
+                  <div class="loading-state">
+                    <div class="loading-spinner"></div>
+                    <span>Waiting for input...</span>
+                  </div>
+                </Show>
+                <Show when={!calculationLoading() && !isCalculated()}>
+                  <div class="loading-state">
+                    <div class="loading-spinner"></div>
+                    <span>Calculating...</span>
+                  </div>
+                </Show>
+                <Show when={!calculationLoading() && isCalculated()}>
+                  <Show when={estimateError() !== ''}>
+                    <div class="estimate-error">
+                      <p>{estimateError()}</p>
+                    </div>
+                  </Show>
+                  <Show when={estimateError() === ''}>
+                    <div class="results-table-container">
+                      <For each={estimateResult()}>
+                        {(value: any, index) => (
+                          <div class="result-table">
+                            <div class="table-header">
+                              <span>Swap Step {index() + 1}</span>
                             </div>
-                          </>
-                        ) : (
-                          <>
-                            {estimateError() !== '' ? (
-                              <>
-                                <p>{estimateError()}</p>
-                              </>
-                            ) : (
-                              <>
-                                <div>
-                                  {estimateResult().map((value: any) => (
-                                    <Table>
-                                      <thead>
-                                        <tr>
-                                          <th></th>
-                                          <th>Token0</th>
-                                          <th>Token1</th>
-                                        </tr>
-                                      </thead>
-                                      <tbody>
-                                        <tr>
-                                          <td>address</td>
-                                          <td>{value.token0}</td>
-                                          <td>{value.token1}</td>
-                                        </tr>
-                                        <tr>
-                                          <td>reserve</td>
-                                          <td>{value.reserve0}</td>
-                                          <td>{value.reserve1}</td>
-                                        </tr>
-                                        <tr>
-                                          <td>change</td>
-                                          <td>+{value.input}</td>
-                                          <td>-{value.output}</td>
-                                        </tr>
-                                      </tbody>
-                                    </Table>
-                                  ))}
-                                </div>
-                              </>
-                            )}
-                          </>
+                            <div class="table-row">
+                              <div class="table-cell header">Token</div>
+                              <div class="table-cell">
+                                <code title={value.token0}>{formatAddress(value.token0)}</code>
+                              </div>
+                              <div class="table-cell">
+                                <code title={value.token1}>{formatAddress(value.token1)}</code>
+                              </div>
+                            </div>
+                            <div class="table-row">
+                              <div class="table-cell header">Reserve</div>
+                              <div class="table-cell">{value.reserve0}</div>
+                              <div class="table-cell">{value.reserve1}</div>
+                            </div>
+                            <div class="table-row highlight">
+                              <div class="table-cell header">Change</div>
+                              <div class="table-cell positive">+{value.input}</div>
+                              <div class="table-cell negative">-{value.output}</div>
+                            </div>
+                          </div>
                         )}
-                      </>
-                    )}
-                  </Col>
-                </Row>
-              </>
-            )}
-          </>
-        )}
-      </Container>
-    </>
+                      </For>
+                    </div>
+                  </Show>
+                </Show>
+              </div>
+            </div>
+
+            {/* Execute Swap Card */}
+            <div class="swap-card full-width">
+              <div class="card-header">
+                <h3>Execute Swap</h3>
+                <div class="card-actions">
+                  <button class="action-btn" onClick={addInputR}>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M12 5v14M5 12h14"/>
+                    </svg>
+                    Add
+                  </button>
+                  <button class="action-btn" onClick={removeInputR}>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M5 12h14"/>
+                    </svg>
+                    Remove
+                  </button>
+                </div>
+              </div>
+              <div class="card-body">
+                <Show when={!isAccount()}>
+                  <div class="no-account">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                      <circle cx="12" cy="7" r="4"/>
+                    </svg>
+                    <span>Please select an account to swap</span>
+                  </div>
+                </Show>
+                <Show when={isAccount() && !tokenListLoading()}>
+                  <div class="loading-state">
+                    <div class="loading-spinner"></div>
+                    <span>Loading...</span>
+                  </div>
+                </Show>
+                <Show when={isAccount() && tokenListLoading()}>
+                  <div class="execute-swap-form">
+                    <div class="execute-swap-path">
+                      <For each={inputsR()}>
+                        {(value, index) => (
+                          <div class="path-item">
+                            <div class="path-number">{index() + 1}</div>
+                            <select
+                              class="swap-select"
+                              onChange={(e) => handleSelectChangeR(e, index())}
+                              value={value}
+                            >
+                              <For each={swapTokenList2()}>
+                                {(token) => (
+                                  <option value={token.address}>
+                                    {token.name ? `${token.name} - ` : ''}{formatAddress(token.address)}
+                                  </option>
+                                )}
+                              </For>
+                            </select>
+                            <Show when={inputsMsgR()[index()]}>
+                              <span class="path-error">{inputsMsgR()[index()]}</span>
+                            </Show>
+                          </div>
+                        )}
+                      </For>
+                    </div>
+                    <div class="execute-swap-input">
+                      <div class="input-group">
+                        <label>Input Amount (wei)</label>
+                        <input
+                          type="text"
+                          class="swap-input"
+                          onInput={handleInputAmountChangeR}
+                          placeholder="Enter amount to swap"
+                        />
+                        <span class="input-hint">{msgR()}</span>
+                      </div>
+                    </div>
+                    <div class="execute-swap-action">
+                      <button class="submit-btn" onClick={handleSubmit}>
+                        Swap Tokens
+                      </button>
+                      <Show when={resultMsg()}>
+                        <p class="result-msg error">{resultMsg()}</p>
+                      </Show>
+                    </div>
+                  </div>
+                </Show>
+              </div>
+            </div>
+          </div>
+        </Show>
+      </div>
+
+      {/* Confirmation Modal */}
+      <Show when={lmodal()}>
+        <div class="modal-overlay">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h3>Confirm Swap</h3>
+              <button class="modal-close" onClick={handleCancel}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M18 6L6 18M6 6l12 12"/>
+                </svg>
+              </button>
+            </div>
+            <div class="modal-body">
+              <div class="swap-path-preview">
+                <span class="path-label">Swap Path</span>
+                <For each={inputsR()}>
+                  {(value, index) => (
+                    <div class="path-preview-item">
+                      <span class="path-index">{index() + 1}</span>
+                      <code title={value}>{formatAddress(value)}</code>
+                    </div>
+                  )}
+                </For>
+              </div>
+              <div class="confirm-item">
+                <span class="confirm-label">Input Amount</span>
+                <span class="confirm-value amount">{inputAmountR()}</span>
+              </div>
+
+              <Show when={isResult()}>
+                <div class={`transaction-result ${goChart() ? 'success' : 'error'}`}>
+                  <p>{result()}</p>
+                </div>
+              </Show>
+            </div>
+            <div class="modal-footer">
+              <Show when={!isResult()}>
+                <button class="modal-btn cancel" onClick={handleCancel}>Cancel</button>
+                <button class="modal-btn confirm" onClick={() => void handleSubmitR()}>
+                  Confirm Swap
+                </button>
+              </Show>
+              <Show when={isResult()}>
+                <button class="modal-btn cancel" onClick={handleCancel}>Close</button>
+                <Show when={goChart()}>
+                  <button class="modal-btn confirm" onClick={handleGoChart}>
+                    View Chart
+                  </button>
+                </Show>
+              </Show>
+            </div>
+          </div>
+        </div>
+      </Show>
+    </div>
   );
 };

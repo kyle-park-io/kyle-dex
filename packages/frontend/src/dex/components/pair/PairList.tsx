@@ -108,7 +108,7 @@ export const PairList: Component<PairListProps> = (props): JSX.Element => {
               <div class="tw-h-full tw-flex tw-flex-col">
                 <h3>Pair</h3>
                 <div class="tw-flex-grow tw-flex tw-items-center tw-justify-center">
-                  현재 네트워크에 Pair가 존재하지 않습니다
+                  No pairs exist on the current network
                 </div>
               </div>
             </>

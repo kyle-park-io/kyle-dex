@@ -1,64 +1,58 @@
 import { type Component, type JSX } from 'solid-js';
 import { Container, Row, Col } from 'solid-bootstrap';
 
-import Notion from '/notion-icon.svg?url';
-import Linkedin from '/linkedin-icon.png?url';
-import Github from '/github-icon.png?url';
+// css
+import './Footer.css';
 
 const Footer: Component = (): JSX.Element => {
-  const handleNotionClick = (): void => {
-    window.open(
-      'https://kyle-park.notion.site/HI-I-m-KYLE-c52ac7c7e75c41dd92792f9db8cee895#0cbc2dce44ad44cba1e679d7ca4519c6',
-    );
-  };
-  const handleLinkedinClick = (): void => {
-    window.open('https://www.linkedin.com/in/kyle-park-io');
-  };
-  const handleGithubClick = (): void => {
-    window.open('https://github.com/kyle-park-io');
+  const handleTelegramClick = (): void => {
+    window.open('https://t.me/kyleparkio');
   };
 
   return (
     <>
-      <Container fluid>
-        <Row class="tw-items-center">
-          <Col lg={3} md={3} sm={4} xs={4}></Col>
+      <Container fluid class="tw-h-full">
+        <Row class="tw-items-center tw-h-full">
           <Col
             lg={6}
             md={6}
-            sm={4}
-            xs={4}
-            class="tw-flex tw-items-center tw-justify-center tw-h-8 tw-text-white"
+            sm={6}
+            xs={6}
+            class="tw-flex tw-items-center tw-justify-start tw-h-full tw-pl-4"
           >
-            <footer class="tw-text-xs sm:tw-text-base">
-              <span>© 2024 kyle-park-io</span>
+            <footer class="footer-copyright">
+              <span>© 2025 kyle-park-io. All rights reserved.</span>
             </footer>
           </Col>
           <Col
-            lg={3}
-            md={3}
-            sm={4}
-            xs={4}
-            class="tw-flex tw-justify-end tw-items-center tw-h-8 tw-gap-1"
+            lg={6}
+            md={6}
+            sm={6}
+            xs={6}
+            class="tw-flex tw-justify-end tw-items-center tw-h-full tw-gap-2 tw-pr-4"
           >
-            <img
-              src={Notion}
-              alt="Notion"
-              onClick={handleNotionClick}
-              class="tw-h-6 tw-cursor-pointer"
-            ></img>
-            <img
-              src={Linkedin}
-              alt="Linkedin"
-              onClick={handleLinkedinClick}
-              class="tw-h-6 tw-cursor-pointer"
-            ></img>
-            <img
-              src={Github}
-              alt="Github"
-              onClick={handleGithubClick}
-              class="tw-h-6 tw-cursor-pointer"
-            ></img>
+            <a
+              href="https://t.me/kyleparkio"
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => {
+                e.preventDefault();
+                handleTelegramClick();
+              }}
+              class="telegram-link"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                class="telegram-icon"
+              >
+                <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
+              </svg>
+              <span>@kyleparkio</span>
+            </a>
           </Col>
         </Row>
       </Container>

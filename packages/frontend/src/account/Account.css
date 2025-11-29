@@ -1,0 +1,283 @@
+/* ========================================
+   Account Page Styles
+   ======================================== */
+
+.account-container {
+  width: 100%;
+  min-height: 100%;
+}
+
+/* Header */
+.account-header {
+  padding: 3rem 2rem;
+  text-align: center;
+  background: linear-gradient(
+    180deg,
+    var(--color-bg-secondary) 0%,
+    var(--color-bg-primary) 100%
+  );
+  border-bottom: 1px solid var(--color-border-primary);
+}
+
+.account-title {
+  font-family: var(--font-primary);
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin: 0 0 0.5rem 0;
+}
+
+.account-subtitle {
+  font-size: 1rem;
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+/* Content */
+.account-content {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+/* Loading */
+.account-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 4rem 2rem;
+  color: var(--color-text-secondary);
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--color-border-primary);
+  border-top-color: var(--color-accent-primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Error */
+.account-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 3rem 2rem;
+  background-color: var(--color-bg-secondary);
+  border: 1px solid var(--color-border-primary);
+  border-radius: 1rem;
+}
+
+.error-icon {
+  color: var(--color-accent-red);
+  margin-bottom: 1rem;
+}
+
+.account-error h3 {
+  font-size: 1.25rem;
+  color: var(--color-text-primary);
+  margin: 0 0 0.5rem 0;
+}
+
+.account-error p {
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+/* Account Card */
+.account-card {
+  background-color: var(--color-bg-secondary);
+  border: 1px solid var(--color-border-primary);
+  border-radius: 1rem;
+  padding: 1.75rem;
+  transition: all 0.3s ease;
+}
+
+.account-card:hover {
+  border-color: var(--color-border-secondary);
+}
+
+/* Network Badge */
+.account-network {
+  margin-bottom: 1.5rem;
+}
+
+.network-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 2rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.network-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+/* Account Name Section */
+.account-name-section {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--color-border-primary);
+}
+
+.account-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  background-color: var(--color-bg-tertiary);
+  border-radius: 50%;
+  color: var(--color-text-secondary);
+}
+
+.account-name {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+/* Account Details */
+.account-details {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.detail-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  background-color: var(--color-bg-tertiary);
+  border-radius: 0.5rem;
+}
+
+.detail-item.highlight {
+  background-color: rgba(240, 185, 11, 0.1);
+  border: 1px solid rgba(240, 185, 11, 0.2);
+}
+
+.detail-label {
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+}
+
+.detail-value {
+  font-family: var(--font-mono);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--color-text-primary);
+}
+
+.detail-value.address {
+  font-size: 0.8125rem;
+}
+
+.detail-value.balance {
+  display: flex;
+  align-items: baseline;
+  gap: 0.375rem;
+  font-size: 1.125rem;
+  color: var(--color-accent-primary);
+}
+
+.currency {
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+}
+
+/* Full Address */
+.account-full-address {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.full-address-label {
+  font-size: 0.8125rem;
+  color: var(--color-text-tertiary);
+}
+
+.full-address-value {
+  padding: 0.75rem 1rem;
+  background-color: var(--color-bg-tertiary);
+  border-radius: 0.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+  word-break: break-all;
+}
+
+/* Empty State */
+.account-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 4rem 2rem;
+  background-color: var(--color-bg-secondary);
+  border: 1px solid var(--color-border-primary);
+  border-radius: 1rem;
+}
+
+.empty-icon {
+  color: var(--color-text-tertiary);
+  margin-bottom: 1.5rem;
+  opacity: 0.5;
+}
+
+.account-empty h3 {
+  font-size: 1.25rem;
+  color: var(--color-text-primary);
+  margin: 0 0 0.5rem 0;
+}
+
+.account-empty p {
+  font-size: 0.9375rem;
+  color: var(--color-text-secondary);
+  max-width: 300px;
+  margin: 0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .account-header {
+    padding: 2rem 1.5rem;
+  }
+
+  .account-content {
+    padding: 1.5rem;
+  }
+
+  .account-card {
+    padding: 1.5rem;
+  }
+
+  .detail-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+  }
+}

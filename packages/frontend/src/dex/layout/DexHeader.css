@@ -1,0 +1,102 @@
+/* ========================================
+   DEX Navigation Header Styles
+   ======================================== */
+
+.dex-nav {
+  width: 100%;
+  background-color: var(--color-bg-secondary);
+  border-bottom: 1px solid var(--color-border-primary);
+}
+
+.dex-nav-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4rem;
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0.75rem 2rem;
+}
+
+.dex-nav-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  flex: 1;
+  padding: 0.75rem 1.25rem;
+  background-color: transparent;
+  border: 1px solid transparent;
+  border-radius: 0.75rem;
+  color: var(--color-text-secondary);
+  font-family: var(--font-primary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.dex-nav-item:hover {
+  background-color: var(--color-bg-tertiary);
+  color: var(--color-text-primary);
+  border-color: var(--color-border-primary);
+}
+
+.dex-nav-item.active {
+  background: linear-gradient(135deg, rgba(240, 185, 11, 0.15) 0%, rgba(252, 213, 53, 0.1) 100%);
+  border-color: var(--color-accent-primary);
+  color: var(--color-accent-primary);
+}
+
+.dex-nav-item.active:hover {
+  background: linear-gradient(135deg, rgba(240, 185, 11, 0.2) 0%, rgba(252, 213, 53, 0.15) 100%);
+}
+
+.nav-icon {
+  flex-shrink: 0;
+  transition: transform var(--transition-fast);
+}
+
+.dex-nav-item:hover .nav-icon {
+  transform: scale(1.1);
+}
+
+.dex-nav-item.active .nav-icon {
+  color: var(--color-accent-primary);
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .dex-nav-container {
+    gap: 0.25rem;
+    padding: 0.5rem;
+  }
+
+  .dex-nav-item {
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.75rem;
+  }
+
+  .nav-icon {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+@media (max-width: 400px) {
+  .dex-nav-item span {
+    display: none;
+  }
+
+  .dex-nav-item {
+    padding: 0.75rem;
+  }
+
+  .nav-icon {
+    width: 22px;
+    height: 22px;
+  }
+}
+

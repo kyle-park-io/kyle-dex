@@ -1,9 +1,7 @@
 import { type Component, type JSX } from 'solid-js';
 import { createSignal, createEffect, onMount, For } from 'solid-js';
 import { useNavigate, useLocation } from '@solidjs/router';
-import { Container, Row, Col, Nav } from 'solid-bootstrap';
 import axios from 'axios';
-import HomeLogo from '/home.svg?url';
 import { getClientList } from '../account/Account.axios';
 import {
   setFromHeaderNavigate,
@@ -28,9 +26,6 @@ const Header: Component = (): JSX.Element => {
   const location = useLocation();
   // navigate
   const navigate = useNavigate();
-  const handleTitleClick = (): void => {
-    navigate('/dex');
-  };
   const handleImageClick = (): void => {
     navigate('/dex');
   };
@@ -547,7 +542,7 @@ const Header: Component = (): JSX.Element => {
 
       const res2 = await axios.get(`${ingressURL}/redis-tcp/real`);
       setCount(res2.data);
-      console.log('실시간 접속자 수 : ', count());
+      console.log('Real-time visitors: ', count());
     }
     void fetchData();
   });
@@ -562,18 +557,27 @@ const Header: Component = (): JSX.Element => {
 
   const handleAboutClick = (): void => {
     navigate('/dex/about');
-    // window.location.href = `${url}/about`;
   };
   const handleSwaggerClick = (): void => {
     window.open(`${globalState.url}/dex/api-docs`);
   };
 
+  // Get network display name
+  const getNetworkDisplay = () => {
+    const n = network();
+    if (n === 'hardhat') return 'Hardhat';
+    if (n === 'sepolia') return 'Sepolia';
+    if (n === 'amoy') return 'Amoy';
+    return 'Select Network';
+  };
+
   return (
     <>
-      <div class="tw-h-full">
-        {/* header */}
-        <header class="offscreen">golang is forever !</header>
-        {/* metamask */}
+      <div class="header-container">
+        {/* Hidden header for screen readers */}
+        <header class="offscreen">KYLE DEX - Decentralized Exchange</header>
+
+        {/* Metamask components */}
         <MetamaskIndex
           chainId="0x"
           network="hardhat"
@@ -620,189 +624,169 @@ const Header: Component = (): JSX.Element => {
           onError={propsHandleAmoyChange}
         />
 
-        <Container fluid class="tw-h-full">
-          <Row class="tw-h-full tw-items-center">
-            <Col lg={4} md={4} sm={4} xs={4} class="tw-flex tw-justify-start">
-              <button onClick={handleImageClick} class="transparent tw-h-10">
-                <img src={HomeLogo} alt="Home" class="tw-h-full"></img>
+        {/* Header Content */}
+        <div class="header-inner">
+          {/* Left Section - Home & Navigation */}
+          <div class="header-left">
+            {/* Home Button - DEX Logo */}
+            <button onClick={handleHomeClick} class="header-home-btn" title="Home">
+              <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect width="40" height="40" rx="10" fill="url(#home-gradient)"/>
+                <path d="M20 10L28 15L28 25L20 30L12 25L12 15Z" fill="#0b0e11"/>
+                <path d="M20 15L24 17.5V22.5L20 25L16 22.5V17.5L20 15Z" fill="url(#inner-gradient)"/>
+                <defs>
+                  <linearGradient id="home-gradient" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
+                    <stop stop-color="#f0b90b"/>
+                    <stop offset="1" stop-color="#fcd535"/>
+                  </linearGradient>
+                  <linearGradient id="inner-gradient" x1="16" y1="15" x2="24" y2="25" gradientUnits="userSpaceOnUse">
+                    <stop stop-color="#f0b90b"/>
+                    <stop offset="1" stop-color="#fcd535"/>
+                  </linearGradient>
+                </defs>
+              </svg>
+            </button>
+
+            {/* Navigation Links */}
+            <nav class="header-nav">
+              <button onClick={handleAboutClick} class="header-nav-item">
+                About
               </button>
-              <button onClick={handleHomeClick} class="transparent">
-                <span>Go Basic Home</span>
+              <button onClick={handleSwaggerClick} class="header-nav-item">
+                Docs
               </button>
-              <button onClick={handleAboutClick} class="transparent">
-                <span>About</span>
+            </nav>
+          </div>
+
+          {/* Center Section - Logo */}
+          <div class="header-center">
+            <button onClick={handleImageClick} class="header-title">
+              KYLE DEX
+            </button>
+          </div>
+
+          {/* Right Section - Actions */}
+          <div class="header-right">
+            {/* Network Selector */}
+            <div class="header-dropdown">
+              <button
+                onMouseEnter={toggleDropdown}
+                class="header-network-btn"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"/>
+                  <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                </svg>
+                <span>{getNetworkDisplay()}</span>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="6 9 12 15 18 9"/>
+                </svg>
               </button>
-              <button onClick={handleSwaggerClick} class="transparent">
-                <span>Swagger</span>
-              </button>
-            </Col>
-            <Col lg={4} md={4} sm={4} xs={4} class="tw-flex tw-justify-center">
-              <button onClick={handleTitleClick} class="transparent">
-                <span>KYLE DEX</span>
-              </button>
-            </Col>
-            <Col lg={4} md={4} sm={4} xs={4} class="tw-flex tw-justify-end">
-              <Nav defaultActiveKey="#" as="ul" class="tw-flex-nowrap">
-                {/* <Nav.Item as="li">
-                  <Nav.Link eventKey="count" class="tw-cursor-default">
-                    <span class="tw-text-black">
-                      실시간 접속자 수: {count()}
-                    </span>
-                  </Nav.Link>
-                </Nav.Item> */}
-                <Nav.Item as="li">
-                  <Nav.Link eventKey="connect">
-                    {!isLocal() && !isMetamaskConnected() ? (
-                      <button
-                        onClick={() => {
-                          handleSetMetamask();
-                        }}
-                      >
-                        <span class="tw-text-black">Connect</span>
-                      </button>
-                    ) : (
-                      <></>
-                    )}
-                  </Nav.Link>
-                </Nav.Item>
-                <Nav.Item as="li">
-                  <Nav.Link eventKey="connect">
-                    {!isLocal() && isMetamaskConnected() ? (
-                      <button>
-                        <span class="tw-text-black">isConnected</span>
-                      </button>
-                    ) : (
-                      <></>
-                    )}
-                  </Nav.Link>
-                </Nav.Item>
-                <Nav.Item as="li">
-                  <Nav.Link eventKey="connect">
-                    {!isLocal() && isMetamaskConnected() ? (
-                      <button
-                        onClick={() => {
-                          handleMetamaskDisconnect();
-                        }}
-                      >
-                        <span class="tw-text-black">Disconnect</span>
-                      </button>
-                    ) : (
-                      <></>
-                    )}
-                  </Nav.Link>
-                </Nav.Item>
-                <Nav.Item as="li">
-                  <Nav.Link eventKey="network">
-                    <div>
-                      <button onMouseEnter={toggleDropdown}>Network</button>
-                      {isOpen() && (
-                        <div
-                          onMouseLeave={toggleDropdown}
-                          class="dropdown-content"
+              {isOpen() && (
+                <div onMouseLeave={toggleDropdown} class="dropdown-content">
+                  <button
+                    class={`dropdown-item ${hardhatButtonColor() === 'blue' ? 'active' : ''}`}
+                    onClick={() => updateNetwork('hardhat')}
+                  >
+                    <span class="dropdown-item-dot" style={{ background: '#fcd535' }}></span>
+                    Hardhat
+                  </button>
+                  <button
+                    class={`dropdown-item ${sepoliaButtonColor() === 'blue' ? 'active' : ''}`}
+                    onClick={() => updateNetwork('sepolia')}
+                  >
+                    <span class="dropdown-item-dot" style={{ background: '#627eea' }}></span>
+                    Sepolia
+                  </button>
+                  <button
+                    class={`dropdown-item ${amoyButtonColor() === 'blue' ? 'active' : ''}`}
+                    onClick={() => updateNetwork('amoy')}
+                  >
+                    <span class="dropdown-item-dot" style={{ background: '#8247e5' }}></span>
+                    Amoy
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Account Selector (Local Network) */}
+            {isLocal() && network() !== 'null' && (
+              <div class="header-dropdown">
+                <button onMouseEnter={toggleDropdown2} class="header-account-btn">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                    <circle cx="12" cy="7" r="4"/>
+                  </svg>
+                  <span>Account</span>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="6 9 12 15 18 9"/>
+                  </svg>
+                </button>
+                {isOpen2() && (
+                  <div onMouseLeave={toggleDropdown2} class="dropdown-content">
+                    <For each={accountList()}>
+                      {(item: any, index) => (
+                        <button
+                          id={item.address}
+                          tabIndex={index()}
+                          class={`dropdown-item ${accountButtonAddress() === item.address ? 'active' : ''}`}
+                          onClick={handleAccountButtonClick}
                         >
-                          <p>
-                            <button
-                              style={{ background: hardhatButtonColor() }}
-                              onClick={() => {
-                                updateNetwork('hardhat');
-                              }}
-                            >
-                              <span class="tw-text-black">Hardhat</span>
-                            </button>
-                          </p>
-                          <p>
-                            <button
-                              style={{ background: sepoliaButtonColor() }}
-                              onClick={() => {
-                                updateNetwork('sepolia');
-                              }}
-                            >
-                              <span class="tw-text-black">Sepolia</span>
-                            </button>
-                          </p>
-                          <p>
-                            <button
-                              style={{ background: amoyButtonColor() }}
-                              onClick={() => {
-                                updateNetwork('amoy');
-                              }}
-                            >
-                              <span class="tw-text-black">Amoy</span>
-                            </button>
-                          </p>
-                        </div>
+                          {item.name}
+                        </button>
                       )}
-                    </div>
-                  </Nav.Link>
-                </Nav.Item>
-                <Nav.Item as="li">
-                  <Nav.Link eventKey="account">
-                    {isLocal() && network() !== 'null' && (
-                      <>
-                        <button onMouseEnter={toggleDropdown2}>Account</button>
-                        {isOpen2() && (
-                          <div
-                            onMouseLeave={toggleDropdown2}
-                            class="dropdown-content"
-                          >
-                            <For each={accountList()}>
-                              {(item: any, index) => (
-                                <p>
-                                  <button
-                                    id={item.address}
-                                    tabIndex={index()}
-                                    style={{
-                                      background:
-                                        accountButtonAddress() === item.address
-                                          ? 'blue'
-                                          : 'white',
-                                    }}
-                                    onClick={handleAccountButtonClick}
-                                  >
-                                    <span class="tw-text-black">
-                                      {item.name}
-                                    </span>
-                                  </button>
-                                </p>
-                              )}
-                            </For>
-                          </div>
-                        )}
-                      </>
-                    )}
-                  </Nav.Link>
-                </Nav.Item>
-                <Nav.Item as="li">
-                  <Nav.Link
-                    eventKey="account"
-                    onClick={() => {
-                      handleAccountClick(
-                        localStorage.getItem('address') as string,
-                      );
-                    }}
-                    class="tw-h-full tw-flex tw-items-center tw-justify-center"
-                  >
-                    <span class="tw-text-black">Account</span>
-                  </Nav.Link>
-                </Nav.Item>
-                <Nav.Item as="li">
-                  <Nav.Link
-                    eventKey="move"
-                    onClick={handleOpen}
-                    class="tw-h-full tw-flex tw-items-center tw-justify-center"
-                  >
-                    <span class="tw-text-black">Balance</span>
-                  </Nav.Link>
-                  <AccountBalanceOf
-                    show={show()}
-                    onHide={handleClose}
-                  ></AccountBalanceOf>
-                </Nav.Item>
-              </Nav>
-            </Col>
-          </Row>
-        </Container>
-        {/* 헤더 콘텐츠 */}
+                    </For>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Wallet Connection */}
+            {!isLocal() && !isMetamaskConnected() && (
+              <button onClick={handleSetMetamask} class="header-connect-btn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="2" y="6" width="20" height="12" rx="2"/>
+                  <path d="M22 10H2M6 14h4"/>
+                </svg>
+                Connect Wallet
+              </button>
+            )}
+
+            {!isLocal() && isMetamaskConnected() && (
+              <div class="header-wallet-connected">
+                <span class="wallet-status">
+                  <span class="wallet-status-dot"></span>
+                  Connected
+                </span>
+                <button onClick={handleMetamaskDisconnect} class="header-disconnect-btn">
+                  Disconnect
+                </button>
+              </div>
+            )}
+
+            {/* Account & Balance */}
+            <button
+              onClick={() => handleAccountClick(localStorage.getItem('address') as string)}
+              class="header-text-btn"
+              title="Account"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                <circle cx="12" cy="7" r="4"/>
+              </svg>
+              <span>Account</span>
+            </button>
+
+            <button onClick={handleOpen} class="header-text-btn" title="Balance">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="2" y="6" width="20" height="12" rx="2"/>
+                <circle cx="16" cy="12" r="2"/>
+              </svg>
+              <span>Balance</span>
+            </button>
+            <AccountBalanceOf show={show()} onHide={handleClose}></AccountBalanceOf>
+          </div>
+        </div>
       </div>
     </>
   );
