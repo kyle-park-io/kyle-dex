@@ -1,10 +1,28 @@
 import { type Component, type JSX } from 'solid-js';
+import { createSignal, onMount } from 'solid-js';
 import { Container, Row, Col } from 'solid-bootstrap';
+import axios from 'axios';
+import { globalState } from '../global/constants';
 
 // css
 import './Footer.css';
 
 const Footer: Component = (): JSX.Element => {
+  const ingressURL = globalState.ingress_reverse_proxy_url;
+  const [onlineCount, setOnlineCount] = createSignal(0);
+
+  onMount(() => {
+    async function fetchVisitors(): Promise<void> {
+      try {
+        const res = await axios.get(`${ingressURL}/redis-tcp/real`);
+        setOnlineCount(res.data);
+      } catch (err) {
+        console.log('Failed to fetch online count');
+      }
+    }
+    void fetchVisitors();
+  });
+
   const handleTelegramClick = (): void => {
     window.open('https://t.me/kyleparkio');
   };
@@ -29,8 +47,14 @@ const Footer: Component = (): JSX.Element => {
             md={6}
             sm={6}
             xs={6}
-            class="tw-flex tw-justify-end tw-items-center tw-h-full tw-gap-2 tw-pr-4"
+            class="tw-flex tw-justify-end tw-items-center tw-h-full tw-gap-4 tw-pr-4"
           >
+            {/* Online Status */}
+            <div class="footer-online-status">
+              <span class="online-dot"></span>
+              <span class="online-count">{onlineCount()}</span>
+              <span class="online-label">ONLINE</span>
+            </div>
             <a
               href="https://t.me/kyleparkio"
               target="_blank"

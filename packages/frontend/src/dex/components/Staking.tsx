@@ -1,5 +1,6 @@
-import { type Component, type JSX, For, Show } from 'solid-js';
+import { type Component, type JSX } from 'solid-js';
 import { createSignal, createEffect } from 'solid-js';
+import { Form } from 'solid-bootstrap';
 import {
   fromDexNavigate,
   setFromDexNavigate,
@@ -563,9 +564,20 @@ export const Staking: Component = (): JSX.Element => {
       const network = localStorage.getItem('network') as string;
       const address = localStorage.getItem('address') as string;
       const router = await getRouter(api, { network });
+      const maxApproval = ethers.MaxUint256.toString();
 
       if (selectedTokenA() === globalState.hardhat_weth_address) {
         console.log('with eth test A');
+        // Approve token B for router
+        await submit(api, {
+          network,
+          userAddress: address,
+          contractAddress: selectedTokenB(),
+          function: 'approve',
+          args: [router, maxApproval],
+        });
+        console.log('Approve token B completed');
+        
         const result = await submitWithETH(api, {
           network,
           userAddress: address,
@@ -577,6 +589,16 @@ export const Staking: Component = (): JSX.Element => {
         console.log(result);
       } else if (selectedTokenB() === globalState.hardhat_weth_address) {
         console.log('with eth test B');
+        // Approve token A for router
+        await submit(api, {
+          network,
+          userAddress: address,
+          contractAddress: selectedTokenA(),
+          function: 'approve',
+          args: [router, maxApproval],
+        });
+        console.log('Approve token A completed');
+        
         const result = await submitWithETH(api, {
           network,
           userAddress: address,
@@ -588,6 +610,25 @@ export const Staking: Component = (): JSX.Element => {
         console.log(result);
       } else {
         console.log('basic test');
+        // Approve both tokens for router
+        await submit(api, {
+          network,
+          userAddress: address,
+          contractAddress: selectedTokenA(),
+          function: 'approve',
+          args: [router, maxApproval],
+        });
+        console.log('Approve token A completed');
+        
+        await submit(api, {
+          network,
+          userAddress: address,
+          contractAddress: selectedTokenB(),
+          function: 'approve',
+          args: [router, maxApproval],
+        });
+        console.log('Approve token B completed');
+        
         const result = await submit(api, {
           network,
           userAddress: address,
@@ -847,39 +888,14 @@ export const Staking: Component = (): JSX.Element => {
     return `${address.slice(0, 8)}...${address.slice(-6)}`;
   };
 
-  // Dropdown open states
-  const [dropdownAOpen, setDropdownAOpen] = createSignal(false);
-  const [dropdownBOpen, setDropdownBOpen] = createSignal(false);
-  const [dropdownPairOpen, setDropdownPairOpen] = createSignal(false);
-
-  const getTokenName = (address: string) => {
-    const tokenList = tokens();
-    if (!tokenList || tokenList.length === 0) return null;
-    const found = tokenList.find(t => t.address === address);
-    return found?.name || null;
-  };
-
-  const handleSelectA = (address: string) => {
-    handleTokenAChange({ target: { value: address } });
-    setDropdownAOpen(false);
-  };
-
-  const handleSelectB = (address: string) => {
-    handleTokenBChange({ target: { value: address } });
-    setDropdownBOpen(false);
-  };
-
-  const handleSelectPair = (address: string) => {
-    handlePairChange({ target: { value: address } });
-    setDropdownPairOpen(false);
-  };
-
   return (
     <div class="staking-container">
       {/* Header */}
       <section class="staking-header">
         <h1 class="staking-title">Add Liquidity</h1>
-        <p class="staking-subtitle">Provide liquidity to earn LP tokens and trading fees</p>
+        <p class="staking-subtitle">
+          Provide liquidity to earn LP tokens and trading fees
+        </p>
       </section>
 
       {/* Content */}
@@ -887,22 +903,38 @@ export const Staking: Component = (): JSX.Element => {
         {!isNetwork() ? (
           <div class="staking-empty-state">
             <div class="empty-icon">
-              <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/>
-                <path d="M12 8v4M12 16h.01"/>
+              <svg
+                width="64"
+                height="64"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+              >
+                <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z" />
+                <path d="M12 8v4M12 16h.01" />
               </svg>
             </div>
             <h3>No Network Selected</h3>
-            <p>Please select a network from the header to start adding liquidity.</p>
+            <p>
+              Please select a network from the header to start adding liquidity.
+            </p>
           </div>
         ) : (
           <>
             {isError() ? (
               <div class="staking-error">
                 <div class="error-icon">
-                  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="10"/>
-                    <path d="M12 8v4M12 16h.01"/>
+                  <svg
+                    width="48"
+                    height="48"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <circle cx="12" cy="12" r="10" />
+                    <path d="M12 8v4M12 16h.01" />
                   </svg>
                 </div>
                 <h3>Error</h3>
@@ -953,7 +985,10 @@ export const Staking: Component = (): JSX.Element => {
                         {/* WETH Info */}
                         <div class="weth-info">
                           <span class="weth-label">WETH Address:</span>
-                          <code class="weth-address" title={globalState.hardhat_weth_address}>
+                          <code
+                            class="weth-address"
+                            title={globalState.hardhat_weth_address}
+                          >
                             {formatAddress(globalState.hardhat_weth_address)}
                           </code>
                         </div>
@@ -961,180 +996,50 @@ export const Staking: Component = (): JSX.Element => {
                         {/* Token/Pair Selection */}
                         {method() === 't' ? (
                           <div class="token-selects">
-                            {/* Token A Dropdown */}
+                            {/* Token A Select */}
                             <div class="select-group">
-                              <label>Token A</label>
-                              <div class="custom-dropdown">
-                                <button 
-                                  class="dropdown-trigger" 
-                                  onClick={() => setDropdownAOpen(!dropdownAOpen())}
-                                  type="button"
-                                >
-                                  <span class="dropdown-value">
-                                    {getTokenName(selectedTokenA()) 
-                                      ? `${getTokenName(selectedTokenA())} - ${formatAddress(selectedTokenA())}` 
-                                      : formatAddress(selectedTokenA())}
-                                  </span>
-                                  <svg 
-                                    class={`dropdown-arrow ${dropdownAOpen() ? 'open' : ''}`} 
-                                    width="16" height="16" viewBox="0 0 24 24" 
-                                    fill="none" stroke="currentColor" stroke-width="2"
-                                  >
-                                    <path d="M6 9l6 6 6-6"/>
-                                  </svg>
-                                </button>
-                                <Show when={dropdownAOpen()}>
-                                  <div class="dropdown-backdrop" onClick={() => setDropdownAOpen(false)}></div>
-                                  <div class="dropdown-menu">
-                                    <For each={tokens()}>
-                                      {(option) => (
-                                        <button
-                                          class={`dropdown-item ${option.address === selectedTokenA() ? 'selected' : ''}`}
-                                          onClick={() => handleSelectA(option.address)}
-                                          type="button"
-                                        >
-                                          <div class="dropdown-item-content">
-                                            <div class="token-icon">
-                                              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                <circle cx="12" cy="12" r="10"/>
-                                                <path d="M12 6v12M9 9l3-3 3 3M9 15l3 3 3-3"/>
-                                              </svg>
-                                            </div>
-                                            <div class="dropdown-item-info">
-                                              <Show when={option.name}>
-                                                <span class="token-name">{option.name}</span>
-                                              </Show>
-                                              <span class="token-address" title={option.address}>
-                                                {formatAddress(option.address)}
-                                              </span>
-                                            </div>
-                                          </div>
-                                          <Show when={option.address === selectedTokenA()}>
-                                            <svg class="check-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                              <path d="M20 6L9 17l-5-5"/>
-                                            </svg>
-                                          </Show>
-                                        </button>
-                                      )}
-                                    </For>
-                                  </div>
-                                </Show>
-                              </div>
+                              <Form.Label>Token A</Form.Label>
+                              <Form.Select
+                                aria-label="Select token A"
+                                onChange={handleTokenAChange}
+                                value={selectedTokenA()}
+                              >
+                                {tokens().map((token) => (
+                                  <option value={token.address}>
+                                    {token.address}
+                                  </option>
+                                ))}
+                              </Form.Select>
                             </div>
-                            {/* Token B Dropdown */}
+                            {/* Token B Select */}
                             <div class="select-group">
-                              <label>Token B</label>
-                              <div class="custom-dropdown">
-                                <button 
-                                  class="dropdown-trigger" 
-                                  onClick={() => setDropdownBOpen(!dropdownBOpen())}
-                                  type="button"
-                                >
-                                  <span class="dropdown-value">
-                                    {getTokenName(selectedTokenB()) 
-                                      ? `${getTokenName(selectedTokenB())} - ${formatAddress(selectedTokenB())}` 
-                                      : formatAddress(selectedTokenB())}
-                                  </span>
-                                  <svg 
-                                    class={`dropdown-arrow ${dropdownBOpen() ? 'open' : ''}`} 
-                                    width="16" height="16" viewBox="0 0 24 24" 
-                                    fill="none" stroke="currentColor" stroke-width="2"
-                                  >
-                                    <path d="M6 9l6 6 6-6"/>
-                                  </svg>
-                                </button>
-                                <Show when={dropdownBOpen()}>
-                                  <div class="dropdown-backdrop" onClick={() => setDropdownBOpen(false)}></div>
-                                  <div class="dropdown-menu">
-                                    <For each={tokens()}>
-                                      {(option) => (
-                                        <button
-                                          class={`dropdown-item ${option.address === selectedTokenB() ? 'selected' : ''}`}
-                                          onClick={() => handleSelectB(option.address)}
-                                          type="button"
-                                        >
-                                          <div class="dropdown-item-content">
-                                            <div class="token-icon">
-                                              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                <circle cx="12" cy="12" r="10"/>
-                                                <path d="M12 6v12M9 9l3-3 3 3M9 15l3 3 3-3"/>
-                                              </svg>
-                                            </div>
-                                            <div class="dropdown-item-info">
-                                              <Show when={option.name}>
-                                                <span class="token-name">{option.name}</span>
-                                              </Show>
-                                              <span class="token-address" title={option.address}>
-                                                {formatAddress(option.address)}
-                                              </span>
-                                            </div>
-                                          </div>
-                                          <Show when={option.address === selectedTokenB()}>
-                                            <svg class="check-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                              <path d="M20 6L9 17l-5-5"/>
-                                            </svg>
-                                          </Show>
-                                        </button>
-                                      )}
-                                    </For>
-                                  </div>
-                                </Show>
-                              </div>
+                              <Form.Label>Token B</Form.Label>
+                              <Form.Select
+                                aria-label="Select token B"
+                                onChange={handleTokenBChange}
+                                value={selectedTokenB()}
+                              >
+                                {tokens().map((token) => (
+                                  <option value={token.address}>
+                                    {token.address}
+                                  </option>
+                                ))}
+                              </Form.Select>
                             </div>
                           </div>
                         ) : (
-                          /* Pair Dropdown */
+                          /* Pair Select */
                           <div class="select-group">
-                            <label>Select Pair</label>
-                            <div class="custom-dropdown">
-                              <button 
-                                class="dropdown-trigger" 
-                                onClick={() => setDropdownPairOpen(!dropdownPairOpen())}
-                                type="button"
-                              >
-                                <span class="dropdown-value">{formatAddress(selectedPair())}</span>
-                                <svg 
-                                  class={`dropdown-arrow ${dropdownPairOpen() ? 'open' : ''}`} 
-                                  width="16" height="16" viewBox="0 0 24 24" 
-                                  fill="none" stroke="currentColor" stroke-width="2"
-                                >
-                                  <path d="M6 9l6 6 6-6"/>
-                                </svg>
-                              </button>
-                              <Show when={dropdownPairOpen()}>
-                                <div class="dropdown-backdrop" onClick={() => setDropdownPairOpen(false)}></div>
-                                <div class="dropdown-menu">
-                                  <For each={pairs()}>
-                                    {(pair) => (
-                                      <button
-                                        class={`dropdown-item ${pair.pair === selectedPair() ? 'selected' : ''}`}
-                                        onClick={() => handleSelectPair(pair.pair)}
-                                        type="button"
-                                      >
-                                        <div class="dropdown-item-content">
-                                          <div class="token-icon">
-                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                              <circle cx="12" cy="12" r="10"/>
-                                              <path d="M8 12h8M12 8v8"/>
-                                            </svg>
-                                          </div>
-                                          <div class="dropdown-item-info">
-                                            <span class="token-address" title={pair.pair}>
-                                              {formatAddress(pair.pair)}
-                                            </span>
-                                          </div>
-                                        </div>
-                                        <Show when={pair.pair === selectedPair()}>
-                                          <svg class="check-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path d="M20 6L9 17l-5-5"/>
-                                          </svg>
-                                        </Show>
-                                      </button>
-                                    )}
-                                  </For>
-                                </div>
-                              </Show>
-                            </div>
+                            <Form.Label>Select Pair</Form.Label>
+                            <Form.Select
+                              aria-label="Select Pair"
+                              onChange={handlePairChange}
+                              value={selectedPair()}
+                            >
+                              {pairs().map((pair) => (
+                                <option value={pair.pair}>{pair.pair}</option>
+                              ))}
+                            </Form.Select>
                           </div>
                         )}
                       </>
@@ -1167,7 +1072,8 @@ export const Staking: Component = (): JSX.Element => {
                               <span class="pool-label">Token A</span>
                               <code class="pool-value" title={selectedTokenA()}>
                                 {formatAddress(selectedTokenA())}
-                                {selectedTokenA() === globalState.hardhat_weth_address && (
+                                {selectedTokenA() ===
+                                  globalState.hardhat_weth_address && (
                                   <span class="token-badge">WETH</span>
                                 )}
                               </code>
@@ -1176,7 +1082,8 @@ export const Staking: Component = (): JSX.Element => {
                               <span class="pool-label">Token B</span>
                               <code class="pool-value" title={selectedTokenB()}>
                                 {formatAddress(selectedTokenB())}
-                                {selectedTokenB() === globalState.hardhat_weth_address && (
+                                {selectedTokenB() ===
+                                  globalState.hardhat_weth_address && (
                                   <span class="token-badge">WETH</span>
                                 )}
                               </code>
@@ -1184,19 +1091,30 @@ export const Staking: Component = (): JSX.Element => {
                             <div class="reserves-grid">
                               <div class="reserve-item">
                                 <span class="reserve-label">Reserve A</span>
-                                <span class="reserve-value">{reserve().reserve0}</span>
+                                <span class="reserve-value">
+                                  {reserve().reserve0}
+                                </span>
                               </div>
                               <div class="reserve-item">
                                 <span class="reserve-label">Reserve B</span>
-                                <span class="reserve-value">{reserve().reserve1}</span>
+                                <span class="reserve-value">
+                                  {reserve().reserve1}
+                                </span>
                               </div>
                             </div>
                           </div>
                         ) : (
                           <div class="no-pool">
-                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                              <circle cx="12" cy="12" r="10"/>
-                              <path d="M12 8v4M12 16h.01"/>
+                            <svg
+                              width="32"
+                              height="32"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              stroke-width="2"
+                            >
+                              <circle cx="12" cy="12" r="10" />
+                              <path d="M12 8v4M12 16h.01" />
                             </svg>
                             <span>No pool found for this pair</span>
                           </div>
@@ -1259,8 +1177,15 @@ export const Staking: Component = (): JSX.Element => {
                               />
                             </div>
                             <div class="conversion-arrow">
-                              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M8 7l-5 5 5 5M16 7l5 5-5 5"/>
+                              <svg
+                                width="20"
+                                height="20"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                              >
+                                <path d="M8 7l-5 5 5 5M16 7l5 5-5 5" />
                               </svg>
                             </div>
                             <div class="conversion-input">
@@ -1289,30 +1214,46 @@ export const Staking: Component = (): JSX.Element => {
                     {!resultLoading() ? (
                       <div class="loading-state">
                         <div class="loading-spinner"></div>
-                        <span>{isCalculating() ? 'Calculating...' : 'Waiting for input...'}</span>
+                        <span>
+                          {isCalculating()
+                            ? 'Calculating...'
+                            : 'Waiting for input...'}
+                        </span>
                       </div>
                     ) : (
                       <div class="results-vertical">
                         <div class="result-card">
-                          <h4>If you inject Token A: {tokenALiquidity() || '0'}</h4>
+                          <h4>
+                            If you inject Token A: {tokenALiquidity() || '0'}
+                          </h4>
                           <div class="result-item">
                             <span class="result-label">Required Token B</span>
-                            <span class="result-value">{tokenBCalculatedLiquidity() || '-'}</span>
+                            <span class="result-value">
+                              {tokenBCalculatedLiquidity() || '-'}
+                            </span>
                           </div>
                           <div class="result-item highlight">
                             <span class="result-label">LP Reward</span>
-                            <span class="result-value">{bCalculatedLiquidity() || '-'}</span>
+                            <span class="result-value">
+                              {bCalculatedLiquidity() || '-'}
+                            </span>
                           </div>
                         </div>
                         <div class="result-card">
-                          <h4>If you inject Token B: {tokenBLiquidity() || '0'}</h4>
+                          <h4>
+                            If you inject Token B: {tokenBLiquidity() || '0'}
+                          </h4>
                           <div class="result-item">
                             <span class="result-label">Required Token A</span>
-                            <span class="result-value">{tokenACalculatedLiquidity() || '-'}</span>
+                            <span class="result-value">
+                              {tokenACalculatedLiquidity() || '-'}
+                            </span>
                           </div>
                           <div class="result-item highlight">
                             <span class="result-label">LP Reward</span>
-                            <span class="result-value">{aCalculatedLiquidity() || '-'}</span>
+                            <span class="result-value">
+                              {aCalculatedLiquidity() || '-'}
+                            </span>
                           </div>
                         </div>
                       </div>
@@ -1328,9 +1269,16 @@ export const Staking: Component = (): JSX.Element => {
                   <div class="card-body">
                     {!isAccount() ? (
                       <div class="no-account">
-                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                          <circle cx="12" cy="7" r="4"/>
+                        <svg
+                          width="32"
+                          height="32"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2"
+                        >
+                          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                          <circle cx="12" cy="7" r="4" />
                         </svg>
                         <span>Please select an account to add liquidity</span>
                       </div>
@@ -1366,7 +1314,9 @@ export const Staking: Component = (): JSX.Element => {
                           <button class="submit-btn" onClick={handleSubmit}>
                             Add Liquidity
                           </button>
-                          {resultMsg() && <p class="result-msg error">{resultMsg()}</p>}
+                          {resultMsg() && (
+                            <p class="result-msg error">{resultMsg()}</p>
+                          )}
                         </div>
                       </div>
                     )}
@@ -1385,23 +1335,36 @@ export const Staking: Component = (): JSX.Element => {
             <div class="modal-header">
               <h3>Confirm Transaction</h3>
               <button class="modal-close" onClick={handleCancel}>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M18 6L6 18M6 6l12 12"/>
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path d="M18 6L6 18M6 6l12 12" />
                 </svg>
               </button>
             </div>
             <div class="modal-body">
               <div class="confirm-item">
                 <span class="confirm-label">Pair</span>
-                <code class="confirm-value" title={selectedPair()}>{formatAddress(selectedPair())}</code>
+                <code class="confirm-value" title={selectedPair()}>
+                  {formatAddress(selectedPair())}
+                </code>
               </div>
               <div class="confirm-item">
                 <span class="confirm-label">Token A</span>
-                <code class="confirm-value" title={selectedTokenA()}>{formatAddress(selectedTokenA())}</code>
+                <code class="confirm-value" title={selectedTokenA()}>
+                  {formatAddress(selectedTokenA())}
+                </code>
               </div>
               <div class="confirm-item">
                 <span class="confirm-label">Token B</span>
-                <code class="confirm-value" title={selectedTokenB()}>{formatAddress(selectedTokenB())}</code>
+                <code class="confirm-value" title={selectedTokenB()}>
+                  {formatAddress(selectedTokenB())}
+                </code>
               </div>
               <div class="confirm-item">
                 <span class="confirm-label">Amount A</span>
@@ -1413,7 +1376,9 @@ export const Staking: Component = (): JSX.Element => {
               </div>
 
               {isResult() && (
-                <div class={`transaction-result ${goChart() ? 'success' : 'error'}`}>
+                <div
+                  class={`transaction-result ${goChart() ? 'success' : 'error'}`}
+                >
                   <p>{result()}</p>
                 </div>
               )}
@@ -1421,14 +1386,21 @@ export const Staking: Component = (): JSX.Element => {
             <div class="modal-footer">
               {!isResult() ? (
                 <>
-                  <button class="modal-btn cancel" onClick={handleCancel}>Cancel</button>
-                  <button class="modal-btn confirm" onClick={() => void handleSubmitR()}>
+                  <button class="modal-btn cancel" onClick={handleCancel}>
+                    Cancel
+                  </button>
+                  <button
+                    class="modal-btn confirm"
+                    onClick={() => void handleSubmitR()}
+                  >
                     Confirm
                   </button>
                 </>
               ) : (
                 <>
-                  <button class="modal-btn cancel" onClick={handleCancel}>Close</button>
+                  <button class="modal-btn cancel" onClick={handleCancel}>
+                    Close
+                  </button>
                   {goChart() && (
                     <button class="modal-btn confirm" onClick={handleGoChart}>
                       View Chart

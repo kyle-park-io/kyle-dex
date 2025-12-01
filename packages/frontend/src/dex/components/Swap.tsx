@@ -1,5 +1,6 @@
-import { type Component, type JSX, For, Show } from 'solid-js';
+import { type Component, type JSX } from 'solid-js';
 import { createSignal, createEffect } from 'solid-js';
+import { Form } from 'solid-bootstrap';
 import {
   fromDexNavigate,
   setFromDexNavigate,
@@ -147,26 +148,26 @@ export const Swap: Component = (): JSX.Element => {
   let currentAbortController2 = new AbortController();
   const [inputs, setInputs] = createSignal([tokenDefault]);
   const [inputsMsg, setInputsMsg] = createSignal(['']);
-  
+
   const addInput = async (): Promise<void> => {
     setInputs([...inputs(), tokenDefault]);
     await handleInputAmountChange2();
   };
-  
+
   const removeInput = async (): Promise<void> => {
     if (inputs().length > 1) {
       setInputs(inputs().slice(0, -1));
     }
     await handleInputAmountChange2();
   };
-  
+
   const handleSelectChange = async (e, index): Promise<void> => {
     const updatedValues = [...inputs()];
     updatedValues[index] = e.target.value;
     setInputs(updatedValues);
     await handleInputAmountChange2();
   };
-  
+
   const handleInputAmountChange2 = async (): Promise<void> => {
     currentAbortController2.abort();
     currentAbortController2 = new AbortController();
@@ -185,7 +186,7 @@ export const Swap: Component = (): JSX.Element => {
       }
     }
   };
-  
+
   const performSwapTask2 = async (signal): Promise<boolean> => {
     return await new Promise((resolve, reject) => {
       const timeoutId = setTimeout(() => {
@@ -218,7 +219,7 @@ export const Swap: Component = (): JSX.Element => {
       }
     }
   };
-  
+
   const performSwapTask = async (value: string, signal): Promise<boolean> => {
     return await new Promise((resolve, reject) => {
       const timeoutId = setTimeout(() => {
@@ -232,11 +233,11 @@ export const Swap: Component = (): JSX.Element => {
       });
     });
   };
-  
+
   const [inputAmount, setInputAmount] = createSignal('');
   const [msg, setMsg] = createSignal('Enter the value!');
   const [bool3, setBool] = createSignal(false);
-  
+
   const setValue = (value: string): void => {
     let bool2 = false;
     if (value === '') {
@@ -261,9 +262,9 @@ export const Swap: Component = (): JSX.Element => {
       setInputAmount('');
     }
   };
-  
+
   const [listBool, setListBool] = createSignal(false);
-  
+
   const checkArray = (): void => {
     setInputsMsg(['']);
     setListBool(true);
@@ -290,10 +291,10 @@ export const Swap: Component = (): JSX.Element => {
     }
     setInputsMsg(arr);
   };
-  
+
   const [estimateResult, setEstimateResult] = createSignal([]);
   const [estimateError, setEstimateError] = createSignal('');
-  
+
   const calculate = async (): Promise<void> => {
     if (!bool3() || !listBool()) {
       return;
@@ -319,23 +320,7 @@ export const Swap: Component = (): JSX.Element => {
   const [inputsR, setInputsR] = createSignal([tokenDefault]);
   const [inputsMsgR, setInputsMsgR] = createSignal(['']);
   const [listBoolR, setListBoolR] = createSignal(false);
-  
-  const addInputR = (): void => {
-    setInputsR([...inputsR(), tokenDefault]);
-  };
-  
-  const removeInputR = (): void => {
-    if (inputsR().length > 1) {
-      setInputsR(inputsR().slice(0, -1));
-    }
-  };
-  
-  const handleSelectChangeR = (e, index): void => {
-    const updatedValues = [...inputsR()];
-    updatedValues[index] = e.target.value;
-    setInputsR(updatedValues);
-  };
-  
+
   const checkArrayR = (): void => {
     setInputsMsgR(['']);
     setListBoolR(true);
@@ -362,11 +347,30 @@ export const Swap: Component = (): JSX.Element => {
     }
     setInputsMsgR(arr);
   };
-  
+
+  const addInputR = (): void => {
+    setInputsR([...inputsR(), tokenDefault]);
+    checkArrayR();
+  };
+
+  const removeInputR = (): void => {
+    if (inputsR().length > 1) {
+      setInputsR(inputsR().slice(0, -1));
+      checkArrayR();
+    }
+  };
+
+  const handleSelectChangeR = (e, index): void => {
+    const updatedValues = [...inputsR()];
+    updatedValues[index] = e.target.value;
+    setInputsR(updatedValues);
+    checkArrayR();
+  };
+
   const [inputAmountR, setInputAmountR] = createSignal('');
   const [msgR, setMsgR] = createSignal('Enter the value!');
   const [bool3R, setBoolR] = createSignal(false);
-  
+
   const setValueR = (value: string): void => {
     let bool2 = false;
     if (value === '') {
@@ -391,15 +395,15 @@ export const Swap: Component = (): JSX.Element => {
       setInputAmountR('');
     }
   };
-  
+
   const handleInputAmountChangeR = (e): void => {
     const value = e.target.value;
     setValueR(value);
   };
-  
+
   const [lmodal, setLModal] = createSignal(false);
   const [resultMsg, setResultMsg] = createSignal('');
-  
+
   const handleSubmit = (): void => {
     checkArrayR();
     if (listBoolR() && bool3R()) {
@@ -409,11 +413,11 @@ export const Swap: Component = (): JSX.Element => {
       setResultMsg('Check input!');
     }
   };
-  
+
   const [isResult, setIsResult] = createSignal(false);
   const [result, setResult] = createSignal('');
   const [goChart, setGoChart] = createSignal(false);
-  
+
   const handleCancel = (): void => {
     if (isResult()) {
       window.location.reload();
@@ -423,12 +427,12 @@ export const Swap: Component = (): JSX.Element => {
       setResult('');
     }
   };
-  
+
   const handleGoChart = (): void => {
     const network = localStorage.getItem('network') as string;
     window.location.href = `${globalState.url}/dex/chart/${network}`;
   };
-  
+
   const handleSubmitR = async (): Promise<void> => {
     try {
       setIsResult(false);
@@ -440,6 +444,7 @@ export const Swap: Component = (): JSX.Element => {
       const router = await getRouter(api, { network });
 
       if (inputsR()[0] === globalState.hardhat_weth_address) {
+        // ETH swap - no approve needed
         const result = await submitWithETH(api, {
           network,
           userAddress: address,
@@ -450,6 +455,21 @@ export const Swap: Component = (): JSX.Element => {
         });
         console.log(result);
       } else {
+        // Token swap - approve first
+        const inputToken = inputsR()[0];
+        const maxApproval = ethers.MaxUint256.toString();
+        
+        // Approve router to spend input token
+        await submit(api, {
+          network,
+          userAddress: address,
+          contractAddress: inputToken,
+          function: 'approve',
+          args: [router, maxApproval],
+        });
+        console.log('Approve completed');
+        
+        // Then swap
         const result = await submit(api, {
           network,
           userAddress: address,
@@ -475,7 +495,7 @@ export const Swap: Component = (): JSX.Element => {
 
   const [eth, setEth] = createSignal('0');
   const [wei, setWei] = createSignal('0');
-  
+
   const handleEth = (e): void => {
     setWei('0');
     const value = e.target.value;
@@ -483,7 +503,7 @@ export const Swap: Component = (): JSX.Element => {
       setWei(ethers.parseEther(value).toString());
     }
   };
-  
+
   const handleWei = (e): void => {
     setEth('0');
     const value = e.target.value;
@@ -507,7 +527,7 @@ export const Swap: Component = (): JSX.Element => {
 
       {/* Content */}
       <div class="swap-content">
-        <Show when={!isNetwork()}>
+        {!isNetwork() ? (
           <div class="swap-empty-state">
             <div class="empty-icon">
               <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
@@ -518,9 +538,7 @@ export const Swap: Component = (): JSX.Element => {
             <h3>No Network Selected</h3>
             <p>Please select a network from the header to start swapping.</p>
           </div>
-        </Show>
-
-        <Show when={isNetwork() && isError()}>
+        ) : isError() ? (
           <div class="swap-error">
             <div class="error-icon">
               <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -531,9 +549,7 @@ export const Swap: Component = (): JSX.Element => {
             <h3>Error</h3>
             <p>{apiErr()}</p>
           </div>
-        </Show>
-
-        <Show when={isNetwork() && !isError()}>
+        ) : (
           <div class="swap-grid">
             {/* Token List Card */}
             <div class="swap-card">
@@ -541,37 +557,31 @@ export const Swap: Component = (): JSX.Element => {
                 <h3>Available Tokens</h3>
               </div>
               <div class="card-body">
-                <Show when={!tokenListLoading()}>
+                {!tokenListLoading() ? (
                   <div class="loading-state">
                     <div class="loading-spinner"></div>
                     <span>Loading tokens...</span>
                   </div>
-                </Show>
-                <Show when={tokenListLoading()}>
-                  <div class="weth-info">
-                    <span class="weth-label">WETH:</span>
-                    <code class="weth-address" title={globalState.hardhat_weth_address}>
-                      {formatAddress(globalState.hardhat_weth_address)}
-                    </code>
-                  </div>
-                  <div class="token-list">
-                    <For each={swapTokenList()}>
-                      {(token) => (
+                ) : (
+                  <>
+                    <div class="weth-info">
+                      <span class="weth-label">WETH:</span>
+                      <code class="weth-address" title={globalState.hardhat_weth_address}>
+                        {formatAddress(globalState.hardhat_weth_address)}
+                      </code>
+                    </div>
+                    <div class="token-list">
+                      {swapTokenList().map((token) => (
                         <div class="token-list-item">
-                          <div class="token-icon-small">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                              <circle cx="12" cy="12" r="10"/>
-                            </svg>
-                          </div>
                           <span class="token-name-small">{token.name || 'Token'}</span>
                           <code class="token-address-small" title={token.address}>
-                            {formatAddress(token.address)}
+                            {token.address}
                           </code>
                         </div>
-                      )}
-                    </For>
-                  </div>
-                </Show>
+                      ))}
+                    </div>
+                  </>
+                )}
               </div>
             </div>
 
@@ -595,39 +605,36 @@ export const Swap: Component = (): JSX.Element => {
                 </div>
               </div>
               <div class="card-body">
-                <Show when={!tokenListLoading()}>
+                {!tokenListLoading() ? (
                   <div class="loading-state">
                     <div class="loading-spinner"></div>
                     <span>Loading...</span>
                   </div>
-                </Show>
-                <Show when={tokenListLoading()}>
+                ) : (
                   <div class="swap-path">
-                    <For each={inputs()}>
-                      {(value, index) => (
-                        <div class="path-item">
-                          <div class="path-number">{index() + 1}</div>
-                          <select
-                            class="swap-select"
-                            onChange={(e) => void handleSelectChange(e, index())}
+                    {inputs().map((value, index) => (
+                      <div class="path-item">
+                        <div class="path-number">{index + 1}</div>
+                        <div class="select-group">
+                          <Form.Select
+                            aria-label={`Select token ${index + 1}`}
+                            onChange={(e) => void handleSelectChange(e, index)}
                             value={value}
                           >
-                            <For each={swapTokenList2()}>
-                              {(token) => (
-                                <option value={token.address}>
-                                  {token.name ? `${token.name} - ` : ''}{formatAddress(token.address)}
-                                </option>
-                              )}
-                            </For>
-                          </select>
-                          <Show when={inputsMsg()[index()]}>
-                            <span class="path-error">{inputsMsg()[index()]}</span>
-                          </Show>
+                            {swapTokenList2().map((token) => (
+                              <option value={token.address}>
+                                {token.address}
+                              </option>
+                            ))}
+                          </Form.Select>
                         </div>
-                      )}
-                    </For>
+                        {inputsMsg()[index] && (
+                          <span class="path-error">{inputsMsg()[index]}</span>
+                        )}
+                      </div>
+                    ))}
                   </div>
-                </Show>
+                )}
               </div>
             </div>
 
@@ -637,55 +644,56 @@ export const Swap: Component = (): JSX.Element => {
                 <h3>Estimate Amount</h3>
               </div>
               <div class="card-body">
-                <Show when={!tokenListLoading()}>
+                {!tokenListLoading() ? (
                   <div class="loading-state">
                     <div class="loading-spinner"></div>
                     <span>Loading...</span>
                   </div>
-                </Show>
-                <Show when={tokenListLoading()}>
-                  <div class="input-group">
-                    <label>Input Amount (wei)</label>
-                    <input
-                      type="text"
-                      class="swap-input"
-                      onInput={(e) => void handleInputAmountChange(e)}
-                      placeholder="Enter amount to swap"
-                    />
-                    <span class="input-hint">{msg()}</span>
-                  </div>
+                ) : (
+                  <>
+                    <div class="input-group">
+                      <label>Input Amount (wei)</label>
+                      <input
+                        type="text"
+                        class="swap-input"
+                        onInput={(e) => void handleInputAmountChange(e)}
+                        placeholder="Enter amount to swap"
+                      />
+                      <span class="input-hint">{msg()}</span>
+                    </div>
 
-                  <div class="conversion-tool">
-                    <label class="conversion-label">Unit Converter</label>
-                    <div class="conversion-inputs">
-                      <div class="conversion-input">
-                        <span class="unit-label">ETH</span>
-                        <input
-                          type="text"
-                          class="swap-input"
-                          value={eth()}
-                          onInput={handleEth}
-                          placeholder="0"
-                        />
-                      </div>
-                      <div class="conversion-arrow">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                          <path d="M8 7l-5 5 5 5M16 7l5 5-5 5"/>
-                        </svg>
-                      </div>
-                      <div class="conversion-input">
-                        <span class="unit-label">WEI</span>
-                        <input
-                          type="text"
-                          class="swap-input"
-                          value={wei()}
-                          onInput={handleWei}
-                          placeholder="0"
-                        />
+                    <div class="conversion-tool">
+                      <label class="conversion-label">Unit Converter</label>
+                      <div class="conversion-inputs">
+                        <div class="conversion-input">
+                          <span class="unit-label">ETH</span>
+                          <input
+                            type="text"
+                            class="swap-input"
+                            value={eth()}
+                            onInput={handleEth}
+                            placeholder="0"
+                          />
+                        </div>
+                        <div class="conversion-arrow">
+                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M8 7l-5 5 5 5M16 7l5 5-5 5"/>
+                          </svg>
+                        </div>
+                        <div class="conversion-input">
+                          <span class="unit-label">WEI</span>
+                          <input
+                            type="text"
+                            class="swap-input"
+                            value={wei()}
+                            onInput={handleWei}
+                            placeholder="0"
+                          />
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </Show>
+                  </>
+                )}
               </div>
             </div>
 
@@ -695,57 +703,50 @@ export const Swap: Component = (): JSX.Element => {
                 <h3>Calculation Results</h3>
               </div>
               <div class="card-body">
-                <Show when={calculationLoading()}>
+                {calculationLoading() ? (
                   <div class="loading-state">
                     <div class="loading-spinner"></div>
                     <span>Waiting for input...</span>
                   </div>
-                </Show>
-                <Show when={!calculationLoading() && !isCalculated()}>
+                ) : !isCalculated() ? (
                   <div class="loading-state">
                     <div class="loading-spinner"></div>
                     <span>Calculating...</span>
                   </div>
-                </Show>
-                <Show when={!calculationLoading() && isCalculated()}>
-                  <Show when={estimateError() !== ''}>
-                    <div class="estimate-error">
-                      <p>{estimateError()}</p>
-                    </div>
-                  </Show>
-                  <Show when={estimateError() === ''}>
-                    <div class="results-table-container">
-                      <For each={estimateResult()}>
-                        {(value: any, index) => (
-                          <div class="result-table">
-                            <div class="table-header">
-                              <span>Swap Step {index() + 1}</span>
-                            </div>
-                            <div class="table-row">
-                              <div class="table-cell header">Token</div>
-                              <div class="table-cell">
-                                <code title={value.token0}>{formatAddress(value.token0)}</code>
-                              </div>
-                              <div class="table-cell">
-                                <code title={value.token1}>{formatAddress(value.token1)}</code>
-                              </div>
-                            </div>
-                            <div class="table-row">
-                              <div class="table-cell header">Reserve</div>
-                              <div class="table-cell">{value.reserve0}</div>
-                              <div class="table-cell">{value.reserve1}</div>
-                            </div>
-                            <div class="table-row highlight">
-                              <div class="table-cell header">Change</div>
-                              <div class="table-cell positive">+{value.input}</div>
-                              <div class="table-cell negative">-{value.output}</div>
-                            </div>
+                ) : estimateError() !== '' ? (
+                  <div class="estimate-error">
+                    <p>{estimateError()}</p>
+                  </div>
+                ) : (
+                  <div class="results-table-container">
+                    {estimateResult().map((value: any, index) => (
+                      <div class="result-table">
+                        <div class="table-header">
+                          <span>Swap Step {index + 1}</span>
+                        </div>
+                        <div class="table-row">
+                          <div class="table-cell header">Token</div>
+                          <div class="table-cell">
+                            <code title={value.token0}>{formatAddress(value.token0)}</code>
                           </div>
-                        )}
-                      </For>
-                    </div>
-                  </Show>
-                </Show>
+                          <div class="table-cell">
+                            <code title={value.token1}>{formatAddress(value.token1)}</code>
+                          </div>
+                        </div>
+                        <div class="table-row">
+                          <div class="table-cell header">Reserve</div>
+                          <div class="table-cell">{value.reserve0}</div>
+                          <div class="table-cell">{value.reserve1}</div>
+                        </div>
+                        <div class="table-row highlight">
+                          <div class="table-cell header">Change</div>
+                          <div class="table-cell positive">+{value.input}</div>
+                          <div class="table-cell negative">-{value.output}</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
 
@@ -769,7 +770,7 @@ export const Swap: Component = (): JSX.Element => {
                 </div>
               </div>
               <div class="card-body">
-                <Show when={!isAccount()}>
+                {!isAccount() ? (
                   <div class="no-account">
                     <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                       <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
@@ -777,39 +778,35 @@ export const Swap: Component = (): JSX.Element => {
                     </svg>
                     <span>Please select an account to swap</span>
                   </div>
-                </Show>
-                <Show when={isAccount() && !tokenListLoading()}>
+                ) : !tokenListLoading() ? (
                   <div class="loading-state">
                     <div class="loading-spinner"></div>
                     <span>Loading...</span>
                   </div>
-                </Show>
-                <Show when={isAccount() && tokenListLoading()}>
+                ) : (
                   <div class="execute-swap-form">
                     <div class="execute-swap-path">
-                      <For each={inputsR()}>
-                        {(value, index) => (
-                          <div class="path-item">
-                            <div class="path-number">{index() + 1}</div>
-                            <select
-                              class="swap-select"
-                              onChange={(e) => handleSelectChangeR(e, index())}
+                      {inputsR().map((value, index) => (
+                        <div class="path-item">
+                          <div class="path-number">{index + 1}</div>
+                          <div class="select-group">
+                            <Form.Select
+                              aria-label={`Select token ${index + 1}`}
+                              onChange={(e) => handleSelectChangeR(e, index)}
                               value={value}
                             >
-                              <For each={swapTokenList2()}>
-                                {(token) => (
-                                  <option value={token.address}>
-                                    {token.name ? `${token.name} - ` : ''}{formatAddress(token.address)}
-                                  </option>
-                                )}
-                              </For>
-                            </select>
-                            <Show when={inputsMsgR()[index()]}>
-                              <span class="path-error">{inputsMsgR()[index()]}</span>
-                            </Show>
+                              {swapTokenList2().map((token) => (
+                                <option value={token.address}>
+                                  {token.address}
+                                </option>
+                              ))}
+                            </Form.Select>
                           </div>
-                        )}
-                      </For>
+                          {inputsMsgR()[index] && (
+                            <span class="path-error">{inputsMsgR()[index]}</span>
+                          )}
+                        </div>
+                      ))}
                     </div>
                     <div class="execute-swap-input">
                       <div class="input-group">
@@ -827,20 +824,20 @@ export const Swap: Component = (): JSX.Element => {
                       <button class="submit-btn" onClick={handleSubmit}>
                         Swap Tokens
                       </button>
-                      <Show when={resultMsg()}>
+                      {resultMsg() && (
                         <p class="result-msg error">{resultMsg()}</p>
-                      </Show>
+                      )}
                     </div>
                   </div>
-                </Show>
+                )}
               </div>
             </div>
           </div>
-        </Show>
+        )}
       </div>
 
       {/* Confirmation Modal */}
-      <Show when={lmodal()}>
+      {lmodal() && (
         <div class="modal-overlay">
           <div class="modal-content">
             <div class="modal-header">
@@ -854,45 +851,46 @@ export const Swap: Component = (): JSX.Element => {
             <div class="modal-body">
               <div class="swap-path-preview">
                 <span class="path-label">Swap Path</span>
-                <For each={inputsR()}>
-                  {(value, index) => (
-                    <div class="path-preview-item">
-                      <span class="path-index">{index() + 1}</span>
-                      <code title={value}>{formatAddress(value)}</code>
-                    </div>
-                  )}
-                </For>
+                {inputsR().map((value, index) => (
+                  <div class="path-preview-item">
+                    <span class="path-index">{index + 1}</span>
+                    <code title={value}>{formatAddress(value)}</code>
+                  </div>
+                ))}
               </div>
               <div class="confirm-item">
                 <span class="confirm-label">Input Amount</span>
                 <span class="confirm-value amount">{inputAmountR()}</span>
               </div>
 
-              <Show when={isResult()}>
+              {isResult() && (
                 <div class={`transaction-result ${goChart() ? 'success' : 'error'}`}>
                   <p>{result()}</p>
                 </div>
-              </Show>
+              )}
             </div>
             <div class="modal-footer">
-              <Show when={!isResult()}>
-                <button class="modal-btn cancel" onClick={handleCancel}>Cancel</button>
-                <button class="modal-btn confirm" onClick={() => void handleSubmitR()}>
-                  Confirm Swap
-                </button>
-              </Show>
-              <Show when={isResult()}>
-                <button class="modal-btn cancel" onClick={handleCancel}>Close</button>
-                <Show when={goChart()}>
-                  <button class="modal-btn confirm" onClick={handleGoChart}>
-                    View Chart
+              {!isResult() ? (
+                <>
+                  <button class="modal-btn cancel" onClick={handleCancel}>Cancel</button>
+                  <button class="modal-btn confirm" onClick={() => void handleSubmitR()}>
+                    Confirm Swap
                   </button>
-                </Show>
-              </Show>
+                </>
+              ) : (
+                <>
+                  <button class="modal-btn cancel" onClick={handleCancel}>Close</button>
+                  {goChart() && (
+                    <button class="modal-btn confirm" onClick={handleGoChart}>
+                      View Chart
+                    </button>
+                  )}
+                </>
+              )}
             </div>
           </div>
         </div>
-      </Show>
+      )}
     </div>
   );
 };

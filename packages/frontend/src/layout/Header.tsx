@@ -1,7 +1,6 @@
 import { type Component, type JSX } from 'solid-js';
 import { createSignal, createEffect, onMount, For } from 'solid-js';
 import { useNavigate, useLocation } from '@solidjs/router';
-import axios from 'axios';
 import { getClientList } from '../account/Account.axios';
 import {
   setFromHeaderNavigate,
@@ -21,7 +20,6 @@ import { globalState } from '../global/constants';
 
 const Header: Component = (): JSX.Element => {
   const apiUrl = globalState.api_url;
-  const ingressURL = globalState.ingress_reverse_proxy_url;
 
   const location = useLocation();
   // navigate
@@ -533,16 +531,15 @@ const Header: Component = (): JSX.Element => {
     }
   });
 
-  const [count, setCount] = createSignal(0);
   const [accountList, setAccountList] = createSignal([]);
   onMount(() => {
     async function fetchData(): Promise<void> {
-      const res = await getClientList(apiUrl, { network: 'hardhat' });
-      setAccountList(res);
-
-      const res2 = await axios.get(`${ingressURL}/redis-tcp/real`);
-      setCount(res2.data);
-      console.log('Real-time visitors: ', count());
+      try {
+        const res = await getClientList(apiUrl, { network: 'hardhat' });
+        setAccountList(res);
+      } catch (err) {
+        console.log('Failed to fetch account list');
+      }
     }
     void fetchData();
   });
